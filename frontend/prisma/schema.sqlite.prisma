@@ -1,0 +1,239 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id               String   @id @default(cuid())
+  name             String
+  logoUrl          String?
+  address          String?
+  taxNumber        String?
+  bankDetails      String?
+  subscriptionPlan String   @default("FREE")
+  status           String   @default("ACTIVE")
+  createdAt        DateTime @default(now())
+
+  users            User[]
+  projects         Project[]
+  clients          Client[]
+}
+
+model User {
+  id           String   @id @default(cuid())
+  companyId    String
+  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name         String
+  email        String   @unique
+  phone        String?
+  passwordHash String?
+  role         String   // SUPER_ADMIN | ADMIN | ENGINEER | LABOUR | CLIENT
+  status       String   @default("ACTIVE")
+  avatarUrl    String?
+  createdAt    DateTime @default(now())
+
+  projectTeams ProjectTeam[]
+}
+
+model Project {
+  id           String        @id @default(cuid())
+  companyId    String
+  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  clientId     String
+  client       Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  name         String
+  startDate    DateTime
+  endDate      DateTime?
+  budget       Decimal
+  status       String        @default("PLANNED") // PLANNED | IN_PROGRESS | ON_HOLD | COMPLETED | CANCELLED
+  priority     String        @default("MEDIUM")
+  progressPct  Int           @default(0)
+  createdAt    DateTime      @default(now())
+
+  team         ProjectTeam[]
+  expenses     Expense[]
+  quotations   Quotation[]
+  invoices     Invoice[]
+
+  @@index([companyId])
+  @@index([clientId])
+}
+
+model ProjectTeam {
+  id            String  @id @default(cuid())
+  projectId     String
+  project       Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roleOnProject String
+
+  @@unique([projectId, userId])
+}
+
+model Client {
+  id        String    @id @default(cuid())
+  companyId String
+  company   Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name      String
+  contact   String?
+  email     String?
+  address   String?
+  createdAt DateTime  @default(now())
+
+  projects  Project[]
+
+  @@index([companyId])
+}
+
+model Attendance {
+  id        String   @id @default(cuid())
+  userId    String
+  projectId String
+  date      DateTime
+  status    String   // PRESENT | ABSENT | LATE | HALF_DAY
+  method    String   // QR | MANUAL
+  markedBy  String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([projectId])
+  @@index([date])
+}
+
+model Material {
+  id           String   @id @default(cuid())
+  companyId    String
+  name         String
+  unit         String
+  stockQty     Decimal
+  reorderLevel Decimal
+  supplierId   String?
+  createdAt    DateTime @default(now())
+
+  @@index([companyId])
+}
+
+model Expense {
+  id        String   @id @default(cuid())
+  companyId String
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  category  String   // FUEL | SALARY | MATERIAL | TRANSPORT | MISC
+  amount    Decimal
+  date      DateTime
+  addedById String
+  note      String?
+  createdAt DateTime @default(now())
+
+  @@index([companyId])
+  @@index([projectId])
+}
+
+model Quotation {
+  id        String   @id @default(cuid())
+  companyId String
+  clientId  String
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  items     String   // JSON string
+  gstPct    Decimal  @default(0)
+  discount  Decimal  @default(0)
+  notes     String?
+  status    String   @default("DRAFT") // DRAFT | SENT | APPROVED | REJECTED
+  pdfUrl    String?
+  version   Int      @default(1)
+  createdAt DateTime @default(now())
+
+  invoices  Invoice[]
+
+  @@index([companyId])
+  @@index([clientId])
+}
+
+model Invoice {
+  id          String    @id @default(cuid())
+  companyId   String
+  clientId    String
+  projectId   String?
+  project     Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  quotationId String?
+  quotation   Quotation? @relation(fields: [quotationId], references: [id], onDelete: SetNull)
+  amount      Decimal
+  status      String    @default("PENDING") // PAID | PENDING | PARTIAL | VOIDED
+  dueDate     DateTime?
+  pdfUrl      String?
+  version     Int       @default(1)
+  createdAt   DateTime  @default(now())
+
+  payments    Payment[]
+
+  @@index([companyId])
+  @@index([clientId])
+}
+
+model Payment {
+  id        String   @id @default(cuid())
+  invoiceId String
+  invoice   Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  amount    Decimal
+  method    String   // CASH | BANK | JAZZCASH | EASYPAISA | STRIPE
+  date      DateTime
+  reference String?
+  createdAt DateTime @default(now())
+
+  @@index([invoiceId])
+}
+
+model Document {
+  id           String   @id @default(cuid())
+  companyId    String
+  projectId    String?
+  type         String   // PDF | IMAGE | VIDEO | CONTRACT
+  url          String
+  uploadedById String
+  createdAt    DateTime @default(now())
+
+  @@index([companyId])
+  @@index([projectId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // EMAIL | SMS | PUSH
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model ActivityLog {
+  id         String   @id @default(cuid())
+  companyId  String
+  userId     String
+  action     String
+  entityType String
+  entityId   String
+  meta       String?  // JSON string
+  createdAt  DateTime @default(now())
+
+  @@index([companyId])
+  @@index([userId])
+}
+
+model DailyReport {
+  id                String   @id @default(cuid())
+  projectId         String
+  engineerId        String
+  rawInput          String
+  aiGeneratedReport String
+  date              DateTime @default(now())
+
+  @@index([projectId])
+  @@index([engineerId])
+}

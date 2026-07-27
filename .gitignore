@@ -1,0 +1,83 @@
+# Node Modules & Dependencies
+node_modules/
+frontend/node_modules/
+.npm/
+.npm_cache_temp/
+.cache/
+npm-cache/
+*.cache
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# Next.js Build Outputs & Turbopack Cache
+.next/
+frontend/.next/
+out/
+frontend/out/
+build/
+dist/
+.turbo/
+*.tsbuildinfo
+
+# SQLite Local Databases & Temp Files
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+dev.db
+frontend/dev.db
+frontend/prisma/dev.db
+frontend/prisma/*.db*
+
+# Environment Secret Files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+
+# Logs & Traces
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Python Virtual Envs & Bytecode
+venv/
+.venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# OS & Editor Specific Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.suo
+*.sln
+*.sw?
+
+# Tooling & CLI Scratch Artifacts
+.gemini/
+scratch/
+.system_generated/
