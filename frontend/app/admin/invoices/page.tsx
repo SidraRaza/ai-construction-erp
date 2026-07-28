@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/navigation/sidebar";
 import { Header } from "@/components/navigation/header";
 import { useToast } from "@/components/ui/toast-provider";
-import { Receipt, FileText, CheckCircle, RefreshCw, Plus, Bot, Edit, DollarSign, CreditCard, ShieldCheck, Wallet } from "lucide-react";
+import { Receipt, FileText, CheckCircle, RefreshCw, Plus, Bot, Edit, DollarSign, CreditCard, ShieldCheck, Wallet, ArrowUpRight } from "lucide-react";
 
 export default function FinancialsPage() {
   const { showToast } = useToast();
@@ -35,7 +35,7 @@ export default function FinancialsPage() {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [payClientName, setPayClientName] = useState("");
   const [payProjectId, setPayProjectId] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("CASH"); // CASH | BANK | CHEQUE | JAZZCASH | EASYPAISA | STRIPE
+  const [paymentMethod, setPaymentMethod] = useState("CASH");
   const [paymentAmount, setPaymentAmount] = useState("");
   const [receiptReference, setReceiptReference] = useState("");
 
@@ -199,95 +199,124 @@ export default function FinancialsPage() {
         <Header userName="Sarah Admin" userRole="Company Admin" />
 
         <main className="p-8 space-y-6 flex-1 overflow-y-auto">
-          {/* Header Banner */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-amber-500/15 via-orange-500/5 to-slate-900 p-6 rounded-3xl border border-amber-500/25 shadow-xl">
-            <div>
-              <h2 className="text-2xl font-bold tracking-tight text-white flex items-center gap-3">
-                <Receipt className="w-7 h-7 text-amber-400" /> Financial Billing & Payments Engine
+          {/* Header Banner with Premium UI Styling */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-gradient-to-r from-slate-900 via-amber-950/20 to-slate-900 p-6 rounded-3xl border border-amber-500/20 shadow-2xl backdrop-blur-xl">
+            <div className="space-y-1">
+              <h2 className="text-2xl font-extrabold tracking-tight text-white flex items-center gap-3">
+                <Receipt className="w-8 h-8 text-amber-400 p-1.5 bg-amber-500/10 rounded-2xl border border-amber-500/20 shadow-inner" />
+                Financial Billing & Payments Engine
               </h2>
-              <p className="text-sm text-slate-400 mt-1">Quotations, invoices, and direct payment tracking (Cash, Bank Cheque, JazzCash, EasyPaisa).</p>
+              <p className="text-xs text-slate-400 font-medium">Manage quotations, versioned invoices, and multi-channel payment records.</p>
             </div>
+
+            {/* Action Buttons Toolbar */}
             <div className="flex items-center gap-3 flex-wrap">
               <button
                 onClick={fetchFinancials}
-                className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-semibold hover:border-amber-500"
+                title="Refresh Financial Data"
+                className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 text-slate-400 hover:text-amber-400 hover:border-amber-500/40 hover:bg-slate-800 transition-all duration-200 shadow-md active:scale-95"
               >
-                <RefreshCw className={`w-4 h-4 text-amber-400 ${isLoading ? "animate-spin" : ""}`} />
+                <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin text-amber-400" : ""}`} />
               </button>
+
               <button
                 onClick={() => setIsQuotationModalOpen(true)}
-                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold text-xs shadow-lg hover:brightness-110 flex items-center gap-2"
+                className="px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white font-bold text-xs tracking-wide shadow-lg shadow-amber-500/20 hover:shadow-amber-500/35 hover:brightness-110 active:scale-95 transition-all duration-200 flex items-center gap-2 border border-amber-400/30"
               >
-                <Plus className="w-4 h-4" /> Create Quotation
+                <Plus className="w-4 h-4 stroke-[3]" /> Create Quotation
               </button>
+
               <button
                 onClick={() => setIsPaymentModalOpen(true)}
-                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold text-xs shadow-lg hover:brightness-110 flex items-center gap-2"
+                className="px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 text-white font-bold text-xs tracking-wide shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/35 hover:brightness-110 active:scale-95 transition-all duration-200 flex items-center gap-2 border border-emerald-400/30"
               >
-                <CreditCard className="w-4 h-4" /> + Record Payment
+                <CreditCard className="w-4 h-4 stroke-[2.5]" /> + Record Payment
               </button>
             </div>
           </div>
 
-          {/* Navigation Tab Switcher */}
-          <div className="flex items-center gap-3 border-b border-slate-800 pb-3">
+          {/* Premium Segmented Tab Switcher */}
+          <div className="bg-slate-900/70 p-1.5 rounded-2xl border border-slate-800/80 inline-flex items-center gap-1 shadow-lg backdrop-blur-md">
             <button
               onClick={() => setActiveTab("quotations")}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+              className={`px-5 py-2.5 rounded-xl text-xs font-extrabold transition-all duration-200 flex items-center gap-2.5 ${
                 activeTab === "quotations"
-                  ? "bg-amber-500/20 text-amber-400 border border-amber-500/30 shadow-md"
-                  : "text-slate-400 hover:bg-slate-800"
+                  ? "bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-400 border border-amber-500/40 shadow-md"
+                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
               }`}
             >
-              <FileText className="w-4 h-4" /> Project Quotations ({quotations.length})
+              <FileText className="w-4 h-4" /> Project Quotations
+              <span className="px-2 py-0.5 rounded-full text-[10px] bg-slate-950 border border-slate-800 text-amber-400 font-mono">
+                {quotations.length}
+              </span>
             </button>
+
             <button
               onClick={() => setActiveTab("invoices")}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+              className={`px-5 py-2.5 rounded-xl text-xs font-extrabold transition-all duration-200 flex items-center gap-2.5 ${
                 activeTab === "invoices"
-                  ? "bg-amber-500/20 text-amber-400 border border-amber-500/30 shadow-md"
-                  : "text-slate-400 hover:bg-slate-800"
+                  ? "bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-400 border border-amber-500/40 shadow-md"
+                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
               }`}
             >
-              <Receipt className="w-4 h-4" /> Invoices ({invoices.length})
+              <Receipt className="w-4 h-4" /> Invoices
+              <span className="px-2 py-0.5 rounded-full text-[10px] bg-slate-950 border border-slate-800 text-amber-400 font-mono">
+                {invoices.length}
+              </span>
             </button>
+
             <button
               onClick={() => setActiveTab("payments")}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+              className={`px-5 py-2.5 rounded-xl text-xs font-extrabold transition-all duration-200 flex items-center gap-2.5 ${
                 activeTab === "payments"
-                  ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-md"
-                  : "text-slate-400 hover:bg-slate-800"
+                  ? "bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-400 border border-emerald-500/40 shadow-md"
+                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
               }`}
             >
-              <Wallet className="w-4 h-4" /> Payments Received ({payments.length})
+              <Wallet className="w-4 h-4" /> Payments Received
+              <span className="px-2 py-0.5 rounded-full text-[10px] bg-slate-950 border border-slate-800 text-emerald-400 font-mono">
+                {payments.length}
+              </span>
             </button>
           </div>
 
           {/* Quotations View */}
           {activeTab === "quotations" && (
-            <div className="bg-slate-900/60 rounded-3xl border border-slate-800 p-6 space-y-4 shadow-xl backdrop-blur-md">
+            <div className="bg-slate-900/60 rounded-3xl border border-slate-800/80 p-6 space-y-4 shadow-xl backdrop-blur-md">
               <div className="flex items-center justify-between">
-                <h3 className="text-base font-bold text-white">Prisma DB Quotations</h3>
-                <span className="text-xs text-slate-400">Rule: AI Drafts require Admin Approval (Constitution §2.3)</span>
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-amber-400" /> Prisma DB Quotations
+                </h3>
+                <span className="text-xs text-slate-400 font-medium">Rule: AI Drafts require Admin Approval (Constitution §2.3)</span>
               </div>
 
               {quotations.length === 0 ? (
-                <div className="py-12 flex flex-col items-center justify-center text-center space-y-3 border-2 border-dashed border-slate-800 rounded-2xl">
-                  <FileText className="w-10 h-10 text-slate-600" />
-                  <h4 className="text-sm font-bold text-slate-300">No Quotations Created in Database Yet</h4>
-                  <p className="text-xs text-slate-500">Click "Create Quotation" to add a new project estimate.</p>
+                <div className="py-16 flex flex-col items-center justify-center text-center space-y-4 border-2 border-dashed border-slate-800/80 rounded-3xl bg-slate-950/40">
+                  <div className="p-4 bg-amber-500/10 rounded-full border border-amber-500/20">
+                    <FileText className="w-10 h-10 text-amber-400" />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="text-base font-bold text-slate-200">No Quotations Created in Database Yet</h4>
+                    <p className="text-xs text-slate-500 max-w-sm">Click the "+ Create Quotation" button above to add a new project estimate.</p>
+                  </div>
+                  <button
+                    onClick={() => setIsQuotationModalOpen(true)}
+                    className="px-4 py-2 rounded-xl bg-amber-500/20 text-amber-400 font-bold text-xs border border-amber-500/30 hover:bg-amber-500/30 transition-all"
+                  >
+                    + Create Quotation Now
+                  </button>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
-                      <tr className="border-b border-slate-800 text-slate-400 font-semibold uppercase">
-                        <th className="py-3 px-4">Quotation ID</th>
-                        <th className="py-3 px-4">Project</th>
-                        <th className="py-3 px-4">Quotation Amount</th>
-                        <th className="py-3 px-4">Type</th>
-                        <th className="py-3 px-4 text-center">Status</th>
-                        <th className="py-3 px-4 text-right">Admin Actions</th>
+                      <tr className="border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
+                        <th className="py-3.5 px-4">Quotation ID</th>
+                        <th className="py-3.5 px-4">Project</th>
+                        <th className="py-3.5 px-4">Quotation Amount</th>
+                        <th className="py-3.5 px-4">Type</th>
+                        <th className="py-3.5 px-4 text-center">Status</th>
+                        <th className="py-3.5 px-4 text-right">Admin Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-800/60">
@@ -300,21 +329,21 @@ export default function FinancialsPage() {
 
                         return (
                           <tr key={q.id} className="hover:bg-slate-800/40 transition-colors">
-                            <td className="py-3.5 px-4 font-semibold font-mono text-amber-400">{q.id}</td>
-                            <td className="py-3.5 px-4 text-slate-400">{q.project?.name || "General Site"}</td>
-                            <td className="py-3.5 px-4 font-bold text-white">${Number(parsedAmount).toLocaleString()}</td>
-                            <td className="py-3.5 px-4">
+                            <td className="py-4 px-4 font-bold font-mono text-amber-400">{q.id}</td>
+                            <td className="py-4 px-4 text-slate-300 font-medium">{q.project?.name || "General Site"}</td>
+                            <td className="py-4 px-4 font-extrabold text-white text-sm">${Number(parsedAmount).toLocaleString()}</td>
+                            <td className="py-4 px-4">
                               {q.status === "DRAFT" ? (
-                                <span className="bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 w-max">
+                                <span className="bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-[10px] font-extrabold px-2.5 py-1 rounded-full flex items-center gap-1 w-max">
                                   <Bot className="w-3 h-3" /> AI DRAFT
                                 </span>
                               ) : (
-                                <span className="text-slate-400">MANUAL</span>
+                                <span className="text-slate-400 font-semibold">MANUAL</span>
                               )}
                             </td>
-                            <td className="py-3.5 px-4 text-center">
+                            <td className="py-4 px-4 text-center">
                               <span
-                                className={`px-3 py-1 rounded-full text-[10px] font-bold border ${
+                                className={`px-3 py-1 rounded-full text-[10px] font-extrabold border ${
                                   q.status === "DRAFT"
                                     ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
                                     : q.status === "SENT" || q.status === "PENDING"
@@ -327,7 +356,7 @@ export default function FinancialsPage() {
                                 {q.status}
                               </span>
                             </td>
-                            <td className="py-3.5 px-4 text-right space-x-2">
+                            <td className="py-4 px-4 text-right">
                               <button
                                 onClick={() => {
                                   setEditingQuotation(q);
@@ -336,9 +365,9 @@ export default function FinancialsPage() {
                                   setEditStatus(q.status);
                                   setEditAmount(String(parsedAmount));
                                 }}
-                                className="px-2.5 py-1 bg-slate-800 text-amber-400 rounded-lg font-semibold hover:bg-slate-700 transition-all border border-slate-700 flex items-center gap-1 ml-auto"
+                                className="px-3.5 py-1.5 bg-slate-800/90 text-amber-400 rounded-xl font-bold hover:bg-amber-500/20 hover:border-amber-500/40 transition-all border border-slate-700/80 inline-flex items-center gap-1.5 shadow-sm active:scale-95"
                               >
-                                <Edit className="w-3 h-3" /> Edit All Fields
+                                <Edit className="w-3.5 h-3.5" /> Edit All Fields
                               </button>
                             </td>
                           </tr>
@@ -353,40 +382,52 @@ export default function FinancialsPage() {
 
           {/* Invoices View */}
           {activeTab === "invoices" && (
-            <div className="bg-slate-900/60 rounded-3xl border border-slate-800 p-6 space-y-4 shadow-xl backdrop-blur-md">
+            <div className="bg-slate-900/60 rounded-3xl border border-slate-800/80 p-6 space-y-4 shadow-xl backdrop-blur-md">
               <div className="flex items-center justify-between">
-                <h3 className="text-base font-bold text-white">Issued Database Invoices</h3>
-                <span className="text-xs text-slate-400">Rule: Immutable; Corrections create Version N+1 (Constitution §2.7)</span>
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <Receipt className="w-5 h-5 text-amber-400" /> Issued Database Invoices
+                </h3>
+                <span className="text-xs text-slate-400 font-medium">Rule: Immutable; Corrections create Version N+1 (Constitution §2.7)</span>
               </div>
 
               {invoices.length === 0 ? (
-                <div className="py-12 flex flex-col items-center justify-center text-center space-y-3 border-2 border-dashed border-slate-800 rounded-2xl">
-                  <Receipt className="w-10 h-10 text-slate-600" />
-                  <h4 className="text-sm font-bold text-slate-300">No Invoices Issued in Database Yet</h4>
-                  <p className="text-xs text-slate-500">Click "+ Record Payment" above to create a payment or invoice directly.</p>
+                <div className="py-16 flex flex-col items-center justify-center text-center space-y-4 border-2 border-dashed border-slate-800/80 rounded-3xl bg-slate-950/40">
+                  <div className="p-4 bg-emerald-500/10 rounded-full border border-emerald-500/20">
+                    <Receipt className="w-10 h-10 text-emerald-400" />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="text-base font-bold text-slate-200">No Invoices Issued in Database Yet</h4>
+                    <p className="text-xs text-slate-500 max-w-sm">Click "+ Record Payment" above to record a payment or create an invoice.</p>
+                  </div>
+                  <button
+                    onClick={() => setIsPaymentModalOpen(true)}
+                    className="px-4 py-2 rounded-xl bg-emerald-500/20 text-emerald-400 font-bold text-xs border border-emerald-500/30 hover:bg-emerald-500/30 transition-all"
+                  >
+                    + Record Payment / Invoice
+                  </button>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
-                      <tr className="border-b border-slate-800 text-slate-400 font-semibold uppercase">
-                        <th className="py-3 px-4">Invoice #</th>
-                        <th className="py-3 px-4">Version</th>
-                        <th className="py-3 px-4">Project</th>
-                        <th className="py-3 px-4">Amount</th>
-                        <th className="py-3 px-4 text-center">Status</th>
+                      <tr className="border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
+                        <th className="py-3.5 px-4">Invoice #</th>
+                        <th className="py-3.5 px-4">Version</th>
+                        <th className="py-3.5 px-4">Project</th>
+                        <th className="py-3.5 px-4">Amount</th>
+                        <th className="py-3.5 px-4 text-center">Status</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-800/60">
                       {invoices.map((inv) => (
                         <tr key={inv.id} className="hover:bg-slate-800/40 transition-colors">
-                          <td className="py-3.5 px-4 font-mono font-semibold text-amber-400">{inv.id}</td>
-                          <td className="py-3.5 px-4 font-bold text-slate-300">v{inv.version || 1}.0</td>
-                          <td className="py-3.5 px-4 font-semibold text-slate-100">{inv.project?.name || "Site Project"}</td>
-                          <td className="py-3.5 px-4 font-bold text-white">${Number(inv.amount || 0).toLocaleString()}</td>
-                          <td className="py-3.5 px-4 text-center">
+                          <td className="py-4 px-4 font-bold font-mono text-amber-400">{inv.id}</td>
+                          <td className="py-4 px-4 font-bold text-slate-300">v{inv.version || 1}.0</td>
+                          <td className="py-4 px-4 font-medium text-slate-100">{inv.project?.name || "Site Project"}</td>
+                          <td className="py-4 px-4 font-extrabold text-white text-sm">${Number(inv.amount || 0).toLocaleString()}</td>
+                          <td className="py-4 px-4 text-center">
                             <span
-                              className={`px-3 py-1 rounded-full text-[10px] font-bold border ${
+                              className={`px-3 py-1 rounded-full text-[10px] font-extrabold border ${
                                 inv.status === "PAID"
                                   ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
                                   : inv.status === "PENDING"
@@ -408,42 +449,52 @@ export default function FinancialsPage() {
 
           {/* Payments Received View */}
           {activeTab === "payments" && (
-            <div className="bg-slate-900/60 rounded-3xl border border-slate-800 p-6 space-y-4 shadow-xl backdrop-blur-md">
+            <div className="bg-slate-900/60 rounded-3xl border border-slate-800/80 p-6 space-y-4 shadow-xl backdrop-blur-md">
               <div className="flex items-center justify-between">
                 <h3 className="text-base font-bold text-white flex items-center gap-2">
                   <Wallet className="w-5 h-5 text-emerald-400" /> Database Payments Audit Trail
                 </h3>
                 <button
                   onClick={() => setIsPaymentModalOpen(true)}
-                  className="px-3 py-1.5 bg-emerald-500/20 text-emerald-400 rounded-xl font-semibold border border-emerald-500/30 text-xs"
+                  className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl font-bold text-xs shadow-md hover:brightness-110 transition-all border border-emerald-400/30 flex items-center gap-1.5"
                 >
-                  + Record New Payment
+                  <CreditCard className="w-3.5 h-3.5" /> + Record New Payment
                 </button>
               </div>
 
               {payments.length === 0 ? (
-                <div className="py-12 flex flex-col items-center justify-center text-center space-y-3 border-2 border-dashed border-slate-800 rounded-2xl">
-                  <CreditCard className="w-10 h-10 text-slate-600" />
-                  <h4 className="text-sm font-bold text-slate-300">No Payments Recorded in Database Yet</h4>
-                  <p className="text-xs text-slate-500">Click "+ Record Payment" to record cash, bank wire, cheque, JazzCash, or EasyPaisa payments.</p>
+                <div className="py-16 flex flex-col items-center justify-center text-center space-y-4 border-2 border-dashed border-slate-800/80 rounded-3xl bg-slate-950/40">
+                  <div className="p-4 bg-emerald-500/10 rounded-full border border-emerald-500/20">
+                    <CreditCard className="w-10 h-10 text-emerald-400" />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="text-base font-bold text-slate-200">No Payments Recorded in Database Yet</h4>
+                    <p className="text-xs text-slate-500 max-w-sm">Record cash, bank wire, cheque, JazzCash, or EasyPaisa payments with proof.</p>
+                  </div>
+                  <button
+                    onClick={() => setIsPaymentModalOpen(true)}
+                    className="px-4 py-2 rounded-xl bg-emerald-500/20 text-emerald-400 font-bold text-xs border border-emerald-500/30 hover:bg-emerald-500/30 transition-all"
+                  >
+                    + Record First Payment
+                  </button>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
-                      <tr className="border-b border-slate-800 text-slate-400 font-semibold uppercase">
-                        <th className="py-3 px-4">Payment ID</th>
-                        <th className="py-3 px-4">Method / Type</th>
-                        <th className="py-3 px-4">Amount Received</th>
-                        <th className="py-3 px-4">Cheque # / Receipt Ref</th>
-                        <th className="py-3 px-4 text-right">Date Recorded</th>
+                      <tr className="border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
+                        <th className="py-3.5 px-4">Payment ID</th>
+                        <th className="py-3.5 px-4">Method / Type</th>
+                        <th className="py-3.5 px-4">Amount Received</th>
+                        <th className="py-3.5 px-4">Cheque # / Receipt Ref</th>
+                        <th className="py-3.5 px-4 text-right">Date Recorded</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-800/60">
                       {payments.map((p) => (
                         <tr key={p.id} className="hover:bg-slate-800/40 transition-colors">
-                          <td className="py-3.5 px-4 font-mono font-semibold text-emerald-400">{p.id}</td>
-                          <td className="py-3.5 px-4 font-semibold text-white">
+                          <td className="py-4 px-4 font-bold font-mono text-emerald-400">{p.id}</td>
+                          <td className="py-4 px-4 font-bold text-white">
                             {p.method === "CASH" && "💵 Naqad Cash"}
                             {p.method === "BANK" && "🏦 Bank Wire Transfer"}
                             {p.method === "CHEQUE" && "📜 Bank Cheque / Pay Order"}
@@ -452,9 +503,9 @@ export default function FinancialsPage() {
                             {p.method === "STRIPE" && "💳 Credit Card (Stripe)"}
                             {!["CASH", "BANK", "CHEQUE", "JAZZCASH", "EASYPAISA", "STRIPE"].includes(p.method) && p.method}
                           </td>
-                          <td className="py-3.5 px-4 font-bold text-emerald-400 text-sm">${Number(p.amount).toLocaleString()}</td>
-                          <td className="py-3.5 px-4 font-mono text-slate-300">{p.reference || "Receipt verified"}</td>
-                          <td className="py-3.5 px-4 text-right text-slate-400">{new Date(p.createdAt).toLocaleDateString()}</td>
+                          <td className="py-4 px-4 font-extrabold text-emerald-400 text-sm">${Number(p.amount).toLocaleString()}</td>
+                          <td className="py-4 px-4 font-mono text-slate-300 font-medium">{p.reference || "Receipt verified"}</td>
+                          <td className="py-4 px-4 text-right text-slate-400 font-medium">{new Date(p.createdAt).toLocaleDateString()}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -466,9 +517,14 @@ export default function FinancialsPage() {
 
           {/* New Explicit Quotation Modal */}
           {isQuotationModalOpen && (
-            <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-4 shadow-2xl">
-                <h3 className="text-lg font-bold text-white">Create New Quotation</h3>
+            <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-5 shadow-2xl">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    <Plus className="w-5 h-5 text-amber-400" /> Create New Quotation
+                  </h3>
+                  <button onClick={() => setIsQuotationModalOpen(false)} className="text-slate-400 hover:text-white">✕</button>
+                </div>
                 <form onSubmit={handleCreateQuotation} className="space-y-4">
                   <div>
                     <label className="text-xs font-semibold text-slate-400 block mb-1">Custom Quotation ID (Optional)</label>
@@ -477,7 +533,7 @@ export default function FinancialsPage() {
                       placeholder="e.g. QT-2026-001 (Leave blank to auto-generate)"
                       value={customQuotationId}
                       onChange={(e) => setCustomQuotationId(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
                     />
                   </div>
 
@@ -489,7 +545,7 @@ export default function FinancialsPage() {
                       placeholder="e.g. Acme Real Estate"
                       value={clientName}
                       onChange={(e) => setClientName(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
                     />
                   </div>
 
@@ -498,7 +554,7 @@ export default function FinancialsPage() {
                     <select
                       value={quotationStatus}
                       onChange={(e) => setQuotationStatus(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 font-bold"
                     >
                       <option value="SENT">SENT</option>
                       <option value="PENDING">PENDING</option>
@@ -513,7 +569,7 @@ export default function FinancialsPage() {
                     <select
                       value={selectedProjectId}
                       onChange={(e) => setSelectedProjectId(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
                     >
                       <option value="">General Site (No specific project)</option>
                       {projects.map((p) => (
@@ -532,7 +588,7 @@ export default function FinancialsPage() {
                       placeholder="340000"
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 font-bold"
                     />
                   </div>
 
@@ -543,7 +599,7 @@ export default function FinancialsPage() {
                       placeholder="e.g. Structural steel & concrete work estimation"
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
                     />
                   </div>
 
@@ -551,13 +607,13 @@ export default function FinancialsPage() {
                     <button
                       type="button"
                       onClick={() => setIsQuotationModalOpen(false)}
-                      className="px-4 py-2 rounded-xl bg-slate-800 text-xs font-semibold text-slate-300 hover:bg-slate-700"
+                      className="px-4 py-2.5 rounded-xl bg-slate-800 text-xs font-bold text-slate-300 hover:bg-slate-700"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-xs font-semibold text-white shadow-lg hover:brightness-110"
+                      className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-xs font-bold text-white shadow-lg hover:brightness-110"
                     >
                       Save Quotation
                     </button>
@@ -569,11 +625,14 @@ export default function FinancialsPage() {
 
           {/* Record Direct Payment Modal */}
           {isPaymentModalOpen && (
-            <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-4 shadow-2xl">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <CreditCard className="w-5 h-5 text-emerald-400" /> Record New Payment
-                </h3>
+            <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-5 shadow-2xl">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    <CreditCard className="w-5 h-5 text-emerald-400" /> Record New Payment
+                  </h3>
+                  <button onClick={() => setIsPaymentModalOpen(false)} className="text-slate-400 hover:text-white">✕</button>
+                </div>
                 <form onSubmit={handleRecordPayment} className="space-y-4">
                   <div>
                     <label className="text-xs font-semibold text-slate-400 block mb-1">Client Name *</label>
@@ -582,7 +641,7 @@ export default function FinancialsPage() {
                       placeholder="e.g. Acme Real Estate"
                       value={payClientName}
                       onChange={(e) => setPayClientName(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500"
                     />
                   </div>
 
@@ -591,7 +650,7 @@ export default function FinancialsPage() {
                     <select
                       value={payProjectId}
                       onChange={(e) => setPayProjectId(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500"
                     >
                       <option value="">General Site (No specific project)</option>
                       {projects.map((p) => (
@@ -607,7 +666,7 @@ export default function FinancialsPage() {
                     <select
                       value={paymentMethod}
                       onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-semibold"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500 font-bold"
                     >
                       <option value="CASH">💵 Naqad Cash (Physical Cash Handover)</option>
                       <option value="BANK">🏦 Bank Wire / Direct Online Transfer</option>
@@ -626,7 +685,7 @@ export default function FinancialsPage() {
                       placeholder="e.g. 50000"
                       value={paymentAmount}
                       onChange={(e) => setPaymentAmount(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-bold"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500 font-extrabold"
                     />
                   </div>
 
@@ -637,7 +696,7 @@ export default function FinancialsPage() {
                       placeholder="e.g. Cheque #884920 / TRX-9988231 / Bank Slip"
                       value={receiptReference}
                       onChange={(e) => setReceiptReference(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500"
                     />
                   </div>
 
@@ -645,13 +704,13 @@ export default function FinancialsPage() {
                     <button
                       type="button"
                       onClick={() => setIsPaymentModalOpen(false)}
-                      className="px-4 py-2 rounded-xl bg-slate-800 text-xs font-semibold text-slate-300 hover:bg-slate-700"
+                      className="px-4 py-2.5 rounded-xl bg-slate-800 text-xs font-bold text-slate-300 hover:bg-slate-700"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-xs font-semibold text-white shadow-lg hover:brightness-110"
+                      className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-xs font-bold text-white shadow-lg hover:brightness-110"
                     >
                       Save Payment to Database
                     </button>
@@ -663,11 +722,14 @@ export default function FinancialsPage() {
 
           {/* Edit Quotation Modal */}
           {editingQuotation && (
-            <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-4 shadow-2xl">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <Edit className="w-5 h-5 text-amber-400" /> Edit All Quotation Fields
-                </h3>
+            <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-5 shadow-2xl">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    <Edit className="w-5 h-5 text-amber-400" /> Edit All Quotation Fields
+                  </h3>
+                  <button onClick={() => setEditingQuotation(null)} className="text-slate-400 hover:text-white">✕</button>
+                </div>
                 <form onSubmit={handleUpdateQuotation} className="space-y-4">
                   <div>
                     <label className="text-xs font-semibold text-slate-400 block mb-1">Quotation ID</label>
@@ -675,7 +737,7 @@ export default function FinancialsPage() {
                       type="text"
                       value={editQuotationId}
                       onChange={(e) => setEditQuotationId(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
                     />
                   </div>
 
@@ -684,7 +746,7 @@ export default function FinancialsPage() {
                     <select
                       value={editProjectId}
                       onChange={(e) => setEditProjectId(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
                     >
                       <option value="">General Site (No specific project)</option>
                       {projects.map((p) => (
@@ -700,7 +762,7 @@ export default function FinancialsPage() {
                     <select
                       value={editStatus}
                       onChange={(e) => setEditStatus(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500 font-bold"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 font-bold"
                     >
                       <option value="SENT">SENT</option>
                       <option value="PENDING">PENDING</option>
@@ -716,7 +778,7 @@ export default function FinancialsPage() {
                       type="number"
                       value={editAmount}
                       onChange={(e) => setEditAmount(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500 font-bold"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 font-extrabold"
                     />
                   </div>
 
@@ -724,13 +786,13 @@ export default function FinancialsPage() {
                     <button
                       type="button"
                       onClick={() => setEditingQuotation(null)}
-                      className="px-4 py-2 rounded-xl bg-slate-800 text-xs font-semibold text-slate-300 hover:bg-slate-700"
+                      className="px-4 py-2.5 rounded-xl bg-slate-800 text-xs font-bold text-slate-300 hover:bg-slate-700"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-xs font-semibold text-white shadow-lg hover:brightness-110"
+                      className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-xs font-bold text-white shadow-lg hover:brightness-110"
                     >
                       Save Changes to Database
                     </button>
