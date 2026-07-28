@@ -11,8 +11,8 @@ export async function GET(req: NextRequest) {
       include: {
         invoice: {
           include: {
-            client: true,
             project: true,
+            quotation: true,
           },
         },
       },
