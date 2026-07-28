@@ -12,6 +12,7 @@ model Company {
   name             String
   logoUrl          String?
   address          String?
+  country          String?  @default("Pakistan")
   taxNumber        String?
   bankDetails      String?
   subscriptionPlan String   @default("FREE")
@@ -58,100 +59,100 @@ model Project {
   expenses     Expense[]
   quotations   Quotation[]
   invoices     Invoice[]
-
-  @@index([companyId])
-  @@index([clientId])
 }
 
 model ProjectTeam {
-  id            String  @id @default(cuid())
-  projectId     String
-  project       Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  userId        String
-  user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  roleOnProject String
-
-  @@unique([projectId, userId])
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      String   // SITE_ENGINEER | MASON_LEAD | FOREMAN | WORKER
+  assignedAt DateTime @default(now())
 }
 
 model Client {
-  id        String    @id @default(cuid())
-  companyId String
-  company   Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  name      String
-  contact   String?
-  email     String?
-  address   String?
-  createdAt DateTime  @default(now())
-
-  projects  Project[]
-
-  @@index([companyId])
-}
-
-model Attendance {
   id        String   @id @default(cuid())
-  userId    String
-  projectId String
-  date      DateTime
-  status    String   // PRESENT | ABSENT | LATE | HALF_DAY
-  method    String   // QR | MANUAL
-  markedBy  String?
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name      String
+  contact   String
+  email     String
   createdAt DateTime @default(now())
 
-  @@index([userId])
-  @@index([projectId])
-  @@index([date])
+  projects   Project[]
+  quotations Quotation[]
 }
 
 model Material {
   id           String   @id @default(cuid())
   companyId    String
   name         String
-  unit         String
-  stockQty     Decimal
-  reorderLevel Decimal
-  supplierId   String?
+  unit         String   // BAGS | TONS | KG | PIECES | CUBIC_METERS
+  stockQty     Decimal  @default(0)
+  reorderLevel Decimal  @default(10)
   createdAt    DateTime @default(now())
 
-  @@index([companyId])
+  inventories Inventory[]
+}
+
+model Inventory {
+  id          String   @id @default(cuid())
+  materialId  String
+  material    Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  type        String   // IN | OUT
+  qty         Decimal
+  supplierId  String?
+  supplier    Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  receivedAt  DateTime @default(now())
+}
+
+model Supplier {
+  id        String   @id @default(cuid())
+  companyId String
+  name      String
+  contact   String
+  category  String   // CEMENT | STEEL | AGGREGATES | ELECTRICAL | PLUMBING
+  rating    Decimal? @default(5.0)
+  createdAt DateTime @default(now())
+
+  inventories Inventory[]
 }
 
 model Expense {
-  id        String   @id @default(cuid())
-  companyId String
-  projectId String
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  category  String   // FUEL | SALARY | MATERIAL | TRANSPORT | MISC
-  amount    Decimal
-  date      DateTime
-  addedById String
-  note      String?
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  category    String   // MATERIALS | LABOUR | EQUIPMENT | PERMITS | OVERHEAD
+  amount      Decimal
+  receiptUrl  String?
+  createdAt   DateTime @default(now())
+}
 
-  @@index([companyId])
-  @@index([projectId])
+model Attendance {
+  id        String   @id @default(cuid())
+  workerId  String
+  date      DateTime
+  status    String   // PRESENT | LATE | ABSENT | HALF_DAY
+  createdAt DateTime @default(now())
 }
 
 model Quotation {
-  id        String   @id @default(cuid())
-  companyId String
-  clientId  String
-  projectId String?
-  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
-  items     String   // JSON string
-  gstPct    Decimal  @default(0)
-  discount  Decimal  @default(0)
-  notes     String?
-  status    String   @default("DRAFT") // DRAFT | SENT | APPROVED | REJECTED
-  pdfUrl    String?
-  version   Int      @default(1)
-  createdAt DateTime @default(now())
+  id          String    @id @default(cuid())
+  companyId   String
+  clientId    String
+  client      Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  projectId   String?
+  project     Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  items       String    // JSON string array of items
+  gstPct      Decimal   @default(17)
+  discount    Decimal   @default(0)
+  notes       String?
+  status      String    @default("DRAFT") // DRAFT | SENT | APPROVED | REJECTED
+  version     Int       @default(1)
+  createdAt   DateTime  @default(now())
 
-  invoices  Invoice[]
-
-  @@index([companyId])
-  @@index([clientId])
+  invoices    Invoice[]
 }
 
 model Invoice {
@@ -163,16 +164,12 @@ model Invoice {
   quotationId String?
   quotation   Quotation? @relation(fields: [quotationId], references: [id], onDelete: SetNull)
   amount      Decimal
-  status      String    @default("PENDING") // PAID | PENDING | PARTIAL | VOIDED
   dueDate     DateTime?
-  pdfUrl      String?
+  status      String    @default("PENDING") // PENDING | PAID | OVERDUE | VOIDED
   version     Int       @default(1)
   createdAt   DateTime  @default(now())
 
   payments    Payment[]
-
-  @@index([companyId])
-  @@index([clientId])
 }
 
 model Payment {
@@ -180,36 +177,10 @@ model Payment {
   invoiceId String
   invoice   Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
   amount    Decimal
-  method    String   // CASH | BANK | JAZZCASH | EASYPAISA | STRIPE
-  date      DateTime
+  method    String
   reference String?
+  date      DateTime @default(now())
   createdAt DateTime @default(now())
-
-  @@index([invoiceId])
-}
-
-model Document {
-  id           String   @id @default(cuid())
-  companyId    String
-  projectId    String?
-  type         String   // PDF | IMAGE | VIDEO | CONTRACT
-  url          String
-  uploadedById String
-  createdAt    DateTime @default(now())
-
-  @@index([companyId])
-  @@index([projectId])
-}
-
-model Notification {
-  id        String   @id @default(cuid())
-  userId    String
-  type      String   // EMAIL | SMS | PUSH
-  message   String
-  read      Boolean  @default(false)
-  createdAt DateTime @default(now())
-
-  @@index([userId])
 }
 
 model ActivityLog {
@@ -218,22 +189,7 @@ model ActivityLog {
   userId     String
   action     String
   entityType String
-  entityId   String
+  entityId   String?
   meta       String?  // JSON string
   createdAt  DateTime @default(now())
-
-  @@index([companyId])
-  @@index([userId])
-}
-
-model DailyReport {
-  id                String   @id @default(cuid())
-  projectId         String
-  engineerId        String
-  rawInput          String
-  aiGeneratedReport String
-  date              DateTime @default(now())
-
-  @@index([projectId])
-  @@index([engineerId])
 }
