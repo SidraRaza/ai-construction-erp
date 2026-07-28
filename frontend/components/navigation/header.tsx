@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Bell, Search, Sun, Moon, CheckCircle2, AlertTriangle, Info, Clock } from "lucide-react";
+import { Bell, Search, Sun, Moon, CheckCircle2, AlertTriangle, Info, Clock, UserPlus } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 import { useToast } from "@/components/ui/toast-provider";
 
@@ -17,6 +17,13 @@ export function Header({ userName = "Sarah Admin", userRole = "Admin" }: HeaderP
   const [searchQuery, setSearchQuery] = useState("");
   const [dbNotifications, setDbNotifications] = useState<any[]>([]);
   const [isLoadingNotifs, setIsLoadingNotifs] = useState(false);
+
+  // Visitor Onboarding Modal State
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [role, setRole] = useState("CLIENT");
 
   const fetchNotifications = async () => {
     setIsLoadingNotifs(true);
@@ -43,6 +50,35 @@ export function Header({ userName = "Sarah Admin", userRole = "Admin" }: HeaderP
     showToast(`Global Search for "${searchQuery}" executed across projects & invoices`, "info");
   };
 
+  const handleVisitorRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name || !email) {
+      showToast("Name and Email are required!", "warning");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, phone, role }),
+      });
+
+      const json = await res.json();
+      if (json.success) {
+        showToast(`Welcome ${name}! Your profile has been registered in the database.`, "success");
+        setIsOnboardingOpen(false);
+        setName("");
+        setEmail("");
+        setPhone("");
+      } else {
+        showToast(`Error: ${json.error?.message}`, "error");
+      }
+    } catch (err) {
+      showToast("Failed to register user profile", "error");
+    }
+  };
+
   const formatTimeAgo = (dateStr: string) => {
     const diff = Math.floor((new Date().getTime() - new Date(dateStr).getTime()) / 1000);
     if (diff < 60) return `${diff}s ago`;
@@ -59,12 +95,10 @@ export function Header({ userName = "Sarah Admin", userRole = "Admin" }: HeaderP
         return { title: "Quotation Created", icon: <Info className="w-3.5 h-3.5 text-amber-400" /> };
       case "UPDATE_QUOTATION":
         return { title: "Quotation Updated", icon: <Info className="w-3.5 h-3.5 text-amber-400" /> };
+      case "REGISTER_USER":
+        return { title: "User Profile Registered", icon: <CheckCircle2 className="w-3.5 h-3.5 text-purple-400" /> };
       case "CREATE_PROJECT":
         return { title: "Project Initialized", icon: <CheckCircle2 className="w-3.5 h-3.5 text-blue-400" /> };
-      case "MARK_ATTENDANCE":
-        return { title: "Attendance Marked", icon: <Info className="w-3.5 h-3.5 text-teal-400" /> };
-      case "CREATE_MATERIAL":
-        return { title: "Material Stock Added", icon: <Info className="w-3.5 h-3.5 text-cyan-400" /> };
       default:
         return { title: action.replace(/_/g, " "), icon: <Info className="w-3.5 h-3.5 text-amber-400" /> };
     }
@@ -86,6 +120,14 @@ export function Header({ userName = "Sarah Admin", userRole = "Admin" }: HeaderP
 
       {/* Action Controls */}
       <div className="flex items-center gap-4">
+        {/* Onboard Profile Button */}
+        <button
+          onClick={() => setIsOnboardingOpen(true)}
+          className="px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/20 text-xs font-bold transition-all flex items-center gap-1.5"
+        >
+          <UserPlus className="w-3.5 h-3.5" /> Onboard Profile
+        </button>
+
         {/* Theme Toggle Button */}
         <button
           onClick={() => {
@@ -147,7 +189,7 @@ export function Header({ userName = "Sarah Admin", userRole = "Admin" }: HeaderP
                           <span className="text-[10px] text-slate-500">{formatTimeAgo(n.createdAt)}</span>
                         </div>
                         <p className="text-[11px] text-slate-400 leading-snug">
-                          {n.entityType} ({n.entityId || "Record"}) modified by Admin.
+                          {n.entityType} ({n.entityId || "Record"}) recorded in system.
                         </p>
                       </div>
                     );
@@ -171,6 +213,86 @@ export function Header({ userName = "Sarah Admin", userRole = "Admin" }: HeaderP
           </div>
         </div>
       </div>
+
+      {/* Visitor Profile Onboarding Modal */}
+      {isOnboardingOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-5 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <UserPlus className="w-5 h-5 text-amber-400" /> Onboard Visitor / User Profile
+              </h3>
+              <button onClick={() => setIsOnboardingOpen(false)} className="text-slate-400 hover:text-white">✕</button>
+            </div>
+            <form onSubmit={handleVisitorRegister} className="space-y-4">
+              <div>
+                <label className="text-xs font-semibold text-slate-400 block mb-1">Full Name *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. John Labour"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-slate-400 block mb-1">Email Address *</label>
+                <input
+                  type="email"
+                  required
+                  placeholder="e.g. john@buildcorp.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-slate-400 block mb-1">Contact Phone Number</label>
+                <input
+                  type="text"
+                  placeholder="e.g. +92 300 9876543"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-slate-400 block mb-1">Role / Persona *</label>
+                <select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 font-bold"
+                >
+                  <option value="CLIENT">CLIENT (Project Owner / Investor)</option>
+                  <option value="ENGINEER">ENGINEER (Civil Engineer)</option>
+                  <option value="LABOUR">LABOUR (Skilled Workforce)</option>
+                  <option value="ADMIN">ADMIN (Operations Lead)</option>
+                </select>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setIsOnboardingOpen(false)}
+                  className="px-4 py-2.5 rounded-xl bg-slate-800 text-xs font-bold text-slate-300 hover:bg-slate-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-xs font-bold text-white shadow-lg hover:brightness-110"
+                >
+                  Register Profile
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
