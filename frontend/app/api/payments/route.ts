@@ -37,30 +37,63 @@ export async function POST(req: NextRequest) {
     const userId = req.headers.get("x-user-id") || "cl_default_user";
 
     const body = await req.json();
-    const { invoiceId, amount, method, reference } = body;
+    const { invoiceId, clientName, projectId, amount, method, reference } = body;
 
-    if (!invoiceId || !amount || !method) {
+    if (!amount || !method) {
       return NextResponse.json(
-        { success: false, error: { message: "Invoice ID, amount, and payment method are required" } },
+        { success: false, error: { message: "Payment amount and method are required" } },
         { status: 400 }
       );
     }
 
-    // 1. Create Payment Record
+    let targetInvoiceId = invoiceId;
+
+    // If no invoiceId provided, auto-resolve client and create an Invoice for this payment!
+    if (!targetInvoiceId) {
+      const cName = clientName || "General Client";
+      let client = await db.client.findFirst({
+        where: { companyId },
+      });
+
+      if (!client) {
+        client = await db.client.create({
+          data: {
+            companyId,
+            name: cName,
+            contact: "+1 555-0000",
+            email: "client@buildcorp.com",
+          },
+        });
+      }
+
+      const invoice = await db.invoice.create({
+        data: {
+          companyId,
+          clientId: client.id,
+          projectId: projectId || null,
+          amount: new Prisma.Decimal(amount),
+          status: "PAID",
+          version: 1,
+        },
+      });
+      targetInvoiceId = invoice.id;
+    } else {
+      // Mark existing Invoice as PAID
+      await db.invoice.update({
+        where: { id: targetInvoiceId },
+        data: { status: "PAID" },
+      });
+    }
+
+    // 2. Create Payment Record
     const payment = await db.payment.create({
       data: {
-        invoiceId,
+        invoiceId: targetInvoiceId,
         amount: new Prisma.Decimal(amount),
-        method, // CASH | BANK | JAZZCASH | EASYPAISA | STRIPE
-        reference: reference || "Receipt verified by Admin",
+        method, // CASH | BANK | CHEQUE | JAZZCASH | EASYPAISA | STRIPE
+        reference: reference || `Paid via ${method}`,
         date: new Date(),
       },
-    });
-
-    // 2. Mark Invoice as PAID
-    await db.invoice.update({
-      where: { id: invoiceId },
-      data: { status: "PAID" },
     });
 
     await ActivityLogService.log({
@@ -69,7 +102,7 @@ export async function POST(req: NextRequest) {
       action: "RECORD_PAYMENT",
       entityType: "Payment",
       entityId: payment.id,
-      meta: { invoiceId, amount, method, reference },
+      meta: { invoiceId: targetInvoiceId, amount, method, reference },
     });
 
     return NextResponse.json({

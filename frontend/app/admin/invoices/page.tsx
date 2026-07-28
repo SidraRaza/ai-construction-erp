@@ -4,14 +4,15 @@ import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/navigation/sidebar";
 import { Header } from "@/components/navigation/header";
 import { useToast } from "@/components/ui/toast-provider";
-import { Receipt, FileText, CheckCircle, RefreshCw, Plus, Bot, Edit, DollarSign, CreditCard, ShieldCheck } from "lucide-react";
+import { Receipt, FileText, CheckCircle, RefreshCw, Plus, Bot, Edit, DollarSign, CreditCard, ShieldCheck, Wallet } from "lucide-react";
 
 export default function FinancialsPage() {
   const { showToast } = useToast();
   const [quotations, setQuotations] = useState<any[]>([]);
   const [invoices, setInvoices] = useState<any[]>([]);
+  const [payments, setPayments] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<"quotations" | "invoices">("quotations");
+  const [activeTab, setActiveTab] = useState<"quotations" | "invoices" | "payments">("quotations");
   const [isLoading, setIsLoading] = useState(true);
 
   // Create Quotation Modal State
@@ -23,15 +24,17 @@ export default function FinancialsPage() {
   const [quotationStatus, setQuotationStatus] = useState("SENT");
   const [description, setDescription] = useState("");
 
-  // Edit Quotation Modal State (ALL FIELDS EDITABLE)
+  // Edit Quotation Modal State
   const [editingQuotation, setEditingQuotation] = useState<any>(null);
   const [editQuotationId, setEditQuotationId] = useState("");
   const [editProjectId, setEditProjectId] = useState("");
   const [editStatus, setEditStatus] = useState("SENT");
   const [editAmount, setEditAmount] = useState("");
 
-  // Payment Proof Modal State
-  const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+  // Record Payment Modal State
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [payClientName, setPayClientName] = useState("");
+  const [payProjectId, setPayProjectId] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("CASH"); // CASH | BANK | CHEQUE | JAZZCASH | EASYPAISA | STRIPE
   const [paymentAmount, setPaymentAmount] = useState("");
   const [receiptReference, setReceiptReference] = useState("");
@@ -39,15 +42,22 @@ export default function FinancialsPage() {
   const fetchFinancials = async () => {
     setIsLoading(true);
     try {
-      const [qRes, iRes, pRes] = await Promise.all([
+      const [qRes, iRes, payRes, pRes] = await Promise.all([
         fetch("/api/quotations"),
         fetch("/api/invoices"),
+        fetch("/api/payments"),
         fetch("/api/projects"),
       ]);
-      const [qJson, iJson, pJson] = await Promise.all([qRes.json(), iRes.json(), pRes.json()]);
+      const [qJson, iJson, payJson, pJson] = await Promise.all([
+        qRes.json(),
+        iRes.json(),
+        payRes.json(),
+        pRes.json(),
+      ]);
 
       if (qJson.success) setQuotations(qJson.data || []);
       if (iJson.success) setInvoices(iJson.data || []);
+      if (payJson.success) setPayments(payJson.data || []);
       if (pJson.success) setProjects(pJson.data || []);
     } catch (err) {
       showToast("Failed to fetch financial data from database", "error");
@@ -91,7 +101,6 @@ export default function FinancialsPage() {
 
       const json = await res.json();
       if (json.success) {
-        // If status was chosen differently, update status
         if (quotationStatus !== "SENT") {
           await fetch(`/api/quotations/${json.data.id}`, {
             method: "PUT",
@@ -147,14 +156,18 @@ export default function FinancialsPage() {
 
   const handleRecordPayment = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedInvoice || !paymentAmount) return;
+    if (!paymentAmount) {
+      showToast("Payment Amount is required!", "warning");
+      return;
+    }
 
     try {
       const res = await fetch("/api/payments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          invoiceId: selectedInvoice.id,
+          clientName: payClientName || "General Client",
+          projectId: payProjectId || undefined,
           amount: Number(paymentAmount),
           method: paymentMethod,
           reference: receiptReference || `Paid via ${paymentMethod}`,
@@ -164,7 +177,9 @@ export default function FinancialsPage() {
       const json = await res.json();
       if (json.success) {
         showToast(`Payment of $${paymentAmount} via ${paymentMethod} recorded in Database!`, "success");
-        setSelectedInvoice(null);
+        setIsPaymentModalOpen(false);
+        setPayClientName("");
+        setPayProjectId("");
         setPaymentAmount("");
         setReceiptReference("");
         fetchFinancials();
@@ -188,11 +203,11 @@ export default function FinancialsPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-amber-500/15 via-orange-500/5 to-slate-900 p-6 rounded-3xl border border-amber-500/25 shadow-xl">
             <div>
               <h2 className="text-2xl font-bold tracking-tight text-white flex items-center gap-3">
-                <Receipt className="w-7 h-7 text-amber-400" /> Financial Billing & Quotations Engine
+                <Receipt className="w-7 h-7 text-amber-400" /> Financial Billing & Payments Engine
               </h2>
-              <p className="text-sm text-slate-400 mt-1">Full Quotation editing (ID, Project, Amount, Status) & payment proof audit trails.</p>
+              <p className="text-sm text-slate-400 mt-1">Quotations, invoices, and direct payment tracking (Cash, Bank Cheque, JazzCash, EasyPaisa).</p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
               <button
                 onClick={fetchFinancials}
                 className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-semibold hover:border-amber-500"
@@ -204,6 +219,12 @@ export default function FinancialsPage() {
                 className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold text-xs shadow-lg hover:brightness-110 flex items-center gap-2"
               >
                 <Plus className="w-4 h-4" /> Create Quotation
+              </button>
+              <button
+                onClick={() => setIsPaymentModalOpen(true)}
+                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold text-xs shadow-lg hover:brightness-110 flex items-center gap-2"
+              >
+                <CreditCard className="w-4 h-4" /> + Record Payment
               </button>
             </div>
           </div>
@@ -228,7 +249,17 @@ export default function FinancialsPage() {
                   : "text-slate-400 hover:bg-slate-800"
               }`}
             >
-              <Receipt className="w-4 h-4" /> Immutable Invoices & Payments ({invoices.length})
+              <Receipt className="w-4 h-4" /> Invoices ({invoices.length})
+            </button>
+            <button
+              onClick={() => setActiveTab("payments")}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+                activeTab === "payments"
+                  ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-md"
+                  : "text-slate-400 hover:bg-slate-800"
+              }`}
+            >
+              <Wallet className="w-4 h-4" /> Payments Received ({payments.length})
             </button>
           </div>
 
@@ -324,7 +355,7 @@ export default function FinancialsPage() {
           {activeTab === "invoices" && (
             <div className="bg-slate-900/60 rounded-3xl border border-slate-800 p-6 space-y-4 shadow-xl backdrop-blur-md">
               <div className="flex items-center justify-between">
-                <h3 className="text-base font-bold text-white">Issued Database Invoices Audit Trail</h3>
+                <h3 className="text-base font-bold text-white">Issued Database Invoices</h3>
                 <span className="text-xs text-slate-400">Rule: Immutable; Corrections create Version N+1 (Constitution §2.7)</span>
               </div>
 
@@ -332,7 +363,7 @@ export default function FinancialsPage() {
                 <div className="py-12 flex flex-col items-center justify-center text-center space-y-3 border-2 border-dashed border-slate-800 rounded-2xl">
                   <Receipt className="w-10 h-10 text-slate-600" />
                   <h4 className="text-sm font-bold text-slate-300">No Invoices Issued in Database Yet</h4>
-                  <p className="text-xs text-slate-500">Approve quotations or create invoices to view immutable audit records.</p>
+                  <p className="text-xs text-slate-500">Click "+ Record Payment" above to create a payment or invoice directly.</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -344,7 +375,6 @@ export default function FinancialsPage() {
                         <th className="py-3 px-4">Project</th>
                         <th className="py-3 px-4">Amount</th>
                         <th className="py-3 px-4 text-center">Status</th>
-                        <th className="py-3 px-4 text-right">Payment & Immutability Action</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-800/60">
@@ -367,19 +397,64 @@ export default function FinancialsPage() {
                               {inv.status}
                             </span>
                           </td>
-                          <td className="py-3.5 px-4 text-right space-x-2">
-                            {inv.status !== "PAID" && inv.status !== "VOIDED" && (
-                              <button
-                                onClick={() => {
-                                  setSelectedInvoice(inv);
-                                  setPaymentAmount(String(inv.amount));
-                                }}
-                                className="px-3 py-1.5 bg-emerald-500/20 text-emerald-400 rounded-xl font-semibold border border-emerald-500/30 hover:bg-emerald-500/30 transition-all text-xs"
-                              >
-                                Record Payment & Proof
-                              </button>
-                            )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Payments Received View */}
+          {activeTab === "payments" && (
+            <div className="bg-slate-900/60 rounded-3xl border border-slate-800 p-6 space-y-4 shadow-xl backdrop-blur-md">
+              <div className="flex items-center justify-between">
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <Wallet className="w-5 h-5 text-emerald-400" /> Database Payments Audit Trail
+                </h3>
+                <button
+                  onClick={() => setIsPaymentModalOpen(true)}
+                  className="px-3 py-1.5 bg-emerald-500/20 text-emerald-400 rounded-xl font-semibold border border-emerald-500/30 text-xs"
+                >
+                  + Record New Payment
+                </button>
+              </div>
+
+              {payments.length === 0 ? (
+                <div className="py-12 flex flex-col items-center justify-center text-center space-y-3 border-2 border-dashed border-slate-800 rounded-2xl">
+                  <CreditCard className="w-10 h-10 text-slate-600" />
+                  <h4 className="text-sm font-bold text-slate-300">No Payments Recorded in Database Yet</h4>
+                  <p className="text-xs text-slate-500">Click "+ Record Payment" to record cash, bank wire, cheque, JazzCash, or EasyPaisa payments.</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="border-b border-slate-800 text-slate-400 font-semibold uppercase">
+                        <th className="py-3 px-4">Payment ID</th>
+                        <th className="py-3 px-4">Method / Type</th>
+                        <th className="py-3 px-4">Amount Received</th>
+                        <th className="py-3 px-4">Cheque # / Receipt Ref</th>
+                        <th className="py-3 px-4 text-right">Date Recorded</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/60">
+                      {payments.map((p) => (
+                        <tr key={p.id} className="hover:bg-slate-800/40 transition-colors">
+                          <td className="py-3.5 px-4 font-mono font-semibold text-emerald-400">{p.id}</td>
+                          <td className="py-3.5 px-4 font-semibold text-white">
+                            {p.method === "CASH" && "💵 Naqad Cash"}
+                            {p.method === "BANK" && "🏦 Bank Wire Transfer"}
+                            {p.method === "CHEQUE" && "📜 Bank Cheque / Pay Order"}
+                            {p.method === "JAZZCASH" && "📱 JazzCash Wallet"}
+                            {p.method === "EASYPAISA" && "📱 EasyPaisa Wallet"}
+                            {p.method === "STRIPE" && "💳 Credit Card (Stripe)"}
+                            {!["CASH", "BANK", "CHEQUE", "JAZZCASH", "EASYPAISA", "STRIPE"].includes(p.method) && p.method}
                           </td>
+                          <td className="py-3.5 px-4 font-bold text-emerald-400 text-sm">${Number(p.amount).toLocaleString()}</td>
+                          <td className="py-3.5 px-4 font-mono text-slate-300">{p.reference || "Receipt verified"}</td>
+                          <td className="py-3.5 px-4 text-right text-slate-400">{new Date(p.createdAt).toLocaleDateString()}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -492,7 +567,101 @@ export default function FinancialsPage() {
             </div>
           )}
 
-          {/* Edit Quotation Modal (EDIT ALL FIELDS: ID, PROJECT, AMOUNT, STATUS) */}
+          {/* Record Direct Payment Modal */}
+          {isPaymentModalOpen && (
+            <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-4 shadow-2xl">
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <CreditCard className="w-5 h-5 text-emerald-400" /> Record New Payment
+                </h3>
+                <form onSubmit={handleRecordPayment} className="space-y-4">
+                  <div>
+                    <label className="text-xs font-semibold text-slate-400 block mb-1">Client Name *</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Acme Real Estate"
+                      value={payClientName}
+                      onChange={(e) => setPayClientName(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-slate-400 block mb-1">Select Project (Optional)</label>
+                    <select
+                      value={payProjectId}
+                      onChange={(e) => setPayProjectId(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"
+                    >
+                      <option value="">General Site (No specific project)</option>
+                      {projects.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-slate-400 block mb-1">Payment Method / Type *</label>
+                    <select
+                      value={paymentMethod}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-semibold"
+                    >
+                      <option value="CASH">💵 Naqad Cash (Physical Cash Handover)</option>
+                      <option value="BANK">🏦 Bank Wire / Direct Online Transfer</option>
+                      <option value="CHEQUE">📜 Bank Cheque / Pay Order (Cheque #)</option>
+                      <option value="JAZZCASH">📱 JazzCash Mobile Wallet</option>
+                      <option value="EASYPAISA">📱 EasyPaisa Mobile Wallet</option>
+                      <option value="STRIPE">💳 Credit / Debit Card (Stripe POS)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-slate-400 block mb-1">Payment Amount ($) *</label>
+                    <input
+                      type="number"
+                      required
+                      placeholder="e.g. 50000"
+                      value={paymentAmount}
+                      onChange={(e) => setPaymentAmount(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-bold"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-slate-400 block mb-1">Receipt Slip # / Cheque # / Screenshot Ref</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Cheque #884920 / TRX-9988231 / Bank Slip"
+                      value={receiptReference}
+                      onChange={(e) => setReceiptReference(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+                    <button
+                      type="button"
+                      onClick={() => setIsPaymentModalOpen(false)}
+                      className="px-4 py-2 rounded-xl bg-slate-800 text-xs font-semibold text-slate-300 hover:bg-slate-700"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-xs font-semibold text-white shadow-lg hover:brightness-110"
+                    >
+                      Save Payment to Database
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* Edit Quotation Modal */}
           {editingQuotation && (
             <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
               <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-4 shadow-2xl">
@@ -564,72 +733,6 @@ export default function FinancialsPage() {
                       className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-xs font-semibold text-white shadow-lg hover:brightness-110"
                     >
                       Save Changes to Database
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          )}
-
-          {/* Record Payment Proof Modal */}
-          {selectedInvoice && (
-            <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-4 shadow-2xl">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <CreditCard className="w-5 h-5 text-emerald-400" /> Record Payment & Receipt Proof
-                </h3>
-                <form onSubmit={handleRecordPayment} className="space-y-4">
-                  <div>
-                    <label className="text-xs font-semibold text-slate-400 block mb-1">Payment Method / Type *</label>
-                    <select
-                      value={paymentMethod}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500 font-semibold"
-                    >
-                      <option value="CASH">💵 Naqad Cash (Physical Cash Handover)</option>
-                      <option value="BANK">🏦 Bank Wire / Direct Online Transfer</option>
-                      <option value="CHEQUE">📜 Bank Cheque / Pay Order (Cheque #)</option>
-                      <option value="JAZZCASH">📱 JazzCash Mobile Wallet</option>
-                      <option value="EASYPAISA">📱 EasyPaisa Mobile Wallet</option>
-                      <option value="STRIPE">💳 Credit / Debit Card (Stripe POS)</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-semibold text-slate-400 block mb-1">Payment Amount ($) *</label>
-                    <input
-                      type="number"
-                      required
-                      value={paymentAmount}
-                      onChange={(e) => setPaymentAmount(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500 font-bold"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-semibold text-slate-400 block mb-1">Receipt Slip # / Cheque # / Transaction Ref / Screenshot Reference</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Cheque #884920 / TRX-9988231 / Bank Slip"
-                      value={receiptReference}
-                      onChange={(e) => setReceiptReference(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedInvoice(null)}
-                      className="px-4 py-2 rounded-xl bg-slate-800 text-xs font-semibold text-slate-300 hover:bg-slate-700"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-xs font-semibold text-white shadow-lg hover:brightness-110"
-                    >
-                      Verify & Record Payment
                     </button>
                   </div>
                 </form>
