@@ -1,45 +1,77 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/navigation/sidebar";
 import { Header } from "@/components/navigation/header";
-import { Package, AlertTriangle, Plus, ArrowUpRight, ArrowDownRight, RefreshCw } from "lucide-react";
-
-const initialMaterials = [
-  { id: "m1", name: "High Grade Portland Cement", unit: "bags", stockQty: 15, reorderLevel: 20, supplier: "National Cement Ltd" },
-  { id: "m2", name: "Deformed Steel Rebar 12mm", unit: "tons", stockQty: 45, reorderLevel: 10, supplier: "Mughal Steel Corp" },
-  { id: "m3", name: "Crushed Aggregate Sand", unit: "tons", stockQty: 120, reorderLevel: 30, supplier: "Margalla Quarries" },
-  { id: "m4", name: "Red Clay Bricks", unit: "thousand", stockQty: 5, reorderLevel: 10, supplier: "Standard Brick Kiln" },
-  { id: "m5", name: "PVC Electrical Conduit Pipes", unit: "meters", stockQty: 300, reorderLevel: 50, supplier: "Popular Pipes Ltd" },
-];
+import { useToast } from "@/components/ui/toast-provider";
+import { Package, AlertTriangle, Plus, RefreshCw } from "lucide-react";
 
 export default function MaterialsPage() {
-  const [materials, setMaterials] = useState(initialMaterials);
-  const [selectedMaterial, setSelectedMaterial] = useState<typeof initialMaterials[0] | null>(null);
-  const [adjustmentQty, setAdjustmentQty] = useState("");
-  const [reason, setReason] = useState("");
+  const { showToast } = useToast();
+  const [materials, setMaterials] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleAdjustStock = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedMaterial || !adjustmentQty) return;
+  // Form State
+  const [name, setName] = useState("");
+  const [unit, setUnit] = useState("bags");
+  const [stockQty, setStockQty] = useState("");
+  const [reorderLevel, setReorderLevel] = useState("");
 
-    const qty = Number(adjustmentQty);
-    setMaterials(
-      materials.map((m) => {
-        if (m.id === selectedMaterial.id) {
-          const newQty = Math.max(0, m.stockQty + qty);
-          return { ...m, stockQty: newQty };
-        }
-        return m;
-      })
-    );
-
-    setSelectedMaterial(null);
-    setAdjustmentQty("");
-    setReason("");
+  const fetchMaterials = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/materials");
+      const json = await res.json();
+      if (json.success) {
+        setMaterials(json.data || []);
+      }
+    } catch (err) {
+      showToast("Failed to fetch materials from database", "error");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const lowStockItems = materials.filter((m) => m.stockQty <= m.reorderLevel);
+  useEffect(() => {
+    fetchMaterials();
+  }, []);
+
+  const handleCreateMaterial = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name || !stockQty) return;
+
+    try {
+      const res = await fetch("/api/materials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          unit,
+          stockQty: Number(stockQty),
+          reorderLevel: Number(reorderLevel || 10),
+        }),
+      });
+
+      const json = await res.json();
+      if (json.success) {
+        showToast(`Material "${name}" created in Database!`, "success");
+        setName("");
+        setStockQty("");
+        setReorderLevel("");
+        setIsModalOpen(false);
+        fetchMaterials();
+      } else {
+        showToast(`Error: ${json.error?.message}`, "error");
+      }
+    } catch (err) {
+      showToast("Failed to add material", "error");
+    }
+  };
+
+  const lowStockItems = materials.filter(
+    (m) => Number(m.stockQty) <= Number(m.reorderLevel)
+  );
 
   return (
     <div className="flex min-h-screen bg-slate-950 text-slate-100 font-sans">
@@ -55,11 +87,22 @@ export default function MaterialsPage() {
               <h2 className="text-2xl font-bold tracking-tight text-white flex items-center gap-3">
                 <Package className="w-7 h-7 text-amber-400" /> Material Inventory Control
               </h2>
-              <p className="text-sm text-slate-400 mt-1">Real-time stock quantities, supplier tracking, and automated low-stock alerts.</p>
+              <p className="text-sm text-slate-400 mt-1">Live Prisma database stock levels and reorder alerts.</p>
             </div>
-            <button className="px-5 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold text-xs shadow-lg shadow-orange-500/25 hover:brightness-110 transition-all flex items-center gap-2">
-              <Plus className="w-4 h-4" /> Add New Material
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={fetchMaterials}
+                className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-semibold hover:border-amber-500"
+              >
+                <RefreshCw className={`w-4 h-4 text-amber-400 ${isLoading ? "animate-spin" : ""}`} />
+              </button>
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="px-5 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold text-xs shadow-lg shadow-orange-500/25 hover:brightness-110 flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4" /> Add Material
+              </button>
+            </div>
           </div>
 
           {/* Low Stock Warning Banner if any item low */}
@@ -75,8 +118,8 @@ export default function MaterialsPage() {
           {/* Materials Table */}
           <div className="bg-slate-900/60 rounded-3xl border border-slate-800 p-6 space-y-4 shadow-xl backdrop-blur-md">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-white">Current Stock Levels</h3>
-              <span className="text-xs text-slate-400">Total Types: {materials.length}</span>
+              <h3 className="text-base font-bold text-white">Prisma DB Inventory Levels</h3>
+              <span className="text-xs text-slate-400">Total Material Types: {materials.length}</span>
             </div>
 
             <div className="overflow-x-auto">
@@ -84,24 +127,21 @@ export default function MaterialsPage() {
                 <thead>
                   <tr className="border-b border-slate-800 text-slate-400 font-semibold uppercase">
                     <th className="py-3 px-4">Material Name</th>
-                    <th className="py-3 px-4">Supplier</th>
                     <th className="py-3 px-4">Unit</th>
-                    <th className="py-3 px-4">Current Stock</th>
+                    <th className="py-3 px-4">Stock Quantity</th>
                     <th className="py-3 px-4">Reorder Threshold</th>
                     <th className="py-3 px-4 text-center">Status</th>
-                    <th className="py-3 px-4 text-right">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/60">
                   {materials.map((m) => {
-                    const isLow = m.stockQty <= m.reorderLevel;
+                    const isLow = Number(m.stockQty) <= Number(m.reorderLevel);
                     return (
                       <tr key={m.id} className="hover:bg-slate-800/40 transition-colors">
                         <td className="py-3.5 px-4 font-semibold text-slate-100">{m.name}</td>
-                        <td className="py-3.5 px-4 text-slate-400">{m.supplier}</td>
                         <td className="py-3.5 px-4 font-mono text-slate-300">{m.unit}</td>
-                        <td className="py-3.5 px-4 font-bold text-white">{m.stockQty.toLocaleString()}</td>
-                        <td className="py-3.5 px-4 text-slate-400">{m.reorderLevel.toLocaleString()}</td>
+                        <td className="py-3.5 px-4 font-bold text-white">{Number(m.stockQty).toLocaleString()}</td>
+                        <td className="py-3.5 px-4 text-slate-400">{Number(m.reorderLevel).toLocaleString()}</td>
                         <td className="py-3.5 px-4 text-center">
                           {isLow ? (
                             <span className="bg-rose-500/10 text-rose-400 border border-rose-500/20 text-[10px] font-bold px-2.5 py-0.5 rounded-full">
@@ -113,14 +153,6 @@ export default function MaterialsPage() {
                             </span>
                           )}
                         </td>
-                        <td className="py-3.5 px-4 text-right">
-                          <button
-                            onClick={() => setSelectedMaterial(m)}
-                            className="px-3 py-1.5 bg-slate-800 border border-slate-700 text-slate-200 rounded-xl text-xs font-semibold hover:border-amber-500 transition-all flex items-center gap-1.5 ml-auto"
-                          >
-                            <RefreshCw className="w-3.5 h-3.5 text-amber-400" /> Adjust Stock
-                          </button>
-                        </td>
                       </tr>
                     );
                   })}
@@ -129,41 +161,64 @@ export default function MaterialsPage() {
             </div>
           </div>
 
-          {/* Adjust Stock Modal */}
-          {selectedMaterial && (
+          {/* Add Material Modal */}
+          {isModalOpen && (
             <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
               <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-4 shadow-2xl">
-                <h3 className="text-lg font-bold text-white">Adjust Stock: {selectedMaterial.name}</h3>
-                <p className="text-xs text-slate-400">Current Quantity: {selectedMaterial.stockQty} {selectedMaterial.unit}</p>
+                <h3 className="text-lg font-bold text-white">Add New Material to Database</h3>
 
-                <form onSubmit={handleAdjustStock} className="space-y-4">
+                <form onSubmit={handleCreateMaterial} className="space-y-4">
                   <div>
-                    <label className="text-xs font-semibold text-slate-400 block mb-1">Adjustment Quantity (Positive to add, Negative to consume)</label>
+                    <label className="text-xs font-semibold text-slate-400 block mb-1">Material Name</label>
                     <input
-                      type="number"
+                      type="text"
                       required
-                      placeholder="e.g. 50 or -20"
-                      value={adjustmentQty}
-                      onChange={(e) => setAdjustmentQty(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
+                      placeholder="e.g. Portland Cement Bags"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
                     />
                   </div>
 
-                  <div>
-                    <label className="text-xs font-semibold text-slate-400 block mb-1">Reason / Notes</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. New supplier batch delivery"
-                      value={reason}
-                      onChange={(e) => setReason(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
-                    />
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <label className="text-xs font-semibold text-slate-400 block mb-1">Unit</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="bags"
+                        value={unit}
+                        onChange={(e) => setUnit(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-slate-400 block mb-1">Stock Qty</label>
+                      <input
+                        type="number"
+                        required
+                        placeholder="100"
+                        value={stockQty}
+                        onChange={(e) => setStockQty(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-slate-400 block mb-1">Reorder Point</label>
+                      <input
+                        type="number"
+                        placeholder="20"
+                        value={reorderLevel}
+                        onChange={(e) => setReorderLevel(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                      />
+                    </div>
                   </div>
 
                   <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
                     <button
                       type="button"
-                      onClick={() => setSelectedMaterial(null)}
+                      onClick={() => setIsModalOpen(false)}
                       className="px-4 py-2 rounded-xl bg-slate-800 text-xs font-semibold text-slate-300 hover:bg-slate-700"
                     >
                       Cancel
@@ -172,7 +227,7 @@ export default function MaterialsPage() {
                       type="submit"
                       className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-xs font-semibold text-white shadow-lg hover:brightness-110"
                     >
-                      Save Stock Adjustment
+                      Save Material
                     </button>
                   </div>
                 </form>
