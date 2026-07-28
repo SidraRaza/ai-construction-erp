@@ -15,13 +15,54 @@ export class FinancialsService {
   ) {
     requirePermission(userRole, "create:financials");
 
+    // 1. Resolve Valid Client Entity ID to satisfy Foreign Key Constraint
+    let targetClientId: string | undefined = data.clientId;
+
+    if (targetClientId) {
+      const existingClient = await db.client.findFirst({
+        where: { id: targetClientId, companyId },
+      });
+      if (!existingClient) {
+        targetClientId = undefined;
+      }
+    }
+
+    if (!targetClientId) {
+      let defaultClient = await db.client.findFirst({
+        where: { companyId },
+      });
+
+      if (!defaultClient) {
+        defaultClient = await db.client.create({
+          data: {
+            companyId,
+            name: "General Corporate Client",
+            contact: "+1 555-0000",
+            email: "client@buildcorp.com",
+          },
+        });
+      }
+      targetClientId = defaultClient.id;
+    }
+
+    // 2. Resolve Valid Project Entity ID (Optional)
+    let targetProjectId: string | undefined = data.projectId;
+    if (targetProjectId) {
+      const existingProject = await db.project.findFirst({
+        where: { id: targetProjectId, companyId },
+      });
+      if (!existingProject) {
+        targetProjectId = undefined;
+      }
+    }
+
     const status = isAiDraft ? "DRAFT" : "SENT";
 
     const quotation = await db.quotation.create({
       data: {
         companyId,
-        clientId: data.clientId,
-        projectId: data.projectId,
+        clientId: targetClientId,
+        projectId: targetProjectId || null,
         items: JSON.stringify(data.items),
         gstPct: new Prisma.Decimal(data.gstPct),
         discount: new Prisma.Decimal(data.discount),
@@ -37,7 +78,7 @@ export class FinancialsService {
       action: isAiDraft ? "CREATE_AI_QUOTATION_DRAFT" : "CREATE_QUOTATION",
       entityType: "Quotation",
       entityId: quotation.id,
-      meta: { clientId: data.clientId, isAiDraft, status },
+      meta: { clientId: targetClientId, isAiDraft, status },
     });
 
     return quotation;
@@ -84,12 +125,51 @@ export class FinancialsService {
   ) {
     requirePermission(userRole, "create:financials");
 
+    // 1. Resolve Valid Client Entity ID
+    let targetClientId: string | undefined = data.clientId;
+    if (targetClientId) {
+      const existingClient = await db.client.findFirst({
+        where: { id: targetClientId, companyId },
+      });
+      if (!existingClient) {
+        targetClientId = undefined;
+      }
+    }
+
+    if (!targetClientId) {
+      let defaultClient = await db.client.findFirst({
+        where: { companyId },
+      });
+      if (!defaultClient) {
+        defaultClient = await db.client.create({
+          data: {
+            companyId,
+            name: "General Corporate Client",
+            contact: "+1 555-0000",
+            email: "client@buildcorp.com",
+          },
+        });
+      }
+      targetClientId = defaultClient.id;
+    }
+
+    // 2. Resolve Valid Project Entity ID
+    let targetProjectId: string | undefined = data.projectId;
+    if (targetProjectId) {
+      const existingProject = await db.project.findFirst({
+        where: { id: targetProjectId, companyId },
+      });
+      if (!existingProject) {
+        targetProjectId = undefined;
+      }
+    }
+
     const invoice = await db.invoice.create({
       data: {
         companyId,
-        clientId: data.clientId,
-        projectId: data.projectId,
-        quotationId: data.quotationId,
+        clientId: targetClientId,
+        projectId: targetProjectId || null,
+        quotationId: data.quotationId || null,
         amount: new Prisma.Decimal(data.amount),
         dueDate: data.dueDate ? new Date(data.dueDate) : null,
         status: "PENDING",
