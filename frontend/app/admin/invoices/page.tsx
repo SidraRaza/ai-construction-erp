@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/navigation/sidebar";
 import { Header } from "@/components/navigation/header";
 import { useToast } from "@/components/ui/toast-provider";
-import { Receipt, FileText, CheckCircle, RefreshCw, Plus, Bot } from "lucide-react";
+import { Receipt, FileText, CheckCircle, RefreshCw, Plus, Bot, Edit, DollarSign, CreditCard, ShieldCheck } from "lucide-react";
 
 export default function FinancialsPage() {
   const { showToast } = useToast();
@@ -13,14 +13,26 @@ export default function FinancialsPage() {
   const [projects, setProjects] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<"quotations" | "invoices">("quotations");
   const [isLoading, setIsLoading] = useState(true);
-  const [isQuotationModalOpen, setIsQuotationModalOpen] = useState(false);
 
-  // Explicit Form State for Quotation Creation
+  // Create Quotation Modal State
+  const [isQuotationModalOpen, setIsQuotationModalOpen] = useState(false);
   const [customQuotationId, setCustomQuotationId] = useState("");
   const [clientName, setClientName] = useState("");
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [amount, setAmount] = useState("");
+  const [quotationStatus, setQuotationStatus] = useState("SENT");
   const [description, setDescription] = useState("");
+
+  // Edit Quotation Modal State
+  const [editingQuotation, setEditingQuotation] = useState<any>(null);
+  const [editStatus, setEditStatus] = useState("SENT");
+  const [editAmount, setEditAmount] = useState("");
+
+  // Payment Proof Modal State
+  const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+  const [paymentMethod, setPaymentMethod] = useState("CASH"); // CASH | BANK | JAZZCASH | EASYPAISA | STRIPE
+  const [paymentAmount, setPaymentAmount] = useState("");
+  const [receiptReference, setReceiptReference] = useState("");
 
   const fetchFinancials = async () => {
     setIsLoading(true);
@@ -77,7 +89,16 @@ export default function FinancialsPage() {
 
       const json = await res.json();
       if (json.success) {
-        showToast(`Quotation for "${clientName}" saved in Database!`, "success");
+        // If status was chosen differently, update status
+        if (quotationStatus !== "SENT") {
+          await fetch(`/api/quotations/${json.data.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: quotationStatus }),
+          });
+        }
+
+        showToast(`Quotation for "${clientName}" saved with status ${quotationStatus}!`, "success");
         setCustomQuotationId("");
         setClientName("");
         setSelectedProjectId("");
@@ -93,30 +114,62 @@ export default function FinancialsPage() {
     }
   };
 
-  const handleApproveQuotation = (id: string) => {
-    setQuotations(
-      quotations.map((q) => (q.id === id ? { ...q, status: "APPROVED" } : q))
-    );
-    showToast("Quotation Approved by Admin in Database!", "success");
+  const handleUpdateQuotation = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingQuotation) return;
+
+    try {
+      const res = await fetch(`/api/quotations/${editingQuotation.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          status: editStatus,
+          amount: editAmount ? Number(editAmount) : undefined,
+        }),
+      });
+
+      const json = await res.json();
+      if (json.success) {
+        showToast(`Quotation ${editingQuotation.id} updated in Database!`, "success");
+        setEditingQuotation(null);
+        fetchFinancials();
+      } else {
+        showToast(`Error: ${json.error?.message}`, "error");
+      }
+    } catch (err) {
+      showToast("Failed to update quotation", "error");
+    }
   };
 
-  const handleVoidAndReissue = (invoiceId: string) => {
-    const target = invoices.find((i) => i.id === invoiceId);
-    if (!target) return;
+  const handleRecordPayment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedInvoice || !paymentAmount) return;
 
-    const voidedList = invoices.map((i) => (i.id === invoiceId ? { ...i, status: "VOIDED" } : i));
-    const reissued = {
-      id: `${target.id}-v${(target.version || 1) + 1}`,
-      client: target.client || { name: "Corporate Client" },
-      project: target.project || { name: "Site Project" },
-      amount: Number(target.amount || 0) + 10000,
-      status: "PENDING",
-      version: (target.version || 1) + 1,
-      createdAt: new Date(),
-    };
+    try {
+      const res = await fetch("/api/payments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          invoiceId: selectedInvoice.id,
+          amount: Number(paymentAmount),
+          method: paymentMethod,
+          reference: receiptReference || `Paid via ${paymentMethod}`,
+        }),
+      });
 
-    setInvoices([reissued, ...voidedList]);
-    showToast(`Invoice ${invoiceId} voided and reissued as v${(target.version || 1) + 1}`, "warning");
+      const json = await res.json();
+      if (json.success) {
+        showToast(`Payment of $${paymentAmount} via ${paymentMethod} recorded in Database!`, "success");
+        setSelectedInvoice(null);
+        setPaymentAmount("");
+        setReceiptReference("");
+        fetchFinancials();
+      } else {
+        showToast(`Error: ${json.error?.message}`, "error");
+      }
+    } catch (err) {
+      showToast("Failed to record payment", "error");
+    }
   };
 
   return (
@@ -133,7 +186,7 @@ export default function FinancialsPage() {
               <h2 className="text-2xl font-bold tracking-tight text-white flex items-center gap-3">
                 <Receipt className="w-7 h-7 text-amber-400" /> Financial Billing & Quotations Engine
               </h2>
-              <p className="text-sm text-slate-400 mt-1">Live database quotations, versioned immutable invoices, and audit trails.</p>
+              <p className="text-sm text-slate-400 mt-1">Quotation editing, status selection, and payment proof audit trails.</p>
             </div>
             <div className="flex items-center gap-3">
               <button
@@ -171,7 +224,7 @@ export default function FinancialsPage() {
                   : "text-slate-400 hover:bg-slate-800"
               }`}
             >
-              <Receipt className="w-4 h-4" /> Immutable Invoices ({invoices.length})
+              <Receipt className="w-4 h-4" /> Immutable Invoices & Payments ({invoices.length})
             </button>
           </div>
 
@@ -199,7 +252,7 @@ export default function FinancialsPage() {
                         <th className="py-3 px-4">Quotation Amount</th>
                         <th className="py-3 px-4">Type</th>
                         <th className="py-3 px-4 text-center">Status</th>
-                        <th className="py-3 px-4 text-right">Admin Sign-off Action</th>
+                        <th className="py-3 px-4 text-right">Admin Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-800/60">
@@ -229,25 +282,27 @@ export default function FinancialsPage() {
                                 className={`px-3 py-1 rounded-full text-[10px] font-bold border ${
                                   q.status === "DRAFT"
                                     ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                                    : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                                    : q.status === "SENT" || q.status === "PENDING"
+                                    ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                                    : q.status === "APPROVED"
+                                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                                    : "bg-rose-500/10 text-rose-400 border-rose-500/20"
                                 }`}
                               >
                                 {q.status}
                               </span>
                             </td>
-                            <td className="py-3.5 px-4 text-right">
-                              {q.status === "DRAFT" ? (
-                                <button
-                                  onClick={() => handleApproveQuotation(q.id)}
-                                  className="px-3 py-1.5 bg-emerald-500/20 text-emerald-400 rounded-xl font-semibold border border-emerald-500/30 hover:bg-emerald-500/30 transition-all text-xs"
-                                >
-                                  Approve & Mark Billable
-                                </button>
-                              ) : (
-                                <span className="text-emerald-400 font-semibold flex items-center justify-end gap-1">
-                                  <CheckCircle className="w-4 h-4" /> Approved
-                                </span>
-                              )}
+                            <td className="py-3.5 px-4 text-right space-x-2">
+                              <button
+                                onClick={() => {
+                                  setEditingQuotation(q);
+                                  setEditStatus(q.status);
+                                  setEditAmount(String(parsedAmount));
+                                }}
+                                className="px-2.5 py-1 bg-slate-800 text-amber-400 rounded-lg font-semibold hover:bg-slate-700 transition-all border border-slate-700"
+                              >
+                                Edit Quotation
+                              </button>
                             </td>
                           </tr>
                         );
@@ -280,10 +335,10 @@ export default function FinancialsPage() {
                       <tr className="border-b border-slate-800 text-slate-400 font-semibold uppercase">
                         <th className="py-3 px-4">Invoice #</th>
                         <th className="py-3 px-4">Version</th>
-                        <th className="py-3 px-4">Client / Project</th>
+                        <th className="py-3 px-4">Project</th>
                         <th className="py-3 px-4">Amount</th>
                         <th className="py-3 px-4 text-center">Status</th>
-                        <th className="py-3 px-4 text-right">Immutability Correction</th>
+                        <th className="py-3 px-4 text-right">Payment & Immutability Action</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-800/60">
@@ -291,10 +346,7 @@ export default function FinancialsPage() {
                         <tr key={inv.id} className="hover:bg-slate-800/40 transition-colors">
                           <td className="py-3.5 px-4 font-mono font-semibold text-amber-400">{inv.id}</td>
                           <td className="py-3.5 px-4 font-bold text-slate-300">v{inv.version || 1}.0</td>
-                          <td className="py-3.5 px-4">
-                            <p className="font-semibold text-slate-100">{inv.client?.name || "Corporate Client"}</p>
-                            <p className="text-[11px] text-slate-400">{inv.project?.name || "Site Project"}</p>
-                          </td>
+                          <td className="py-3.5 px-4 font-semibold text-slate-100">{inv.project?.name || "Site Project"}</td>
                           <td className="py-3.5 px-4 font-bold text-white">${Number(inv.amount || 0).toLocaleString()}</td>
                           <td className="py-3.5 px-4 text-center">
                             <span
@@ -309,16 +361,17 @@ export default function FinancialsPage() {
                               {inv.status}
                             </span>
                           </td>
-                          <td className="py-3.5 px-4 text-right">
-                            {inv.status !== "VOIDED" ? (
+                          <td className="py-3.5 px-4 text-right space-x-2">
+                            {inv.status !== "PAID" && inv.status !== "VOIDED" && (
                               <button
-                                onClick={() => handleVoidAndReissue(inv.id)}
-                                className="px-3 py-1.5 bg-slate-800 border border-slate-700 text-slate-300 rounded-xl hover:border-amber-500 transition-all flex items-center gap-1.5 ml-auto text-xs"
+                                onClick={() => {
+                                  setSelectedInvoice(inv);
+                                  setPaymentAmount(String(inv.amount));
+                                }}
+                                className="px-3 py-1.5 bg-emerald-500/20 text-emerald-400 rounded-xl font-semibold border border-emerald-500/30 hover:bg-emerald-500/30 transition-all text-xs"
                               >
-                                <RefreshCw className="w-3.5 h-3.5 text-amber-400" /> Void & Reissue v{(inv.version || 1) + 1}
+                                Record Payment & Proof
                               </button>
-                            ) : (
-                              <span className="text-slate-500 text-[11px] italic">Voided Audit Record</span>
                             )}
                           </td>
                         </tr>
@@ -360,6 +413,21 @@ export default function FinancialsPage() {
                   </div>
 
                   <div>
+                    <label className="text-xs font-semibold text-slate-400 block mb-1">Quotation Initial Status *</label>
+                    <select
+                      value={quotationStatus}
+                      onChange={(e) => setQuotationStatus(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                    >
+                      <option value="SENT">SENT</option>
+                      <option value="PENDING">PENDING</option>
+                      <option value="DRAFT">DRAFT</option>
+                      <option value="APPROVED">APPROVED</option>
+                      <option value="REJECTED">REJECTED</option>
+                    </select>
+                  </div>
+
+                  <div>
                     <label className="text-xs font-semibold text-slate-400 block mb-1">Select Project (Optional)</label>
                     <select
                       value={selectedProjectId}
@@ -387,17 +455,6 @@ export default function FinancialsPage() {
                     />
                   </div>
 
-                  <div>
-                    <label className="text-xs font-semibold text-slate-400 block mb-1">Description / Notes</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Structural steel & concrete work estimation"
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
-                    />
-                  </div>
-
                   <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
                     <button
                       type="button"
@@ -411,6 +468,122 @@ export default function FinancialsPage() {
                       className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-xs font-semibold text-white shadow-lg hover:brightness-110"
                     >
                       Save Quotation
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* Edit Quotation Modal */}
+          {editingQuotation && (
+            <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-4 shadow-2xl">
+                <h3 className="text-lg font-bold text-white">Update Quotation: {editingQuotation.id}</h3>
+                <form onSubmit={handleUpdateQuotation} className="space-y-4">
+                  <div>
+                    <label className="text-xs font-semibold text-slate-400 block mb-1">Update Status</label>
+                    <select
+                      value={editStatus}
+                      onChange={(e) => setEditStatus(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                    >
+                      <option value="SENT">SENT</option>
+                      <option value="PENDING">PENDING</option>
+                      <option value="DRAFT">DRAFT</option>
+                      <option value="APPROVED">APPROVED</option>
+                      <option value="REJECTED">REJECTED</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-slate-400 block mb-1">Quotation Amount ($)</label>
+                    <input
+                      type="number"
+                      value={editAmount}
+                      onChange={(e) => setEditAmount(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+                    <button
+                      type="button"
+                      onClick={() => setEditingQuotation(null)}
+                      className="px-4 py-2 rounded-xl bg-slate-800 text-xs font-semibold text-slate-300 hover:bg-slate-700"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-xs font-semibold text-white shadow-lg hover:brightness-110"
+                    >
+                      Save Changes to Database
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* Record Payment Proof Modal */}
+          {selectedInvoice && (
+            <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-4 shadow-2xl">
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <CreditCard className="w-5 h-5 text-emerald-400" /> Record Payment & Receipt Proof
+                </h3>
+                <form onSubmit={handleRecordPayment} className="space-y-4">
+                  <div>
+                    <label className="text-xs font-semibold text-slate-400 block mb-1">Payment Method / Type *</label>
+                    <select
+                      value={paymentMethod}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500 font-semibold"
+                    >
+                      <option value="CASH">Naqad Cash (Physical Cash Handover)</option>
+                      <option value="BANK">Bank Wire / Direct Transfer</option>
+                      <option value="JAZZCASH">JazzCash Mobile Wallet</option>
+                      <option value="EASYPAISA">EasyPaisa Mobile Wallet</option>
+                      <option value="STRIPE">Stripe Card Payment</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-slate-400 block mb-1">Payment Amount ($) *</label>
+                    <input
+                      type="number"
+                      required
+                      value={paymentAmount}
+                      onChange={(e) => setPaymentAmount(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500 font-bold"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-slate-400 block mb-1">Receipt Slip # / Transaction Ref / Screenshot Reference</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. TRX-9988231 / Bank Receipt Slip / Handover Note"
+                      value={receiptReference}
+                      onChange={(e) => setReceiptReference(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedInvoice(null)}
+                      className="px-4 py-2 rounded-xl bg-slate-800 text-xs font-semibold text-slate-300 hover:bg-slate-700"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-xs font-semibold text-white shadow-lg hover:brightness-110"
+                    >
+                      Verify & Record Payment
                     </button>
                   </div>
                 </form>
