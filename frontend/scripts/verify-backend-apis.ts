@@ -137,7 +137,7 @@ async function verifyBackendApis() {
       data: {
         projectId,
         userId: engineerUser.id,
-        roleOnProject: "Site Lead",
+        role: "SITE_ENGINEER",
       },
     });
 
