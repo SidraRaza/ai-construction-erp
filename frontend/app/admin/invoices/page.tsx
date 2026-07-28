@@ -15,8 +15,6 @@ export default function FinancialsPage() {
   const [isQuotationModalOpen, setIsQuotationModalOpen] = useState(false);
 
   // Form State for Quotation
-  const [clientName, setClientName] = useState("");
-  const [projectName, setProjectName] = useState("");
   const [amount, setAmount] = useState("");
 
   const fetchFinancials = async () => {
@@ -52,7 +50,14 @@ export default function FinancialsPage() {
         body: JSON.stringify({
           clientId: "cl_default_client",
           projectId: "p1",
-          items: [{ description: "Initial Site Estimation", amount: Number(amount) }],
+          items: [
+            {
+              description: "Initial Site Estimation",
+              quantity: 1,
+              unitRate: Number(amount),
+              amount: Number(amount),
+            },
+          ],
           gstPct: 18,
           discount: 0,
           notes: "Created via Admin Financial Studio",
@@ -66,7 +71,7 @@ export default function FinancialsPage() {
         setIsQuotationModalOpen(false);
         fetchFinancials();
       } else {
-        showToast(`Error: ${json.error?.message}`, "error");
+        showToast(`Error: ${json.error?.message || "Validation Error"}`, "error");
       }
     } catch (err) {
       showToast("Failed to create quotation", "error");
@@ -183,47 +188,55 @@ export default function FinancialsPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-800/60">
-                      {quotations.map((q) => (
-                        <tr key={q.id} className="hover:bg-slate-800/40 transition-colors">
-                          <td className="py-3.5 px-4 font-semibold font-mono text-slate-100">{q.id?.substring(0, 10)}...</td>
-                          <td className="py-3.5 px-4 text-slate-400">{q.project?.name || "General Site"}</td>
-                          <td className="py-3.5 px-4 font-bold text-white">${Number(q.items ? JSON.parse(q.items)[0]?.amount || 0 : 0).toLocaleString()}</td>
-                          <td className="py-3.5 px-4">
-                            {q.status === "DRAFT" ? (
-                              <span className="bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 w-max">
-                                <Bot className="w-3 h-3" /> AI DRAFT
-                              </span>
-                            ) : (
-                              <span className="text-slate-400">MANUAL</span>
-                            )}
-                          </td>
-                          <td className="py-3.5 px-4 text-center">
-                            <span
-                              className={`px-3 py-1 rounded-full text-[10px] font-bold border ${
-                                q.status === "DRAFT"
-                                  ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                                  : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                              }`}
-                            >
-                              {q.status}
-                            </span>
-                          </td>
-                          <td className="py-3.5 px-4 text-right">
-                            {q.status === "DRAFT" ? (
-                              <button
-                                onClick={() => handleApproveQuotation(q.id)}
-                                className="px-3 py-1.5 bg-emerald-500/20 text-emerald-400 rounded-xl font-semibold border border-emerald-500/30 hover:bg-emerald-500/30 transition-all text-xs"
+                      {quotations.map((q) => {
+                        let parsedAmount = 0;
+                        try {
+                          const parsed = typeof q.items === "string" ? JSON.parse(q.items) : q.items;
+                          parsedAmount = parsed[0]?.unitRate || parsed[0]?.amount || 0;
+                        } catch (e) {}
+
+                        return (
+                          <tr key={q.id} className="hover:bg-slate-800/40 transition-colors">
+                            <td className="py-3.5 px-4 font-semibold font-mono text-slate-100">{q.id?.substring(0, 10)}...</td>
+                            <td className="py-3.5 px-4 text-slate-400">{q.project?.name || "General Site"}</td>
+                            <td className="py-3.5 px-4 font-bold text-white">${Number(parsedAmount).toLocaleString()}</td>
+                            <td className="py-3.5 px-4">
+                              {q.status === "DRAFT" ? (
+                                <span className="bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 w-max">
+                                  <Bot className="w-3 h-3" /> AI DRAFT
+                                </span>
+                              ) : (
+                                <span className="text-slate-400">MANUAL</span>
+                              )}
+                            </td>
+                            <td className="py-3.5 px-4 text-center">
+                              <span
+                                className={`px-3 py-1 rounded-full text-[10px] font-bold border ${
+                                  q.status === "DRAFT"
+                                    ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                                    : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                                }`}
                               >
-                                Approve & Mark Billable
-                              </button>
-                            ) : (
-                              <span className="text-emerald-400 font-semibold flex items-center justify-end gap-1">
-                                <CheckCircle className="w-4 h-4" /> Approved
+                                {q.status}
                               </span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
+                            </td>
+                            <td className="py-3.5 px-4 text-right">
+                              {q.status === "DRAFT" ? (
+                                <button
+                                  onClick={() => handleApproveQuotation(q.id)}
+                                  className="px-3 py-1.5 bg-emerald-500/20 text-emerald-400 rounded-xl font-semibold border border-emerald-500/30 hover:bg-emerald-500/30 transition-all text-xs"
+                                >
+                                  Approve & Mark Billable
+                                </button>
+                              ) : (
+                                <span className="text-emerald-400 font-semibold flex items-center justify-end gap-1">
+                                  <CheckCircle className="w-4 h-4" /> Approved
+                                </span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>

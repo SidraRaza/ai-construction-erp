@@ -2,8 +2,9 @@ import { z } from "zod";
 
 export const quotationItemSchema = z.object({
   description: z.string().min(1, "Item description required"),
-  quantity: z.number().positive("Quantity must be positive"),
-  unitRate: z.number().positive("Unit rate must be positive"),
+  quantity: z.number().positive().default(1),
+  unitRate: z.number().positive().optional().default(1),
+  amount: z.number().optional(),
 });
 
 export const createQuotationSchema = z.object({
