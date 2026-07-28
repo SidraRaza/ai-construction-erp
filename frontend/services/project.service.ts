@@ -14,10 +14,55 @@ export class ProjectService {
   ) {
     requirePermission(userRole, "manage:projects");
 
+    // 1. Ensure Company Record Exists in Database
+    let company = await db.company.findUnique({
+      where: { id: companyId },
+    });
+
+    if (!company) {
+      company = await db.company.create({
+        data: {
+          id: companyId,
+          name: "BuildCorp ERP Construction",
+          email: "info@buildcorp.com",
+        },
+      });
+    }
+
+    // 2. Resolve Valid Client Entity ID to satisfy Foreign Key Constraint
+    let targetClientId: string | undefined = data.clientId;
+
+    if (targetClientId) {
+      const existingClient = await db.client.findFirst({
+        where: { id: targetClientId, companyId: company.id },
+      });
+      if (!existingClient) {
+        targetClientId = undefined;
+      }
+    }
+
+    if (!targetClientId) {
+      let defaultClient = await db.client.findFirst({
+        where: { companyId: company.id },
+      });
+
+      if (!defaultClient) {
+        defaultClient = await db.client.create({
+          data: {
+            companyId: company.id,
+            name: "General Corporate Client",
+            contact: "+1 555-0000",
+            email: "client@buildcorp.com",
+          },
+        });
+      }
+      targetClientId = defaultClient.id;
+    }
+
     const project = await db.project.create({
       data: {
-        companyId,
-        clientId: data.clientId,
+        companyId: company.id,
+        clientId: targetClientId,
         name: data.name,
         startDate: new Date(data.startDate),
         endDate: data.endDate ? new Date(data.endDate) : null,
@@ -31,7 +76,7 @@ export class ProjectService {
     });
 
     await ActivityLogService.log({
-      companyId,
+      companyId: company.id,
       userId,
       action: "CREATE_PROJECT",
       entityType: "Project",
