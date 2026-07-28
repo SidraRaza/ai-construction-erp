@@ -10,24 +10,30 @@ export default function FinancialsPage() {
   const { showToast } = useToast();
   const [quotations, setQuotations] = useState<any[]>([]);
   const [invoices, setInvoices] = useState<any[]>([]);
+  const [projects, setProjects] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<"quotations" | "invoices">("quotations");
   const [isLoading, setIsLoading] = useState(true);
   const [isQuotationModalOpen, setIsQuotationModalOpen] = useState(false);
 
-  // Form State for Quotation
+  // Explicit Form State for Quotation Creation
+  const [clientName, setClientName] = useState("");
+  const [selectedProjectId, setSelectedProjectId] = useState("");
   const [amount, setAmount] = useState("");
+  const [description, setDescription] = useState("");
 
   const fetchFinancials = async () => {
     setIsLoading(true);
     try {
-      const [qRes, iRes] = await Promise.all([
+      const [qRes, iRes, pRes] = await Promise.all([
         fetch("/api/quotations"),
         fetch("/api/invoices"),
+        fetch("/api/projects"),
       ]);
-      const [qJson, iJson] = await Promise.all([qRes.json(), iRes.json()]);
+      const [qJson, iJson, pJson] = await Promise.all([qRes.json(), iRes.json(), pRes.json()]);
 
       if (qJson.success) setQuotations(qJson.data || []);
       if (iJson.success) setInvoices(iJson.data || []);
+      if (pJson.success) setProjects(pJson.data || []);
     } catch (err) {
       showToast("Failed to fetch financial data from database", "error");
     } finally {
@@ -41,18 +47,21 @@ export default function FinancialsPage() {
 
   const handleCreateQuotation = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!amount) return;
+    if (!amount || !clientName) {
+      showToast("Client Name and Quotation Amount are required!", "warning");
+      return;
+    }
 
     try {
       const res = await fetch("/api/quotations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          clientId: "cl_default_client",
-          projectId: "p1",
+          clientId: clientName.toLowerCase().replace(/\s+/g, "_"),
+          projectId: selectedProjectId || undefined,
           items: [
             {
-              description: "Initial Site Estimation",
+              description: description || "Site Estimation",
               quantity: 1,
               unitRate: Number(amount),
               amount: Number(amount),
@@ -60,14 +69,17 @@ export default function FinancialsPage() {
           ],
           gstPct: 18,
           discount: 0,
-          notes: "Created via Admin Financial Studio",
+          notes: `Client: ${clientName}`,
         }),
       });
 
       const json = await res.json();
       if (json.success) {
-        showToast("New Quotation saved in Prisma Database!", "success");
+        showToast(`Quotation for "${clientName}" saved in Database!`, "success");
+        setClientName("");
+        setSelectedProjectId("");
         setAmount("");
+        setDescription("");
         setIsQuotationModalOpen(false);
         fetchFinancials();
       } else {
@@ -172,7 +184,7 @@ export default function FinancialsPage() {
                 <div className="py-12 flex flex-col items-center justify-center text-center space-y-3 border-2 border-dashed border-slate-800 rounded-2xl">
                   <FileText className="w-10 h-10 text-slate-600" />
                   <h4 className="text-sm font-bold text-slate-300">No Quotations Created in Database Yet</h4>
-                  <p className="text-xs text-slate-500">Click "Create Quotation" or run AI Studio to generate database estimates.</p>
+                  <p className="text-xs text-slate-500">Click "Create Quotation" to add a new project estimate.</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -315,20 +327,59 @@ export default function FinancialsPage() {
             </div>
           )}
 
-          {/* New Quotation Modal */}
+          {/* New Explicit Quotation Modal */}
           {isQuotationModalOpen && (
             <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
               <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-4 shadow-2xl">
-                <h3 className="text-lg font-bold text-white">Create New Quotation in Database</h3>
+                <h3 className="text-lg font-bold text-white">Create New Quotation</h3>
                 <form onSubmit={handleCreateQuotation} className="space-y-4">
                   <div>
-                    <label className="text-xs font-semibold text-slate-400 block mb-1">Quotation Amount ($)</label>
+                    <label className="text-xs font-semibold text-slate-400 block mb-1">Client Name *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Acme Real Estate"
+                      value={clientName}
+                      onChange={(e) => setClientName(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-slate-400 block mb-1">Select Project (Optional)</label>
+                    <select
+                      value={selectedProjectId}
+                      onChange={(e) => setSelectedProjectId(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                    >
+                      <option value="">General Site (No specific project)</option>
+                      {projects.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-slate-400 block mb-1">Quotation Amount ($) *</label>
                     <input
                       type="number"
                       required
-                      placeholder="185000"
+                      placeholder="340000"
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-slate-400 block mb-1">Description / Notes</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Structural steel & concrete work estimation"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
                     />
                   </div>
