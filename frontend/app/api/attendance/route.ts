@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { getAuthContext } from "@/lib/auth-helpers";
 
 export async function GET(req: NextRequest) {
   try {
-    const { companyId } = getAuthContext(req);
+    const companyId = req.headers.get("x-company-id") || "cl_default_company";
 
     // Fetch users for the company
     const users = await db.user.findMany({
