@@ -30,7 +30,7 @@ export default function FinancialsPage() {
 
   // Payment Proof Modal State
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
-  const [paymentMethod, setPaymentMethod] = useState("CASH"); // CASH | BANK | JAZZCASH | EASYPAISA | STRIPE
+  const [paymentMethod, setPaymentMethod] = useState("CASH"); // CASH | BANK | CHEQUE | JAZZCASH | EASYPAISA | STRIPE
   const [paymentAmount, setPaymentAmount] = useState("");
   const [receiptReference, setReceiptReference] = useState("");
 
@@ -455,6 +455,17 @@ export default function FinancialsPage() {
                     />
                   </div>
 
+                  <div>
+                    <label className="text-xs font-semibold text-slate-400 block mb-1">Description / Notes</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Structural steel & concrete work estimation"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                    />
+                  </div>
+
                   <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
                     <button
                       type="button"
@@ -541,11 +552,12 @@ export default function FinancialsPage() {
                       onChange={(e) => setPaymentMethod(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500 font-semibold"
                     >
-                      <option value="CASH">Naqad Cash (Physical Cash Handover)</option>
-                      <option value="BANK">Bank Wire / Direct Transfer</option>
-                      <option value="JAZZCASH">JazzCash Mobile Wallet</option>
-                      <option value="EASYPAISA">EasyPaisa Mobile Wallet</option>
-                      <option value="STRIPE">Stripe Card Payment</option>
+                      <option value="CASH">💵 Naqad Cash (Physical Cash Handover)</option>
+                      <option value="BANK">🏦 Bank Wire / Direct Online Transfer</option>
+                      <option value="CHEQUE">📜 Bank Cheque / Pay Order (Cheque #)</option>
+                      <option value="JAZZCASH">📱 JazzCash Mobile Wallet</option>
+                      <option value="EASYPAISA">📱 EasyPaisa Mobile Wallet</option>
+                      <option value="STRIPE">💳 Credit / Debit Card (Stripe POS)</option>
                     </select>
                   </div>
 
@@ -561,10 +573,10 @@ export default function FinancialsPage() {
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold text-slate-400 block mb-1">Receipt Slip # / Transaction Ref / Screenshot Reference</label>
+                    <label className="text-xs font-semibold text-slate-400 block mb-1">Receipt Slip # / Cheque # / Transaction Ref / Screenshot Reference</label>
                     <input
                       type="text"
-                      placeholder="e.g. TRX-9988231 / Bank Receipt Slip / Handover Note"
+                      placeholder="e.g. Cheque #884920 / TRX-9988231 / Bank Slip"
                       value={receiptReference}
                       onChange={(e) => setReceiptReference(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
