@@ -24,7 +24,7 @@ export class ProjectService {
         data: {
           id: companyId,
           name: "BuildCorp ERP Construction",
-          email: "info@buildcorp.com",
+          address: "Headquarters, Main Boulevard",
         },
       });
     }
