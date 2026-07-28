@@ -3,6 +3,31 @@ import { createQuotationSchema } from "@/validations/financials.validation";
 import { FinancialsService } from "@/services/financials.service";
 import { ApiResponse } from "@/types/api";
 import { Role } from "@/lib/rbac";
+import { db } from "@/lib/db";
+
+export async function GET(req: Request) {
+  try {
+    const companyId = req.headers.get("x-company-id") || "cl_default_company";
+
+    const quotations = await db.quotation.findMany({
+      where: { companyId },
+      include: {
+        project: true,
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return NextResponse.json({
+      success: true,
+      data: quotations,
+    });
+  } catch (error: any) {
+    return NextResponse.json(
+      { success: false, error: { message: error.message } },
+      { status: 500 }
+    );
+  }
+}
 
 export async function POST(req: Request) {
   try {
