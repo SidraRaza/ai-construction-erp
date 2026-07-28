@@ -23,8 +23,10 @@ export default function FinancialsPage() {
   const [quotationStatus, setQuotationStatus] = useState("SENT");
   const [description, setDescription] = useState("");
 
-  // Edit Quotation Modal State
+  // Edit Quotation Modal State (ALL FIELDS EDITABLE)
   const [editingQuotation, setEditingQuotation] = useState<any>(null);
+  const [editQuotationId, setEditQuotationId] = useState("");
+  const [editProjectId, setEditProjectId] = useState("");
   const [editStatus, setEditStatus] = useState("SENT");
   const [editAmount, setEditAmount] = useState("");
 
@@ -123,6 +125,8 @@ export default function FinancialsPage() {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          newId: editQuotationId !== editingQuotation.id ? editQuotationId : undefined,
+          projectId: editProjectId || null,
           status: editStatus,
           amount: editAmount ? Number(editAmount) : undefined,
         }),
@@ -130,7 +134,7 @@ export default function FinancialsPage() {
 
       const json = await res.json();
       if (json.success) {
-        showToast(`Quotation ${editingQuotation.id} updated in Database!`, "success");
+        showToast(`Quotation updated in Database!`, "success");
         setEditingQuotation(null);
         fetchFinancials();
       } else {
@@ -186,7 +190,7 @@ export default function FinancialsPage() {
               <h2 className="text-2xl font-bold tracking-tight text-white flex items-center gap-3">
                 <Receipt className="w-7 h-7 text-amber-400" /> Financial Billing & Quotations Engine
               </h2>
-              <p className="text-sm text-slate-400 mt-1">Quotation editing, status selection, and payment proof audit trails.</p>
+              <p className="text-sm text-slate-400 mt-1">Full Quotation editing (ID, Project, Amount, Status) & payment proof audit trails.</p>
             </div>
             <div className="flex items-center gap-3">
               <button
@@ -296,12 +300,14 @@ export default function FinancialsPage() {
                               <button
                                 onClick={() => {
                                   setEditingQuotation(q);
+                                  setEditQuotationId(q.id);
+                                  setEditProjectId(q.projectId || "");
                                   setEditStatus(q.status);
                                   setEditAmount(String(parsedAmount));
                                 }}
-                                className="px-2.5 py-1 bg-slate-800 text-amber-400 rounded-lg font-semibold hover:bg-slate-700 transition-all border border-slate-700"
+                                className="px-2.5 py-1 bg-slate-800 text-amber-400 rounded-lg font-semibold hover:bg-slate-700 transition-all border border-slate-700 flex items-center gap-1 ml-auto"
                               >
-                                Edit Quotation
+                                <Edit className="w-3 h-3" /> Edit All Fields
                               </button>
                             </td>
                           </tr>
@@ -486,18 +492,46 @@ export default function FinancialsPage() {
             </div>
           )}
 
-          {/* Edit Quotation Modal */}
+          {/* Edit Quotation Modal (EDIT ALL FIELDS: ID, PROJECT, AMOUNT, STATUS) */}
           {editingQuotation && (
             <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
               <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-4 shadow-2xl">
-                <h3 className="text-lg font-bold text-white">Update Quotation: {editingQuotation.id}</h3>
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <Edit className="w-5 h-5 text-amber-400" /> Edit All Quotation Fields
+                </h3>
                 <form onSubmit={handleUpdateQuotation} className="space-y-4">
                   <div>
-                    <label className="text-xs font-semibold text-slate-400 block mb-1">Update Status</label>
+                    <label className="text-xs font-semibold text-slate-400 block mb-1">Quotation ID</label>
+                    <input
+                      type="text"
+                      value={editQuotationId}
+                      onChange={(e) => setEditQuotationId(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-slate-400 block mb-1">Select Project</label>
+                    <select
+                      value={editProjectId}
+                      onChange={(e) => setEditProjectId(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                    >
+                      <option value="">General Site (No specific project)</option>
+                      {projects.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-slate-400 block mb-1">Quotation Status</label>
                     <select
                       value={editStatus}
                       onChange={(e) => setEditStatus(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500 font-bold"
                     >
                       <option value="SENT">SENT</option>
                       <option value="PENDING">PENDING</option>
@@ -513,7 +547,7 @@ export default function FinancialsPage() {
                       type="number"
                       value={editAmount}
                       onChange={(e) => setEditAmount(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500 font-bold"
                     />
                   </div>
 

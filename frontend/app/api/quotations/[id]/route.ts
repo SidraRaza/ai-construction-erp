@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { ActivityLogService } from "@/services/activity-log.service";
-import { Prisma } from "@prisma/client";
 
 export async function PUT(
   req: NextRequest,
@@ -13,7 +12,7 @@ export async function PUT(
     const userId = req.headers.get("x-user-id") || "cl_default_user";
 
     const body = await req.json();
-    const { status, amount, notes } = body;
+    const { newId, projectId, status, amount, notes } = body;
 
     const existing = await db.quotation.findFirst({
       where: { id, companyId },
@@ -36,6 +35,8 @@ export async function PUT(
     const updated = await db.quotation.update({
       where: { id },
       data: {
+        ...(newId ? { id: newId } : {}),
+        ...(projectId !== undefined ? { projectId: projectId || null } : {}),
         ...(status ? { status } : {}),
         ...(notes ? { notes } : {}),
         items: updatedItems,
@@ -47,7 +48,7 @@ export async function PUT(
       userId,
       action: "UPDATE_QUOTATION",
       entityType: "Quotation",
-      entityId: id,
+      entityId: updated.id,
       meta: { previousStatus: existing.status, newStatus: updated.status, amount },
     });
 
