@@ -1,32 +1,35 @@
 import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcryptjs";
+import * as crypto from "crypto";
 
 const prisma = new PrismaClient();
 
-async function main() {
-  console.log("🌱 Starting database seed...");
+function hashPassword(password: string): string {
+  return crypto.createHash("sha256").update(password).digest("hex");
+}
 
-  const passwordHash = await bcrypt.hash("Password123!", 10);
+async function main() {
+  console.log("🌱 Seeding database...");
 
   // 1. Create Default Company
   const company = await prisma.company.create({
     data: {
-      name: "BuildCorp Solutions",
-      address: "123 Construction Boulevard, Suite 400",
-      taxNumber: "TX-998877",
-      bankDetails: "Bank of America - IBAN US99BOFA123456789",
+      id: "cl_default_company",
+      name: "BuildCorp Enterprise ERP",
       subscriptionPlan: "ENTERPRISE",
       status: "ACTIVE",
     },
   });
-  console.log(`✅ Created Company: ${company.name}`);
 
-  // 2. Create Users across Roles
-  await prisma.user.create({
+  console.log(`✅ Created company: ${company.name} (${company.id})`);
+
+  // 2. Create Users for all 5 Roles
+  const passwordHash = hashPassword("Password123!");
+
+  const superAdmin = await prisma.user.create({
     data: {
       companyId: company.id,
-      name: "Super Admin User",
-      email: "superadmin@buildcorp.com",
+      name: "Platform Owner",
+      email: "owner@buildcorp.com",
       passwordHash,
       role: "SUPER_ADMIN",
     },
@@ -62,10 +65,10 @@ async function main() {
     },
   });
 
-  await prisma.user.create({
+  const clientUser = await prisma.user.create({
     data: {
       companyId: company.id,
-      name: "Robert Client",
+      name: "Client Representative",
       email: "client@buildcorp.com",
       passwordHash,
       role: "CLIENT",
@@ -81,7 +84,6 @@ async function main() {
       name: "Acme Real Estate",
       contact: "+1 555-0199",
       email: "contact@acmerealestate.com",
-      address: "456 Skyline Drive",
     },
   });
 
@@ -99,15 +101,16 @@ async function main() {
       progressPct: 25,
       team: {
         create: [
-          { userId: engineer.id, roleOnProject: "Site Engineer" },
-          { userId: labour.id, roleOnProject: "Mason Lead" },
+          { userId: engineer.id, role: "SITE_ENGINEER" },
+          { userId: labour.id, role: "MASON_LEAD" },
         ],
       },
     },
   });
 
-  console.log(`✅ Created Sample Project: ${project.name}`);
-  console.log("🎉 Seeding completed successfully!");
+  console.log(`✅ Created project: ${project.name} (${project.id})`);
+
+  console.log("🎉 Database seeding completed successfully!");
 }
 
 main()

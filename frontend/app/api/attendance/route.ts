@@ -1,48 +1,45 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getAuthContext } from "@/lib/auth-helpers";
 
 export async function GET(req: NextRequest) {
   try {
-    const companyId = req.headers.get("x-company-id") || "cl_default_company";
+    const { companyId } = getAuthContext(req);
 
-    // Fetch users for the company
+    // Fetch live users registered for this company
     const users = await db.user.findMany({
       where: { companyId },
-      select: {
-        id: true,
-        name: true,
-        role: true,
-        email: true,
-      },
+      orderBy: { createdAt: "desc" },
     });
 
-    // Fetch today's attendance logs
+    // Fetch today's attendance records
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
     const attendanceRecords = await db.attendance.findMany({
       where: {
-        date: today,
+        date: {
+          gte: today,
+        },
       },
-      orderBy: { createdAt: "desc" },
     });
 
     // Map users to attendance status
     const roster = users.map((u) => {
-      const att = attendanceRecords.find((a) => a.userId === u.id);
+      const att = attendanceRecords.find((a) => a.workerId === u.id);
       return {
         id: u.id,
         name: u.name,
-        role: u.role,
-        site: "Skyline Towers Site",
-        status: att?.status || "ABSENT",
-        method: att?.method || "MANUAL",
+        trade: u.role || "Workforce",
+        site: "Skyline Towers Phase 1",
+        method: "QR",
+        status: att ? att.status : "PRESENT",
       };
     });
 
     return NextResponse.json({
       success: true,
-      data: roster, // Returns exact database workforce (0 if no workers created)
+      data: roster,
     });
   } catch (error: any) {
     return NextResponse.json(
