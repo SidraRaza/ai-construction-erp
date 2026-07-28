@@ -42,10 +42,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: roster.length > 0 ? roster : [
-        { id: "usr_admin", name: "Sarah Admin", role: "ADMIN", site: "Main Office Site", status: "PRESENT", method: "QR" },
-        { id: "usr_eng", name: "Ahmed Engineer", role: "ENGINEER", site: "Skyline Towers Site", status: "PRESENT", method: "QR" },
-      ],
+      data: roster, // Returns exact database workforce (0 if no workers created)
     });
   } catch (error: any) {
     return NextResponse.json(

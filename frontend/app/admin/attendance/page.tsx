@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/navigation/sidebar";
 import { Header } from "@/components/navigation/header";
 import { useToast } from "@/components/ui/toast-provider";
-import { UserCheck, QrCode, RefreshCw } from "lucide-react";
+import { UserCheck, QrCode, RefreshCw, Users } from "lucide-react";
 
 export default function AttendancePage() {
   const { showToast } = useToast();
@@ -48,32 +48,30 @@ export default function AttendancePage() {
 
       const json = await res.json();
       if (json.success) {
-        showToast(`Updated attendance for user in database to ${newStatus}`, "success");
-        setLabourList(
-          labourList.map((item) =>
-            item.id === userId ? { ...item, status: newStatus, method: "MANUAL" } : item
-          )
-        );
+        showToast(`Recorded ${newStatus} status in database`, "success");
       } else {
-        // If duplicate record exists, update local state
-        setLabourList(
-          labourList.map((item) =>
-            item.id === userId ? { ...item, status: newStatus, method: "MANUAL" } : item
-          )
-        );
-        showToast(`Attendance status updated to ${newStatus}`, "info");
+        showToast(`Status set to ${newStatus}`, "info");
       }
+      setLabourList(
+        labourList.map((item) =>
+          item.id === userId ? { ...item, status: newStatus, method: "MANUAL" } : item
+        )
+      );
     } catch (err) {
-      showToast("Attendance status updated", "info");
+      showToast(`Status updated to ${newStatus}`, "info");
     }
   };
 
   const handleSimulateQrScan = async () => {
+    if (labourList.length === 0) {
+      setQrMessage("⚠️ No workforce registered in database yet to scan.");
+      return;
+    }
     setQrMessage("Scanning QR Code...");
-    const target = labourList[0] || { id: "usr_eng", name: "Ahmed Engineer" };
+    const target = labourList[0];
 
     try {
-      const res = await fetch("/api/attendance/mark", {
+      await fetch("/api/attendance/mark", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -85,7 +83,6 @@ export default function AttendancePage() {
         }),
       });
 
-      const json = await res.json();
       setQrMessage(`✅ Verified ${target.name} via QR scan in Database!`);
       showToast(`QR Check-in recorded for ${target.name}`, "success");
       fetchAttendance();
@@ -157,63 +154,73 @@ export default function AttendancePage() {
               <span className="text-xs text-slate-400">Date: {new Date().toLocaleDateString()}</span>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr className="border-b border-slate-800 text-slate-400 font-semibold uppercase">
-                    <th className="py-3 px-4">Worker Name</th>
-                    <th className="py-3 px-4">Trade / Role</th>
-                    <th className="py-3 px-4">Site Location</th>
-                    <th className="py-3 px-4">Method</th>
-                    <th className="py-3 px-4 text-center">Status</th>
-                    <th className="py-3 px-4 text-right">Quick Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-800/60">
-                  {labourList.map((worker) => (
-                    <tr key={worker.id} className="hover:bg-slate-800/40 transition-colors">
-                      <td className="py-3.5 px-4 font-semibold text-slate-100">{worker.name}</td>
-                      <td className="py-3.5 px-4 text-slate-400">{worker.role}</td>
-                      <td className="py-3.5 px-4 text-slate-300">{worker.site}</td>
-                      <td className="py-3.5 px-4 font-mono text-[11px] text-amber-400">{worker.method}</td>
-                      <td className="py-3.5 px-4 text-center">
-                        <span
-                          className={`px-3 py-1 rounded-full text-[10px] font-bold border ${
-                            worker.status === "PRESENT"
-                              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                              : worker.status === "LATE"
-                              ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                              : "bg-rose-500/10 text-rose-400 border-rose-500/20"
-                          }`}
-                        >
-                          {worker.status}
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-4 text-right space-x-1">
-                        <button
-                          onClick={() => handleToggleStatus(worker.id, "PRESENT")}
-                          className="px-2.5 py-1 bg-emerald-500/20 text-emerald-400 rounded-lg font-semibold hover:bg-emerald-500/30 transition-all"
-                        >
-                          Present
-                        </button>
-                        <button
-                          onClick={() => handleToggleStatus(worker.id, "LATE")}
-                          className="px-2.5 py-1 bg-amber-500/20 text-amber-400 rounded-lg font-semibold hover:bg-amber-500/30 transition-all"
-                        >
-                          Late
-                        </button>
-                        <button
-                          onClick={() => handleToggleStatus(worker.id, "ABSENT")}
-                          className="px-2.5 py-1 bg-rose-500/20 text-rose-400 rounded-lg font-semibold hover:bg-rose-500/30 transition-all"
-                        >
-                          Absent
-                        </button>
-                      </td>
+            {labourList.length === 0 ? (
+              <div className="py-12 flex flex-col items-center justify-center text-center space-y-3 border-2 border-dashed border-slate-800 rounded-2xl">
+                <Users className="w-10 h-10 text-slate-600" />
+                <h4 className="text-sm font-bold text-slate-300">No Workers Registered in Database Yet</h4>
+                <p className="text-xs text-slate-500 max-w-sm">
+                  Add employees and site workers in Staff & Payroll to see them in the daily site roster.
+                </p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="border-b border-slate-800 text-slate-400 font-semibold uppercase">
+                      <th className="py-3 px-4">Worker Name</th>
+                      <th className="py-3 px-4">Trade / Role</th>
+                      <th className="py-3 px-4">Site Location</th>
+                      <th className="py-3 px-4">Method</th>
+                      <th className="py-3 px-4 text-center">Status</th>
+                      <th className="py-3 px-4 text-right">Quick Action</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60">
+                    {labourList.map((worker) => (
+                      <tr key={worker.id} className="hover:bg-slate-800/40 transition-colors">
+                        <td className="py-3.5 px-4 font-semibold text-slate-100">{worker.name}</td>
+                        <td className="py-3.5 px-4 text-slate-400">{worker.role}</td>
+                        <td className="py-3.5 px-4 text-slate-300">{worker.site}</td>
+                        <td className="py-3.5 px-4 font-mono text-[11px] text-amber-400">{worker.method}</td>
+                        <td className="py-3.5 px-4 text-center">
+                          <span
+                            className={`px-3 py-1 rounded-full text-[10px] font-bold border ${
+                              worker.status === "PRESENT"
+                                ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                                : worker.status === "LATE"
+                                ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                                : "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                            }`}
+                          >
+                            {worker.status}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4 text-right space-x-1">
+                          <button
+                            onClick={() => handleToggleStatus(worker.id, "PRESENT")}
+                            className="px-2.5 py-1 bg-emerald-500/20 text-emerald-400 rounded-lg font-semibold hover:bg-emerald-500/30 transition-all"
+                          >
+                            Present
+                          </button>
+                          <button
+                            onClick={() => handleToggleStatus(worker.id, "LATE")}
+                            className="px-2.5 py-1 bg-amber-500/20 text-amber-400 rounded-lg font-semibold hover:bg-amber-500/30 transition-all"
+                          >
+                            Late
+                          </button>
+                          <button
+                            onClick={() => handleToggleStatus(worker.id, "ABSENT")}
+                            className="px-2.5 py-1 bg-rose-500/20 text-rose-400 rounded-lg font-semibold hover:bg-rose-500/30 transition-all"
+                          >
+                            Absent
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
 
           {/* QR Scanner Modal Simulation */}
