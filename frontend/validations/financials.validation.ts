@@ -8,6 +8,7 @@ export const quotationItemSchema = z.object({
 });
 
 export const createQuotationSchema = z.object({
+  id: z.string().optional(),
   clientId: z.string().min(1, "Client is required"),
   projectId: z.string().optional(),
   items: z.array(quotationItemSchema).min(1, "At least one item is required"),
@@ -17,6 +18,7 @@ export const createQuotationSchema = z.object({
 });
 
 export const createInvoiceSchema = z.object({
+  id: z.string().optional(),
   clientId: z.string().min(1, "Client is required"),
   projectId: z.string().optional(),
   quotationId: z.string().optional(),

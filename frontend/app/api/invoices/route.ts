@@ -8,8 +8,8 @@ export async function GET(req: NextRequest) {
     const invoices = await db.invoice.findMany({
       where: { companyId },
       include: {
-        client: true,
         project: true,
+        quotation: true,
       },
       orderBy: { createdAt: "desc" },
     });

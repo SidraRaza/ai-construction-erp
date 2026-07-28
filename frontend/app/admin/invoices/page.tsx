@@ -16,6 +16,7 @@ export default function FinancialsPage() {
   const [isQuotationModalOpen, setIsQuotationModalOpen] = useState(false);
 
   // Explicit Form State for Quotation Creation
+  const [customQuotationId, setCustomQuotationId] = useState("");
   const [clientName, setClientName] = useState("");
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [amount, setAmount] = useState("");
@@ -57,6 +58,7 @@ export default function FinancialsPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          id: customQuotationId.trim() || undefined,
           clientId: clientName.toLowerCase().replace(/\s+/g, "_"),
           projectId: selectedProjectId || undefined,
           items: [
@@ -76,6 +78,7 @@ export default function FinancialsPage() {
       const json = await res.json();
       if (json.success) {
         showToast(`Quotation for "${clientName}" saved in Database!`, "success");
+        setCustomQuotationId("");
         setClientName("");
         setSelectedProjectId("");
         setAmount("");
@@ -209,7 +212,7 @@ export default function FinancialsPage() {
 
                         return (
                           <tr key={q.id} className="hover:bg-slate-800/40 transition-colors">
-                            <td className="py-3.5 px-4 font-semibold font-mono text-slate-100">{q.id?.substring(0, 10)}...</td>
+                            <td className="py-3.5 px-4 font-semibold font-mono text-amber-400">{q.id}</td>
                             <td className="py-3.5 px-4 text-slate-400">{q.project?.name || "General Site"}</td>
                             <td className="py-3.5 px-4 font-bold text-white">${Number(parsedAmount).toLocaleString()}</td>
                             <td className="py-3.5 px-4">
@@ -286,7 +289,7 @@ export default function FinancialsPage() {
                     <tbody className="divide-y divide-slate-800/60">
                       {invoices.map((inv) => (
                         <tr key={inv.id} className="hover:bg-slate-800/40 transition-colors">
-                          <td className="py-3.5 px-4 font-mono font-semibold text-amber-400">{inv.id?.substring(0, 10)}...</td>
+                          <td className="py-3.5 px-4 font-mono font-semibold text-amber-400">{inv.id}</td>
                           <td className="py-3.5 px-4 font-bold text-slate-300">v{inv.version || 1}.0</td>
                           <td className="py-3.5 px-4">
                             <p className="font-semibold text-slate-100">{inv.client?.name || "Corporate Client"}</p>
@@ -333,6 +336,17 @@ export default function FinancialsPage() {
               <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-4 shadow-2xl">
                 <h3 className="text-lg font-bold text-white">Create New Quotation</h3>
                 <form onSubmit={handleCreateQuotation} className="space-y-4">
+                  <div>
+                    <label className="text-xs font-semibold text-slate-400 block mb-1">Custom Quotation ID (Optional)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. QT-2026-001 (Leave blank to auto-generate)"
+                      value={customQuotationId}
+                      onChange={(e) => setCustomQuotationId(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                    />
+                  </div>
+
                   <div>
                     <label className="text-xs font-semibold text-slate-400 block mb-1">Client Name *</label>
                     <input

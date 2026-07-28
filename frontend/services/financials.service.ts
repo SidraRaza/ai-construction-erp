@@ -60,6 +60,7 @@ export class FinancialsService {
 
     const quotation = await db.quotation.create({
       data: {
+        ...(data.id ? { id: data.id } : {}),
         companyId,
         clientId: targetClientId,
         projectId: targetProjectId || null,
@@ -166,6 +167,7 @@ export class FinancialsService {
 
     const invoice = await db.invoice.create({
       data: {
+        ...(data.id ? { id: data.id } : {}),
         companyId,
         clientId: targetClientId,
         projectId: targetProjectId || null,
