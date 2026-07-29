@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Bell, Search, Sun, Moon, CheckCircle2, Info, Clock, UserPlus, LogOut, KeyRound, Edit3 } from "lucide-react";
+import { Bell, Search, Sun, Moon, CheckCircle2, Info, Clock, UserPlus, LogOut, KeyRound, Edit3, ChevronDown, UserCheck, ShieldCheck, Building2, Globe2 } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 import { useToast } from "@/components/ui/toast-provider";
 import { UserAuthModal } from "@/components/auth/user-auth-modal";
@@ -16,6 +16,7 @@ export function Header({ userName: initialName = "Sarah Admin", userRole: initia
   const { theme, toggleTheme } = useTheme();
   const { showToast } = useToast();
   const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [dbNotifications, setDbNotifications] = useState<any[]>([]);
   const [isLoadingNotifs, setIsLoadingNotifs] = useState(false);
@@ -44,7 +45,7 @@ export function Header({ userName: initialName = "Sarah Admin", userRole: initia
       }
     } catch (err) {
       console.error("Failed to fetch activity log notifications", err);
-    } finally {
+    } fontally {
       setIsLoadingNotifs(false);
     }
   };
@@ -62,6 +63,7 @@ export function Header({ userName: initialName = "Sarah Admin", userRole: initia
   const handleLogout = () => {
     localStorage.removeItem("erp_user_session");
     setActiveSession(null);
+    setIsUserMenuOpen(false);
     showToast("Logged out of private account", "info");
     setIsAuthModalOpen(true);
   };
@@ -98,7 +100,9 @@ export function Header({ userName: initialName = "Sarah Admin", userRole: initia
   const currentCompany = activeSession?.company;
 
   const displayName = currentUser?.name || initialName;
-  const displayRole = currentUser?.role ? `${currentUser.role} (${currentCompany?.name || "Company"})` : initialRole;
+  const displayEmail = currentUser?.email || "admin@buildcorp.com";
+  const displayCompany = currentCompany?.name || "BuildCorp Enterprise";
+  const displayRole = currentUser?.role ? `${currentUser.role}` : initialRole;
 
   return (
     <header className="h-16 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-6 flex items-center justify-between sticky top-0 z-30">
@@ -116,35 +120,6 @@ export function Header({ userName: initialName = "Sarah Admin", userRole: initia
 
       {/* Action Controls */}
       <div className="flex items-center gap-3">
-        {/* Edit Profile Button */}
-        {activeSession && (
-          <button
-            onClick={() => setIsEditProfileOpen(true)}
-            title="Edit your personal & company information"
-            className="px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/20 text-xs font-bold transition-all flex items-center gap-1.5"
-          >
-            <Edit3 className="w-3.5 h-3.5" /> Edit Profile
-          </button>
-        )}
-
-        {/* Register / Login Account Button */}
-        {activeSession ? (
-          <button
-            onClick={handleLogout}
-            title="Log out of current private dashboard"
-            className="px-3 py-1.5 rounded-xl bg-slate-900 text-slate-400 hover:text-rose-400 hover:bg-slate-800 border border-slate-800 text-xs font-bold transition-all flex items-center gap-1.5"
-          >
-            <LogOut className="w-3.5 h-3.5" /> Switch Account
-          </button>
-        ) : (
-          <button
-            onClick={() => setIsAuthModalOpen(true)}
-            className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold text-xs shadow-md hover:brightness-110 transition-all flex items-center gap-1.5 border border-amber-400/30"
-          >
-            <KeyRound className="w-3.5 h-3.5" /> Register / Login
-          </button>
-        )}
-
         {/* Theme Toggle Button */}
         <button
           onClick={() => {
@@ -162,7 +137,10 @@ export function Header({ userName: initialName = "Sarah Admin", userRole: initia
           <button
             onClick={() => {
               setIsNotifOpen(!isNotifOpen);
-              if (!isNotifOpen) fetchNotifications();
+              if (!isNotifOpen) {
+                fetchNotifications();
+                setIsUserMenuOpen(false);
+              }
             }}
             className="p-2 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 relative transition-all"
           >
@@ -219,15 +197,106 @@ export function Header({ userName: initialName = "Sarah Admin", userRole: initia
 
         <div className="h-6 w-px bg-slate-800" />
 
-        {/* User Profile Badge */}
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold text-sm shadow-md">
-            {displayName.charAt(0)}
-          </div>
-          <div className="hidden sm:block text-left">
-            <p className="text-xs font-semibold text-slate-100">{displayName}</p>
-            <p className="text-[11px] text-slate-400 truncate max-w-[140px]">{displayRole}</p>
-          </div>
+        {/* Clickable User Profile Badge with Dropdown Menu */}
+        <div className="relative">
+          <button
+            onClick={() => {
+              setIsUserMenuOpen(!isUserMenuOpen);
+              setIsNotifOpen(false);
+            }}
+            className="flex items-center gap-3 p-1.5 rounded-2xl hover:bg-slate-900 border border-transparent hover:border-slate-800 transition-all duration-200 text-left group"
+          >
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold text-sm shadow-md group-hover:scale-105 transition-transform">
+              {displayName.charAt(0)}
+            </div>
+            <div className="hidden sm:block">
+              <p className="text-xs font-bold text-slate-100 flex items-center gap-1">
+                {displayName}
+                <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${isUserMenuOpen ? "rotate-180 text-amber-400" : ""}`} />
+              </p>
+              <p className="text-[11px] text-slate-400 truncate max-w-[130px] font-medium">{displayRole}</p>
+            </div>
+          </button>
+
+          {/* Enterprise User Profile Dropdown Menu */}
+          {isUserMenuOpen && (
+            <div className="absolute right-0 mt-3 w-72 bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-2xl space-y-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+              {/* Profile Card Header */}
+              <div className="p-3 bg-slate-950/80 rounded-2xl border border-slate-800/80 space-y-2">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-white font-black text-base shadow-md">
+                    {displayName.charAt(0)}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-bold text-white truncate">{displayName}</p>
+                    <p className="text-[11px] text-slate-400 truncate font-mono">{displayEmail}</p>
+                  </div>
+                </div>
+                <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400 font-medium">
+                  <span className="flex items-center gap-1"><Building2 className="w-3 h-3 text-amber-400" /> {displayCompany}</span>
+                  <span className="bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded-full border border-amber-500/20 font-bold">{displayRole}</span>
+                </div>
+              </div>
+
+              {/* Menu Items */}
+              <div className="space-y-1">
+                <button
+                  onClick={() => {
+                    setIsUserMenuOpen(false);
+                    setIsEditProfileOpen(true);
+                  }}
+                  className="w-full p-2.5 rounded-xl hover:bg-slate-800 text-xs font-bold text-slate-200 flex items-center gap-2.5 transition-colors group text-left"
+                >
+                  <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 group-hover:bg-amber-500 group-hover:text-white transition-all">
+                    <Edit3 className="w-3.5 h-3.5" />
+                  </div>
+                  <div>
+                    <p className="text-slate-100">Edit Profile & Company</p>
+                    <p className="text-[10px] text-slate-400 font-normal">Update name, phone, company, country</p>
+                  </div>
+                </button>
+
+                {!activeSession && (
+                  <button
+                    onClick={() => {
+                      setIsUserMenuOpen(false);
+                      setIsAuthModalOpen(true);
+                    }}
+                    className="w-full p-2.5 rounded-xl hover:bg-slate-800 text-xs font-bold text-amber-400 flex items-center gap-2.5 transition-colors text-left"
+                  >
+                    <div className="p-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                      <KeyRound className="w-3.5 h-3.5" />
+                    </div>
+                    <div>
+                      <p>Register / Login Account</p>
+                      <p className="text-[10px] text-slate-400 font-normal">Access your private dashboard</p>
+                    </div>
+                  </button>
+                )}
+
+                {activeSession && (
+                  <button
+                    onClick={handleLogout}
+                    className="w-full p-2.5 rounded-xl hover:bg-rose-500/10 text-xs font-bold text-rose-400 flex items-center gap-2.5 transition-colors text-left"
+                  >
+                    <div className="p-1.5 rounded-lg bg-rose-500/10 border border-rose-500/20">
+                      <LogOut className="w-3.5 h-3.5 text-rose-400" />
+                    </div>
+                    <div>
+                      <p>Sign Out / Switch Account</p>
+                      <p className="text-[10px] text-slate-400 font-normal">Log out of current private dashboard</p>
+                    </div>
+                  </button>
+                )}
+              </div>
+
+              <div className="pt-2 border-t border-slate-800 text-center">
+                <p className="text-[10px] text-slate-500 flex items-center justify-center gap-1 font-medium">
+                  <ShieldCheck className="w-3 h-3 text-emerald-400" /> 100% Private Isolated Tenant Vault
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
