@@ -1,16 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Bell, Search, Sun, Moon, CheckCircle2, AlertTriangle, Info, Clock, UserPlus } from "lucide-react";
+import { Bell, Search, Sun, Moon, CheckCircle2, Info, Clock, UserPlus, LogOut, KeyRound, Lock } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 import { useToast } from "@/components/ui/toast-provider";
+import { UserAuthModal } from "@/components/auth/user-auth-modal";
 
 interface HeaderProps {
   userName?: string;
   userRole?: string;
 }
 
-export function Header({ userName = "Sarah Admin", userRole = "Admin" }: HeaderProps) {
+export function Header({ userName: initialName = "Sarah Admin", userRole: initialRole = "Admin" }: HeaderProps) {
   const { theme, toggleTheme } = useTheme();
   const { showToast } = useToast();
   const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -18,12 +19,18 @@ export function Header({ userName = "Sarah Admin", userRole = "Admin" }: HeaderP
   const [dbNotifications, setDbNotifications] = useState<any[]>([]);
   const [isLoadingNotifs, setIsLoadingNotifs] = useState(false);
 
-  // Visitor Onboarding Modal State
-  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [role, setRole] = useState("CLIENT");
+  // Active Auth Session State
+  const [activeSession, setActiveSession] = useState<{ user?: any; company?: any } | null>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("erp_user_session");
+      if (saved) {
+        setActiveSession(JSON.parse(saved));
+      }
+    } catch (e) {}
+  }, []);
 
   const fetchNotifications = async () => {
     setIsLoadingNotifs(true);
@@ -50,33 +57,11 @@ export function Header({ userName = "Sarah Admin", userRole = "Admin" }: HeaderP
     showToast(`Global Search for "${searchQuery}" executed across projects & invoices`, "info");
   };
 
-  const handleVisitorRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name || !email) {
-      showToast("Name and Email are required!", "warning");
-      return;
-    }
-
-    try {
-      const res = await fetch("/api/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, phone, role }),
-      });
-
-      const json = await res.json();
-      if (json.success) {
-        showToast(`Welcome ${name}! Your profile has been registered in the database.`, "success");
-        setIsOnboardingOpen(false);
-        setName("");
-        setEmail("");
-        setPhone("");
-      } else {
-        showToast(`Error: ${json.error?.message}`, "error");
-      }
-    } catch (err) {
-      showToast("Failed to register user profile", "error");
-    }
+  const handleLogout = () => {
+    localStorage.removeItem("erp_user_session");
+    setActiveSession(null);
+    showToast("Logged out of private account", "info");
+    setIsAuthModalOpen(true);
   };
 
   const formatTimeAgo = (dateStr: string) => {
@@ -96,13 +81,20 @@ export function Header({ userName = "Sarah Admin", userRole = "Admin" }: HeaderP
       case "UPDATE_QUOTATION":
         return { title: "Quotation Updated", icon: <Info className="w-3.5 h-3.5 text-amber-400" /> };
       case "REGISTER_USER":
-        return { title: "User Profile Registered", icon: <CheckCircle2 className="w-3.5 h-3.5 text-purple-400" /> };
+      case "REGISTER_COMPANY_ADMIN":
+        return { title: "New Account Registered", icon: <CheckCircle2 className="w-3.5 h-3.5 text-purple-400" /> };
       case "CREATE_PROJECT":
         return { title: "Project Initialized", icon: <CheckCircle2 className="w-3.5 h-3.5 text-blue-400" /> };
       default:
         return { title: action.replace(/_/g, " "), icon: <Info className="w-3.5 h-3.5 text-amber-400" /> };
     }
   };
+
+  const currentUser = activeSession?.user;
+  const currentCompany = activeSession?.company;
+
+  const displayName = currentUser?.name || initialName;
+  const displayRole = currentUser?.role ? `${currentUser.role} (${currentCompany?.name || "Company"})` : initialRole;
 
   return (
     <header className="h-16 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-6 flex items-center justify-between sticky top-0 z-30">
@@ -119,14 +111,24 @@ export function Header({ userName = "Sarah Admin", userRole = "Admin" }: HeaderP
       </form>
 
       {/* Action Controls */}
-      <div className="flex items-center gap-4">
-        {/* Onboard Profile Button */}
-        <button
-          onClick={() => setIsOnboardingOpen(true)}
-          className="px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/20 text-xs font-bold transition-all flex items-center gap-1.5"
-        >
-          <UserPlus className="w-3.5 h-3.5" /> Onboard Profile
-        </button>
+      <div className="flex items-center gap-3">
+        {/* Register / Login Account Button */}
+        {activeSession ? (
+          <button
+            onClick={handleLogout}
+            title="Log out of current private dashboard"
+            className="px-3 py-1.5 rounded-xl bg-slate-900 text-slate-400 hover:text-rose-400 hover:bg-slate-800 border border-slate-800 text-xs font-bold transition-all flex items-center gap-1.5"
+          >
+            <LogOut className="w-3.5 h-3.5" /> Switch Account
+          </button>
+        ) : (
+          <button
+            onClick={() => setIsAuthModalOpen(true)}
+            className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold text-xs shadow-md hover:brightness-110 transition-all flex items-center gap-1.5 border border-amber-400/30"
+          >
+            <KeyRound className="w-3.5 h-3.5" /> Register / Login
+          </button>
+        )}
 
         {/* Theme Toggle Button */}
         <button
@@ -170,11 +172,11 @@ export function Header({ userName = "Sarah Admin", userRole = "Admin" }: HeaderP
               <div className="space-y-2 max-h-64 overflow-y-auto">
                 {isLoadingNotifs ? (
                   <div className="py-6 text-center text-xs text-slate-500 flex items-center justify-center gap-2">
-                    <Clock className="w-4 h-4 animate-spin text-amber-400" /> Loading live database alerts...
+                    <Clock className="w-4 h-4 animate-spin text-amber-400" /> Loading live alerts...
                   </div>
                 ) : dbNotifications.length === 0 ? (
                   <div className="py-6 text-center text-xs text-slate-500">
-                    No system activity alerts in database yet.
+                    No system alerts in database yet.
                   </div>
                 ) : (
                   dbNotifications.map((n) => {
@@ -189,7 +191,7 @@ export function Header({ userName = "Sarah Admin", userRole = "Admin" }: HeaderP
                           <span className="text-[10px] text-slate-500">{formatTimeAgo(n.createdAt)}</span>
                         </div>
                         <p className="text-[11px] text-slate-400 leading-snug">
-                          {n.entityType} ({n.entityId || "Record"}) recorded in system.
+                          {n.entityType} ({n.entityId || "Record"}) recorded.
                         </p>
                       </div>
                     );
@@ -205,94 +207,23 @@ export function Header({ userName = "Sarah Admin", userRole = "Admin" }: HeaderP
         {/* User Profile Badge */}
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold text-sm shadow-md">
-            {userName.charAt(0)}
+            {displayName.charAt(0)}
           </div>
           <div className="hidden sm:block text-left">
-            <p className="text-xs font-semibold text-slate-100">{userName}</p>
-            <p className="text-[11px] text-slate-400">{userRole}</p>
+            <p className="text-xs font-semibold text-slate-100">{displayName}</p>
+            <p className="text-[11px] text-slate-400 truncate max-w-[140px]">{displayRole}</p>
           </div>
         </div>
       </div>
 
-      {/* Visitor Profile Onboarding Modal */}
-      {isOnboardingOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-5 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <UserPlus className="w-5 h-5 text-amber-400" /> Onboard Visitor / User Profile
-              </h3>
-              <button onClick={() => setIsOnboardingOpen(false)} className="text-slate-400 hover:text-white">✕</button>
-            </div>
-            <form onSubmit={handleVisitorRegister} className="space-y-4">
-              <div>
-                <label className="text-xs font-semibold text-slate-400 block mb-1">Full Name *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. John Labour"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-semibold text-slate-400 block mb-1">Email Address *</label>
-                <input
-                  type="email"
-                  required
-                  placeholder="e.g. john@buildcorp.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-semibold text-slate-400 block mb-1">Contact Phone Number</label>
-                <input
-                  type="text"
-                  placeholder="e.g. +92 300 9876543"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-semibold text-slate-400 block mb-1">Role / Persona *</label>
-                <select
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 font-bold"
-                >
-                  <option value="CLIENT">CLIENT (Project Owner / Investor)</option>
-                  <option value="ENGINEER">ENGINEER (Civil Engineer)</option>
-                  <option value="LABOUR">LABOUR (Skilled Workforce)</option>
-                  <option value="ADMIN">ADMIN (Operations Lead)</option>
-                </select>
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
-                <button
-                  type="button"
-                  onClick={() => setIsOnboardingOpen(false)}
-                  className="px-4 py-2.5 rounded-xl bg-slate-800 text-xs font-bold text-slate-300 hover:bg-slate-700"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-xs font-bold text-white shadow-lg hover:brightness-110"
-                >
-                  Register Profile
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* User Registration & Login Gatekeeper Modal */}
+      <UserAuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onSuccess={(session) => {
+          setActiveSession(session);
+        }}
+      />
     </header>
   );
 }
