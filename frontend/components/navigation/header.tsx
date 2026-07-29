@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Bell, Search, Sun, Moon, CheckCircle2, Info, Clock, UserPlus, LogOut, KeyRound, Lock } from "lucide-react";
+import { Bell, Search, Sun, Moon, CheckCircle2, Info, Clock, UserPlus, LogOut, KeyRound, Edit3 } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 import { useToast } from "@/components/ui/toast-provider";
 import { UserAuthModal } from "@/components/auth/user-auth-modal";
+import { EditProfileModal } from "@/components/auth/edit-profile-modal";
 
 interface HeaderProps {
   userName?: string;
@@ -22,6 +23,7 @@ export function Header({ userName: initialName = "Sarah Admin", userRole: initia
   // Active Auth Session State
   const [activeSession, setActiveSession] = useState<{ user?: any; company?: any } | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -80,6 +82,8 @@ export function Header({ userName: initialName = "Sarah Admin", userRole: initia
         return { title: "Quotation Created", icon: <Info className="w-3.5 h-3.5 text-amber-400" /> };
       case "UPDATE_QUOTATION":
         return { title: "Quotation Updated", icon: <Info className="w-3.5 h-3.5 text-amber-400" /> };
+      case "UPDATE_USER_PROFILE":
+        return { title: "Profile Updated", icon: <CheckCircle2 className="w-3.5 h-3.5 text-amber-400" /> };
       case "REGISTER_USER":
       case "REGISTER_COMPANY_ADMIN":
         return { title: "New Account Registered", icon: <CheckCircle2 className="w-3.5 h-3.5 text-purple-400" /> };
@@ -112,6 +116,17 @@ export function Header({ userName: initialName = "Sarah Admin", userRole: initia
 
       {/* Action Controls */}
       <div className="flex items-center gap-3">
+        {/* Edit Profile Button */}
+        {activeSession && (
+          <button
+            onClick={() => setIsEditProfileOpen(true)}
+            title="Edit your personal & company information"
+            className="px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/20 text-xs font-bold transition-all flex items-center gap-1.5"
+          >
+            <Edit3 className="w-3.5 h-3.5" /> Edit Profile
+          </button>
+        )}
+
         {/* Register / Login Account Button */}
         {activeSession ? (
           <button
@@ -222,6 +237,17 @@ export function Header({ userName: initialName = "Sarah Admin", userRole: initia
         onClose={() => setIsAuthModalOpen(false)}
         onSuccess={(session) => {
           setActiveSession(session);
+        }}
+      />
+
+      {/* Edit Profile & Company Details Modal */}
+      <EditProfileModal
+        isOpen={isEditProfileOpen}
+        onClose={() => setIsEditProfileOpen(false)}
+        currentUser={currentUser}
+        currentCompany={currentCompany}
+        onSuccess={(updatedSession) => {
+          setActiveSession(updatedSession);
         }}
       />
     </header>
