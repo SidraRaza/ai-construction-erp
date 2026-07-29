@@ -57,6 +57,8 @@ export class ExpenseService {
     return expense;
   }
 
+  static createExpense = ExpenseService.recordExpense;
+
   static async getExpenses(companyId: string, projectId?: string, category?: string) {
     const whereClause: Record<string, unknown> = {
       project: { companyId },
