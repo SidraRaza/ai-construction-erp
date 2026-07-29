@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -29,6 +29,12 @@ interface SidebarProps {
 export function Sidebar({ role }: SidebarProps) {
   const pathname = usePathname();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+  useEffect(() => {
+    const handleToggle = () => setIsMobileOpen(true);
+    window.addEventListener("open-mobile-sidebar", handleToggle);
+    return () => window.removeEventListener("open-mobile-sidebar", handleToggle);
+  }, []);
 
   const getNavigationLinks = () => {
     switch (role) {
@@ -81,13 +87,14 @@ export function Sidebar({ role }: SidebarProps) {
 
   return (
     <>
-      {/* Mobile Drawer Trigger Button (Visible on screens < lg) */}
+      {/* Floating Mobile Menu Button (Bottom Right on screens < lg) */}
       <button
         onClick={() => setIsMobileOpen(true)}
-        className="lg:hidden fixed bottom-6 right-6 z-40 p-3.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-full shadow-2xl shadow-amber-500/30 border border-amber-400/40 active:scale-95 transition-all"
+        className="lg:hidden fixed bottom-6 right-6 z-40 p-3.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-full shadow-2xl shadow-amber-500/30 border border-amber-400/40 active:scale-95 transition-all flex items-center gap-2 text-xs font-extrabold"
         aria-label="Open Navigation Menu"
       >
-        <Menu className="w-6 h-6 stroke-[2.5]" />
+        <Menu className="w-5 h-5 stroke-[2.5]" />
+        <span>Menu</span>
       </button>
 
       {/* Mobile Backdrop Overlay */}

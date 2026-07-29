@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Bell, Search, Sun, Moon, CheckCircle2, Info, Clock, UserPlus, LogOut, KeyRound, Edit3, ChevronDown, UserCheck, ShieldCheck, Building2, Globe2 } from "lucide-react";
+import { Bell, Search, Sun, Moon, CheckCircle2, Info, Clock, UserPlus, LogOut, KeyRound, Edit3, ChevronDown, UserCheck, ShieldCheck, Building2, Globe2, Menu } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 import { useToast } from "@/components/ui/toast-provider";
 import { UserAuthModal } from "@/components/auth/user-auth-modal";
@@ -105,21 +105,32 @@ export function Header({ userName: initialName = "Sarah Admin", userRole: initia
   const displayRole = currentUser?.role ? `${currentUser.role}` : initialRole;
 
   return (
-    <header className="h-16 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-6 flex items-center justify-between sticky top-0 z-30">
-      {/* Search Bar */}
-      <form onSubmit={handleGlobalSearch} className="relative w-80">
-        <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Global search projects, invoices, site logs..."
-          className="w-full bg-slate-900/80 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500/50 transition-all"
-        />
-      </form>
+    <header className="h-16 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30">
+      {/* Mobile Hamburger Menu Toggle + Search Bar */}
+      <div className="flex items-center gap-3 flex-1 max-w-md">
+        <button
+          onClick={() => window.dispatchEvent(new Event("open-mobile-sidebar"))}
+          className="lg:hidden p-2 rounded-xl bg-slate-900 border border-slate-800 text-amber-400 hover:text-white hover:border-amber-500/40 transition-all"
+          aria-label="Open Mobile Menu"
+          title="Open Navigation Menu"
+        >
+          <Menu className="w-5 h-5 stroke-[2.5]" />
+        </button>
+
+        <form onSubmit={handleGlobalSearch} className="relative w-full sm:w-72 lg:w-80">
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Global search projects, invoices..."
+            className="w-full bg-slate-900/80 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500/50 transition-all"
+          />
+        </form>
+      </div>
 
       {/* Action Controls */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3">
         {/* Theme Toggle Button */}
         <button
           onClick={() => {
@@ -195,7 +206,7 @@ export function Header({ userName: initialName = "Sarah Admin", userRole: initia
           )}
         </div>
 
-        <div className="h-6 w-px bg-slate-800" />
+        <div className="h-6 w-px bg-slate-800 hidden sm:block" />
 
         {/* Clickable User Profile Badge with Dropdown Menu */}
         <div className="relative">
@@ -204,7 +215,7 @@ export function Header({ userName: initialName = "Sarah Admin", userRole: initia
               setIsUserMenuOpen(!isUserMenuOpen);
               setIsNotifOpen(false);
             }}
-            className="flex items-center gap-3 p-1.5 rounded-2xl hover:bg-slate-900 border border-transparent hover:border-slate-800 transition-all duration-200 text-left group"
+            className="flex items-center gap-3 p-1 rounded-2xl hover:bg-slate-900 border border-transparent hover:border-slate-800 transition-all duration-200 text-left group"
           >
             <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold text-sm shadow-md group-hover:scale-105 transition-transform">
               {displayName.charAt(0)}
