@@ -143,22 +143,25 @@ export class ProjectService {
       throw new Error("Project not found in your company");
     }
 
-    const teamMember = await db.projectTeam.upsert({
-      where: {
-        projectId_userId: {
+    const existingMember = await db.projectTeam.findFirst({
+      where: { projectId, userId: data.userId },
+    });
+
+    let teamMember;
+    if (existingMember) {
+      teamMember = await db.projectTeam.update({
+        where: { id: existingMember.id },
+        data: { role: data.roleOnProject || "SITE_ENGINEER" },
+      });
+    } else {
+      teamMember = await db.projectTeam.create({
+        data: {
           projectId,
           userId: data.userId,
+          role: data.roleOnProject || "SITE_ENGINEER",
         },
-      },
-      update: {
-        roleOnProject: data.roleOnProject,
-      },
-      create: {
-        projectId,
-        userId: data.userId,
-        roleOnProject: data.roleOnProject,
-      },
-    });
+      });
+    }
 
     await ActivityLogService.log({
       companyId,
