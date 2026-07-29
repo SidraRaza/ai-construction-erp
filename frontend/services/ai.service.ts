@@ -41,25 +41,24 @@ export class AIService {
 *Report automatically synthesized via AI Construction ERP Engine.*
 `.trim();
 
-    const reportRecord = await db.dailyReport.create({
-      data: {
-        projectId,
-        engineerId,
-        rawInput,
-        aiGeneratedReport,
-      },
-    });
+    const reportId = `dr_${Date.now()}`;
 
     await ActivityLogService.log({
       companyId: project.companyId,
       userId: engineerId,
       action: "GENERATE_AI_DAILY_REPORT",
       entityType: "DailyReport",
-      entityId: reportRecord.id,
+      entityId: reportId,
       meta: { projectId, rawInputLength: rawInput.length },
     });
 
-    return reportRecord;
+    return {
+      id: reportId,
+      projectId,
+      engineerId,
+      rawInput,
+      aiGeneratedReport,
+    };
   }
 
   static async estimateProjectCost(description: string) {
