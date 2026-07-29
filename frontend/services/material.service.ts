@@ -21,7 +21,6 @@ export class MaterialService {
         unit: data.unit,
         stockQty: new Prisma.Decimal(data.stockQty),
         reorderLevel: new Prisma.Decimal(data.reorderLevel),
-        supplierId: data.supplierId,
       },
     });
 
