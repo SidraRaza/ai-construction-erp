@@ -45,7 +45,7 @@ export function Header({ userName: initialName = "Sarah Admin", userRole: initia
       }
     } catch (err) {
       console.error("Failed to fetch activity log notifications", err);
-    } fontally {
+    } finally {
       setIsLoadingNotifs(false);
     }
   };
