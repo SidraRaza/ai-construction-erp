@@ -51,7 +51,7 @@ export class ContractService {
   }
 
   static async getContracts(companyId: string, projectId?: string) {
-    const logs = await ActivityLogService.getLogs(companyId, 50);
+    const logs = await ActivityLogService.getCompanyLogs(companyId, 50);
     return logs
       .filter((l) => l.action === "CREATE_SUBCONTRACTOR_CONTRACT")
       .map((l) => {
