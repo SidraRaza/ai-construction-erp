@@ -20,34 +20,26 @@ export class AttendanceService {
     const attendanceDate = new Date(data.date);
     attendanceDate.setHours(0, 0, 0, 0);
 
-    const project = await db.project.findFirst({
-      where: { id: data.projectId, companyId },
-    });
-
-    if (!project) {
-      throw new Error("Project not found in your company");
-    }
-
     const existing = await db.attendance.findFirst({
       where: {
-        userId: data.userId,
-        projectId: data.projectId,
+        workerId: data.userId,
         date: attendanceDate,
       },
     });
 
     if (existing) {
-      throw new Error("Attendance record already exists for this user on this date");
+      const updated = await db.attendance.update({
+        where: { id: existing.id },
+        data: { status: data.status },
+      });
+      return updated;
     }
 
     const record = await db.attendance.create({
       data: {
-        userId: data.userId,
-        projectId: data.projectId,
+        workerId: data.userId,
         date: attendanceDate,
         status: data.status,
-        method: data.method,
-        markedBy: markedById,
       },
     });
 
@@ -74,21 +66,12 @@ export class AttendanceService {
     const attendanceDate = new Date(data.date);
     attendanceDate.setHours(0, 0, 0, 0);
 
-    const project = await db.project.findFirst({
-      where: { id: data.projectId, companyId },
-    });
-
-    if (!project) {
-      throw new Error("Project not found in your company");
-    }
-
     const createdRecords = [];
 
     for (const rec of data.records) {
       const existing = await db.attendance.findFirst({
         where: {
-          userId: rec.userId,
-          projectId: data.projectId,
+          workerId: rec.userId,
           date: attendanceDate,
         },
       });
@@ -96,18 +79,15 @@ export class AttendanceService {
       if (existing) {
         const updated = await db.attendance.update({
           where: { id: existing.id },
-          data: { status: rec.status, method: rec.method, markedBy: markedById },
+          data: { status: rec.status },
         });
         createdRecords.push(updated);
       } else {
         const created = await db.attendance.create({
           data: {
-            userId: rec.userId,
-            projectId: data.projectId,
+            workerId: rec.userId,
             date: attendanceDate,
             status: rec.status,
-            method: rec.method,
-            markedBy: markedById,
           },
         });
         createdRecords.push(created);
@@ -128,7 +108,6 @@ export class AttendanceService {
 
   static async getAttendanceHistory(companyId: string, projectId?: string, date?: string) {
     const whereClause: Record<string, unknown> = {};
-    if (projectId) whereClause.projectId = projectId;
     if (date) {
       const parsedDate = new Date(date);
       parsedDate.setHours(0, 0, 0, 0);
