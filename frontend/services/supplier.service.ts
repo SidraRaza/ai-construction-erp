@@ -3,6 +3,7 @@ import { CreateSupplierInput, CreatePurchaseOrderInput } from "@/validations/sup
 import { ActivityLogService } from "@/services/activity-log.service";
 import { requirePermission } from "@/services/rbac-guard";
 import { Role } from "@/lib/rbac";
+import { Prisma } from "@prisma/client";
 
 export class SupplierService {
   static async createSupplier(
@@ -13,13 +14,13 @@ export class SupplierService {
   ) {
     requirePermission(userRole, "manage:projects");
 
-    const supplier = await db.client.create({
+    const supplier = await db.supplier.create({
       data: {
         companyId,
-        name: `${data.name} [Supplier: ${data.category}]`,
+        name: data.name,
         contact: data.contact,
-        email: data.email,
-        address: data.address,
+        category: data.category,
+        rating: data.rating ? new Prisma.Decimal(data.rating) : new Prisma.Decimal(5.0),
       },
     });
 
@@ -36,38 +37,60 @@ export class SupplierService {
   }
 
   static async getSuppliers(companyId: string) {
-    return db.client.findMany({
-      where: {
-        companyId,
-        name: { contains: "[Supplier:" },
-      },
-      orderBy: { name: "asc" },
+    return db.supplier.findMany({
+      where: { companyId },
+      orderBy: { createdAt: "desc" },
     });
   }
 
-  /**
-   * Auto Purchase Order Suggestion Engine
-   * Scans inventory for items where stock <= reorderLevel and generates PO drafts
-   */
+  static async createPurchaseOrder(
+    companyId: string,
+    userId: string,
+    userRole: Role,
+    data: CreatePurchaseOrderInput
+  ) {
+    requirePermission(userRole, "manage:projects");
+
+    const poId = `po_${Date.now()}`;
+
+    await ActivityLogService.log({
+      companyId,
+      userId,
+      action: "CREATE_PURCHASE_ORDER",
+      entityType: "PurchaseOrder",
+      entityId: poId,
+      meta: {
+        supplierId: data.supplierId,
+        materialId: data.materialId,
+        qty: data.qty,
+        totalAmount: data.totalAmount,
+      },
+    });
+
+    return {
+      id: poId,
+      supplierId: data.supplierId,
+      materialId: data.materialId,
+      qty: data.qty,
+      totalAmount: data.totalAmount,
+      status: "ISSUED",
+      createdAt: new Date(),
+    };
+  }
+
   static async getAutoPurchaseOrderSuggestions(companyId: string) {
     const lowStockMaterials = await db.material.findMany({
       where: { companyId },
     });
 
-    const suggestions = lowStockMaterials
-      .filter((m) => m.stockQty.lessThanOrEqualTo(m.reorderLevel))
-      .map((m) => {
-        const suggestedQty = m.reorderLevel.mul(3).minus(m.stockQty);
-        return {
-          materialId: m.id,
-          materialName: m.name,
-          currentStock: m.stockQty.toNumber(),
-          reorderLevel: m.reorderLevel.toNumber(),
-          suggestedReorderQty: Math.max(10, suggestedQty.toNumber()),
-          unit: m.unit,
-        };
-      });
-
-    return suggestions;
+    return lowStockMaterials
+      .filter((m) => Number(m.stockQty) < Number(m.reorderLevel))
+      .map((m) => ({
+        materialId: m.id,
+        materialName: m.name,
+        currentStock: Number(m.stockQty),
+        reorderLevel: Number(m.reorderLevel),
+        suggestedOrderQty: Math.max(50, Number(m.reorderLevel) * 2),
+      }));
   }
 }
