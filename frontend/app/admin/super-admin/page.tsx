@@ -31,9 +31,9 @@ export default function SuperAdminPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [timeFilter, setTimeFilter] = useState("ALL");
 
-  // Owner Password Authentication Gatekeeper State
+  // Owner Password Authentication Gatekeeper State (Completely Blank Inputs)
   const [isSuperAdminAuth, setIsSuperAdminAuth] = useState(false);
-  const [adminName, setAdminName] = useState("Sidra");
+  const [adminName, setAdminName] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
   const [authError, setAuthError] = useState("");
 
@@ -83,7 +83,7 @@ export default function SuperAdminPage() {
     setAuthError("");
 
     if (adminPassword !== "87626") {
-      setAuthError("Incorrect Owner Password! Password is 87626.");
+      setAuthError("Incorrect Owner Password!");
       showToast("Incorrect Super Admin Password", "error");
       return;
     }
@@ -91,7 +91,7 @@ export default function SuperAdminPage() {
     const superAdminSession = {
       user: {
         id: "super_admin_sidra",
-        name: adminName || "Sidra",
+        name: adminName.trim() || "Sidra",
         email: "sidra@buildcorp.com",
         role: "SUPER_ADMIN",
         companyId: "cl_default_company",
@@ -104,13 +104,15 @@ export default function SuperAdminPage() {
 
     localStorage.setItem("erp_user_session", JSON.stringify(superAdminSession));
     setIsSuperAdminAuth(true);
-    showToast("Authenticated as Platform Owner (Sidra)!", "success");
+    showToast(`Authenticated as Platform Owner (${adminName.trim() || "Sidra"})!`, "success");
     fetchSuperAdminData();
   };
 
   const handleLogoutSuperAdmin = () => {
     localStorage.removeItem("erp_user_session");
     setIsSuperAdminAuth(false);
+    setAdminName("");
+    setAdminPassword("");
     showToast("Logged out of Super Admin Owner Portal", "info");
   };
 
@@ -140,7 +142,7 @@ export default function SuperAdminPage() {
     return true;
   });
 
-  // If NOT Authenticated as Super Admin: Render Full Screen Standalone Login Portal (NO Sidebar, NO Header)
+  // If NOT Authenticated as Super Admin: Render Full Screen Standalone Login Portal (NO Sidebar, NO Header, Blank Inputs)
   if (!isSuperAdminAuth) {
     return (
       <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4 relative overflow-hidden font-sans">
@@ -153,16 +155,18 @@ export default function SuperAdminPage() {
           </div>
 
           <div className="space-y-1">
-            <h2 className="text-2xl font-extrabold text-white">Sidra's Platform Owner Portal</h2>
-            <p className="text-xs text-slate-400 font-medium">Enter your Super Admin password to access global user creation ledgers and multi-tenant metrics.</p>
+            <h2 className="text-2xl font-extrabold text-white">Platform Owner Portal</h2>
+            <p className="text-xs text-slate-400 font-medium">Enter owner name and password to unlock global user creation ledgers.</p>
           </div>
 
-          <form onSubmit={handleSuperAdminLogin} className="space-y-4 text-left">
+          <form onSubmit={handleSuperAdminLogin} autoComplete="off" className="space-y-4 text-left">
             <div>
-              <label className="text-xs font-bold text-slate-300 block mb-1">Owner Name</label>
+              <label className="text-xs font-bold text-slate-300 block mb-1">Owner Name *</label>
               <input
                 type="text"
                 required
+                autoComplete="off"
+                placeholder="Enter owner name"
                 value={adminName}
                 onChange={(e) => setAdminName(e.target.value)}
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-amber-500 font-bold"
@@ -174,10 +178,11 @@ export default function SuperAdminPage() {
               <input
                 type="password"
                 required
-                placeholder="Enter password (87626)"
+                autoComplete="new-password"
+                placeholder="••••••••"
                 value={adminPassword}
                 onChange={(e) => setAdminPassword(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-amber-500 font-mono text-sm"
               />
             </div>
 
@@ -234,10 +239,10 @@ export default function SuperAdminPage() {
           {/* Owner Profile Badge & Lock Button */}
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold text-sm shadow-md">
-              S
+              {(adminName || "Sidra").charAt(0).toUpperCase()}
             </div>
             <div className="hidden sm:block text-left">
-              <p className="text-xs font-bold text-white">Sidra (Platform Owner)</p>
+              <p className="text-xs font-bold text-white">{adminName || "Sidra"} (Platform Owner)</p>
               <p className="text-[11px] text-emerald-400 font-mono">SUPER_ADMIN Active</p>
             </div>
             <button
@@ -258,7 +263,7 @@ export default function SuperAdminPage() {
           <div className="space-y-1">
             <h2 className="text-2xl font-extrabold tracking-tight text-white flex items-center gap-3">
               <Crown className="w-8 h-8 text-amber-400 p-1.5 bg-amber-500/10 rounded-2xl border border-amber-500/20 shadow-inner" />
-              Sidra's Super Admin Owner Control Center
+              {adminName || "Sidra"}'s Super Admin Owner Control Center
             </h2>
             <p className="text-xs text-slate-400 font-medium flex items-center gap-2">
               <Lock className="w-3.5 h-3.5 text-emerald-400" /> Standalone Full-Width Owner Workspace • Track real-time user registrations, dates, exact times, days, & months.
