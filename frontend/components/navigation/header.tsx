@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Bell, Search, Sun, Moon, CheckCircle2, Info, Clock, UserPlus, LogOut, KeyRound, Edit3, ChevronDown, UserCheck, ShieldCheck, Building2, Globe2, Menu } from "lucide-react";
+import Link from "next/link";
+import { Bell, Search, Sun, Moon, CheckCircle2, Info, Clock, UserPlus, LogOut, KeyRound, Edit3, ChevronDown, UserCheck, ShieldCheck, Building2, Globe2, Menu, SlidersHorizontal } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 import { useToast } from "@/components/ui/toast-provider";
 import { UserAuthModal } from "@/components/auth/user-auth-modal";
@@ -152,6 +153,15 @@ export function Header({ userName: initialName = "Sarah Admin", userRole: initia
 
       {/* Action Controls */}
       <div className="flex items-center gap-2 sm:gap-3">
+        {/* Custom Production Fields Shortcut Button in Header Toolbar */}
+        <Link
+          href="/admin/custom-fields"
+          title="Configure Self-Configurable Production Fields"
+          className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/20 text-xs font-bold transition-all"
+        >
+          <SlidersHorizontal className="w-3.5 h-3.5" /> Custom Fields
+        </Link>
+
         {/* Theme Toggle Button */}
         <button
           onClick={() => {
@@ -272,6 +282,20 @@ export function Header({ userName: initialName = "Sarah Admin", userRole: initia
 
               {/* Menu Items */}
               <div className="space-y-1">
+                <Link
+                  href="/admin/custom-fields"
+                  onClick={() => setIsUserMenuOpen(false)}
+                  className="w-full p-2.5 rounded-xl hover:bg-slate-800 text-xs font-bold text-slate-200 flex items-center gap-2.5 transition-colors group text-left"
+                >
+                  <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 group-hover:bg-amber-500 group-hover:text-white transition-all">
+                    <SlidersHorizontal className="w-3.5 h-3.5" />
+                  </div>
+                  <div>
+                    <p className="text-slate-100">Custom Production Fields</p>
+                    <p className="text-[10px] text-slate-400 font-normal">Define your own fields & production logs</p>
+                  </div>
+                </Link>
+
                 <button
                   onClick={() => {
                     setIsUserMenuOpen(false);
@@ -279,7 +303,7 @@ export function Header({ userName: initialName = "Sarah Admin", userRole: initia
                   }}
                   className="w-full p-2.5 rounded-xl hover:bg-slate-800 text-xs font-bold text-slate-200 flex items-center gap-2.5 transition-colors group text-left"
                 >
-                  <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 group-hover:bg-amber-500 group-hover:text-white transition-all">
+                  <div className="p-1.5 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 group-hover:bg-slate-700 group-hover:text-white transition-all">
                     <Edit3 className="w-3.5 h-3.5" />
                   </div>
                   <div>
