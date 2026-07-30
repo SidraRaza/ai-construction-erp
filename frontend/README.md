@@ -1,4 +1,4 @@
-# 🎨 AI Construction ERP — Frontend Documentation & UI Guide
+# 🎨 AI Construction ERP — Frontend Application Architecture
 
 This directory contains the Next.js App Router frontend application for **AI Construction ERP**. Built with React 19, Next.js 16, TypeScript, Tailwind CSS v4, and Lucide React icons, it features a glassmorphic dark/light UI design system tailored for construction management.
 
@@ -15,9 +15,10 @@ This directory contains the Next.js App Router frontend application for **AI Con
 - **`/admin/attendance`** — Labour Attendance Operations (Daily site workforce roster, QR check-in simulation, status toggles).
 - **`/admin/materials`** — Inventory Stock Levels (Stock quantity tracking, unit rates, reorder level warnings, add material modal).
 - **`/admin/suppliers`** — Vendor Procurement Roster (Supplier contacts, categories, rating cards, add vendor modal).
-- **`/admin/invoices`** — Financial Billing & Payments Engine (Create/edit quotations, immutable invoices, multi-channel payment proof modal: Cash, Bank Wire, Cheque, JazzCash, EasyPaisa, Stripe).
+- **`/admin/invoices`** — Financial Billing & Payments Engine (Create/edit quotations, immutable invoices, multi-channel payment proof modal).
 - **`/admin/employees`** — Staff & User Directory (Registered database users, role badges, automated monthly payroll calculator).
 - **`/admin/contracts`** — Subcontractor Agreements (Trade contract milestones, start/end dates, contract amounts).
+- **`/admin/custom-fields`** — Self-Configurable Custom Production Fields Engine (Define custom fields, dynamic production form generator).
 - **`/admin/ai`** — AI Intelligence Studio (Daily site report formatter, project cost/timeline estimator, AI quotation generator, grounded AI chat).
 - **`/admin/super-admin`** — Super Admin Platform Owner Control Center (Global tenant accounts, geographical country distribution, user counts, data isolation status).
 
@@ -36,35 +37,15 @@ This directory contains the Next.js App Router frontend application for **AI Con
 
 - **`Header` ([`components/navigation/header.tsx`](file:///D:/ai-construction-erp/frontend/components/navigation/header.tsx)):**
   - Global Search Input
-  - Sun/Moon Theme Switcher Button (Toggles `html.light` & `html.dark` modes with `localStorage` persistence)
-  - Live Database Activity Notifications Dropdown (Fetches `/api/activity-log` with relative time indicators)
-  - Onboard Profile Visitor Modal Button
-  - User Avatar & Role Badge
+  - Custom Production Fields Shortcut Button
+  - Sun/Moon Theme Switcher Button
+  - Live Database Activity Notifications Dropdown
+  - Interactive User Avatar Badge & Role Dropdown
 
 - **`Sidebar` ([`components/navigation/sidebar.tsx`](file:///D:/ai-construction-erp/frontend/components/navigation/sidebar.tsx)):**
   - Dynamic navigation links scoped to user role (`ADMIN`, `ENGINEER`, `CLIENT`, `SUPER_ADMIN`).
   - Active route highlighting with ambient amber glow borders.
+  - Mobile slide-out navigation drawer with floating trigger button.
 
-- **`ThemeProvider` ([`components/theme-provider.tsx`](file:///D:/ai-construction-erp/frontend/components/theme-provider.tsx)):**
-  - Context provider applying theme class mutations to `document.documentElement`.
-
-- **`ToastProvider` ([`components/ui/toast-provider.tsx`](file:///D:/ai-construction-erp/frontend/components/ui/toast-provider.tsx)):**
-  - Global notification toast system for success, error, warning, and info alerts.
-
----
-
-## 🛠️ Setup & Development Commands
-
-```bash
-# Install Node dependencies
-npm install
-
-# Start local Next.js development server
-npm run dev
-
-# Compile TypeScript production build
-npm run build
-
-# Start production server
-npm start
-```
+- **`RouteGuard` ([`components/auth/route-guard.tsx`](file:///D:/ai-construction-erp/frontend/components/auth/route-guard.tsx)):**
+  - Enforces route authorization and session verification across all protected modules.
