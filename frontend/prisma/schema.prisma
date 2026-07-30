@@ -22,6 +22,8 @@ model Company {
   users            User[]
   projects         Project[]
   clients          Client[]
+  customFields     CustomField[]
+  customEntries    CustomFieldEntry[]
 }
 
 model User {
@@ -192,4 +194,26 @@ model ActivityLog {
   entityId   String?
   meta       String?  // JSON string
   createdAt  DateTime @default(now())
+}
+
+model CustomField {
+  id          String   @id @default(cuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  fieldName   String   // Display label
+  fieldType   String   // TEXT | NUMBER | DATE | SELECT | CHECKBOX
+  options     String?  // JSON string array for select dropdown options
+  isRequired  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model CustomFieldEntry {
+  id          String   @id @default(cuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  recordTitle String   // Title of custom production record e.g. "Concrete Pouring Log #101"
+  fieldValues String   // JSON string of custom key-value pairs
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

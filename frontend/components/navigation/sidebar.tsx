@@ -19,6 +19,7 @@ import {
   Menu,
   X,
   Globe2,
+  SlidersHorizontal,
 } from "lucide-react";
 import { Role } from "@/lib/rbac";
 
@@ -49,6 +50,7 @@ export function Sidebar({ role }: SidebarProps) {
           { name: "Quotations & Invoices", href: "/admin/invoices", icon: Receipt },
           { name: "Staff & Payroll", href: "/admin/employees", icon: Users },
           { name: "Subcontracts", href: "/admin/contracts", icon: FileCheck },
+          { name: "Custom Production Fields", href: "/admin/custom-fields", icon: SlidersHorizontal },
           { name: "AI Studio", href: "/admin/ai", icon: Bot },
         ];
       case "ADMIN":
@@ -61,6 +63,7 @@ export function Sidebar({ role }: SidebarProps) {
           { name: "Quotations & Invoices", href: "/admin/invoices", icon: Receipt },
           { name: "Staff & Payroll", href: "/admin/employees", icon: Users },
           { name: "Subcontracts", href: "/admin/contracts", icon: FileCheck },
+          { name: "Custom Production Fields", href: "/admin/custom-fields", icon: SlidersHorizontal },
           { name: "AI Studio", href: "/admin/ai", icon: Bot },
         ];
       case "ENGINEER":
