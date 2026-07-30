@@ -151,8 +151,8 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="pt-6 border-t border-slate-800 text-center text-xs text-slate-500 font-medium">
-            AI Construction ERP v1.0 • Multi-Tenant Isolated
+          <div className="pt-6 border-t border-slate-800 text-center text-xs text-slate-400 font-medium">
+            Created & Designed by <strong className="text-amber-400">Sidra Raza</strong> • AI Construction ERP
           </div>
         </div>
       )}
@@ -160,7 +160,7 @@ export default function Home() {
       {/* Hero Section */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-20 text-center space-y-6 sm:space-y-8 flex-1 flex flex-col justify-center items-center">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold uppercase tracking-wider">
-          <ShieldCheck className="w-4 h-4 text-emerald-400" /> Enterprise Multi-Tenant AI ERP Platform
+          <ShieldCheck className="w-4 h-4 text-emerald-400" /> Enterprise Multi-Tenant SaaS Platform by Sidra Raza
         </div>
 
         <h1 className="text-3xl sm:text-6xl font-extrabold text-white tracking-tight leading-tight max-w-4xl">
@@ -200,8 +200,8 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-800/80 px-6 py-5 text-center text-xs text-slate-500">
-        AI Construction ERP v1.0 • Built to Enterprise Standards • Powered by Next.js & Prisma
+      <footer className="border-t border-slate-800/80 px-6 py-5 text-center text-xs text-slate-400 font-medium">
+        Created & Built by <strong className="text-amber-400">Sidra Raza</strong> (Platform Founder & Lead Architect) • AI Construction ERP v1.0
       </footer>
     </div>
   );

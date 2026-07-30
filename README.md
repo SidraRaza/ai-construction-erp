@@ -1,6 +1,9 @@
 # 🏗️ AI Construction ERP — Enterprise Multi-Tenant SaaS Platform
 
-AI Construction ERP is a full-stack, enterprise-grade Construction Resource Planning (ERP) platform powered by AI. Designed to serve construction firms, civil engineers, contractors, real estate developers, skilled workers, and project investors across the globe, it provides complete end-to-end management of construction sites, workforce attendance, material inventory, financial billing, multi-channel payment processing, and AI-driven site intelligence.
+> **Created & Built by:** **Sidra Raza** (Platform Founder & Lead Architect)  
+> **Official Repository:** [https://github.com/SidraRaza/ai-construction-erp.git](https://github.com/SidraRaza/ai-construction-erp.git)
+
+AI Construction ERP is a full-stack, enterprise-grade Construction Resource Planning (ERP) platform designed, conceptualized, and built by **Sidra Raza**. Powered by Next.js, Prisma, and Artificial Intelligence, it serves construction firms, civil engineers, contractors, real estate developers, skilled workers, and project investors across the globe, providing complete end-to-end management of construction sites, workforce attendance, material inventory, financial billing, multi-channel payment processing, and AI-driven site intelligence.
 
 Built on a **Multi-Tenant SaaS Architecture**, independent businesses and users can register their accounts, store their clients and site data securely in 100% private database vaults, and access isolated dashboards without any cross-tenant data leakage.
 
@@ -55,5 +58,7 @@ Built on a **Multi-Tenant SaaS Architecture**, independent businesses and users 
 
 ---
 
-## 📄 License & System Architecture
-AI Construction ERP — Protected Multi-Tenant Platform Architecture. All rights reserved.
+## 👤 Author & Ownership
+**Created & Authored by:** **Sidra Raza**  
+**Repository:** [https://github.com/SidraRaza/ai-construction-erp.git](https://github.com/SidraRaza/ai-construction-erp.git)  
+© 2026 Sidra Raza. All Rights Reserved.
