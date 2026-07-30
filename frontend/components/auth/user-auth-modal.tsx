@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useToast } from "@/components/ui/toast-provider";
+import { saveSession } from "@/lib/session";
 import { Lock, UserPlus, LogIn, Building2, Mail, KeyRound, Phone, ShieldCheck, CheckCircle2 } from "lucide-react";
 
 interface UserAuthModalProps {
@@ -52,16 +53,15 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
 
       const json = await res.json();
       if (json.success && json.data) {
-        const session = {
+        const sessionWithExpiry = saveSession({
           user: json.data.user,
           company: json.data.company,
-        };
+        });
 
-        localStorage.setItem("erp_user_session", JSON.stringify(session));
         document.cookie = `x-company-id=${json.data.company.id}; path=/`;
 
-        showToast(`Account created successfully! Welcome ${json.data.user.name}`, "success");
-        onSuccess(session);
+        showToast(`Account created! Welcome ${json.data.user.name} (1-Hour Session Active)`, "success");
+        onSuccess(sessionWithExpiry);
         onClose();
       } else {
         showToast(json.error?.message || "Registration failed", "error");
@@ -93,59 +93,67 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
 
       const json = await res.json();
       if (json.success && json.data) {
-        const session = {
+        const sessionWithExpiry = saveSession({
           user: json.data,
-          company: { id: json.data.companyId, name: json.data.name + "'s Company" },
-        };
+          company: {
+            id: json.data.companyId || "cl_default_company",
+            name: "My Business",
+          },
+        });
 
-        localStorage.setItem("erp_user_session", JSON.stringify(session));
-        document.cookie = `x-company-id=${json.data.companyId}; path=/`;
+        if (json.data.companyId) {
+          document.cookie = `x-company-id=${json.data.companyId}; path=/`;
+        }
 
-        showToast(`Logged in successfully as ${json.data.name}`, "success");
-        onSuccess(session);
+        showToast(`Logged in successfully! Welcome ${json.data.name} (1-Hour Session Active)`, "success");
+        onSuccess(sessionWithExpiry);
         onClose();
       } else {
-        showToast(json.error?.message || "Invalid credentials", "error");
+        showToast(json.error?.message || "Login failed", "error");
       }
     } catch (err) {
-      showToast("Authentication failed", "error");
+      showToast("Error logging in", "error");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-6 shadow-2xl relative">
-        {/* Header Title */}
-        <div className="text-center space-y-1">
-          <div className="inline-flex p-3 bg-amber-500/10 rounded-2xl border border-amber-500/20 mb-2">
-            <Lock className="w-6 h-6 text-amber-400" />
+    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-5 shadow-2xl relative overflow-hidden">
+        {/* Decorative Top Accent Line */}
+        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600" />
+
+        {/* Modal Header & Tabs */}
+        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="w-5 h-5 text-amber-400" />
+            <h3 className="text-base font-bold text-white">Private Account Access</h3>
           </div>
-          <h3 className="text-xl font-black text-white tracking-tight">AI Construction ERP Portal Access</h3>
-          <p className="text-xs text-slate-400">Register your account or log in to access your private dashboard.</p>
+          <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
+            ✕
+          </button>
         </div>
 
-        {/* Tab Switcher */}
-        <div className="flex bg-slate-950 p-1.5 rounded-2xl border border-slate-800/80">
+        {/* Tab Selection */}
+        <div className="flex bg-slate-950 p-1 rounded-2xl border border-slate-800">
           <button
             type="button"
             onClick={() => setActiveTab("REGISTER")}
             className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
               activeTab === "REGISTER"
-                ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md"
+                ? "bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-md"
                 : "text-slate-400 hover:text-white"
             }`}
           >
             <UserPlus className="w-3.5 h-3.5" /> Create New Account
           </button>
-
           <button
             type="button"
             onClick={() => setActiveTab("LOGIN")}
             className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
               activeTab === "LOGIN"
-                ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md"
+                ? "bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-md"
                 : "text-slate-400 hover:text-white"
             }`}
           >
@@ -154,7 +162,7 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
         </div>
 
         {/* Registration Form */}
-        {activeTab === "REGISTER" ? (
+        {activeTab === "REGISTER" && (
           <form onSubmit={handleRegister} className="space-y-3.5">
             <div>
               <label className="text-xs font-bold text-slate-300 block mb-1">Company / Business Name *</label>
@@ -163,10 +171,10 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
                 <input
                   type="text"
                   required
-                  placeholder="e.g. BuildCorp Builders"
+                  placeholder="e.g. BuildCorp Enterprise"
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 font-semibold"
                 />
               </div>
             </div>
@@ -181,109 +189,112 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
                   placeholder="e.g. Sarah Ahmed"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 font-semibold"
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-xs font-bold text-slate-300 block mb-1">Email / Gmail Address *</label>
+              <label className="text-xs font-bold text-slate-300 block mb-1">Gmail / Email Address *</label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="email"
                   required
-                  placeholder="e.g. sarah@buildcorp.com"
+                  placeholder="name@gmail.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="text-xs font-bold text-slate-300 block mb-1">Private Secret Password *</label>
-              <div className="relative">
-                <KeyRound className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="password"
-                  required
-                  placeholder="••••••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="text-xs font-bold text-slate-300 block mb-1">Phone Number (Optional)</label>
-              <div className="relative">
-                <Phone className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="e.g. +92 300 1234567"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white font-bold text-xs shadow-lg shadow-amber-500/20 hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2 border border-amber-400/30 mt-2"
-            >
-              {isLoading ? "Creating Account..." : <><CheckCircle2 className="w-4 h-4" /> Register & Access Private Dashboard</>}
-            </button>
-          </form>
-        ) : (
-          /* Login Form */
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="text-xs font-bold text-slate-300 block mb-1">Email / Gmail Address *</label>
-              <div className="relative">
-                <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="email"
-                  required
-                  placeholder="e.g. admin@buildcorp.com"
-                  value={loginEmail}
-                  onChange={(e) => setLoginEmail(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="text-xs font-bold text-slate-300 block mb-1">Password *</label>
-              <div className="relative">
-                <KeyRound className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="password"
-                  required
-                  placeholder="••••••••••••"
-                  value={loginPassword}
-                  onChange={(e) => setLoginPassword(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
                 />
               </div>
             </div>
 
+            <div>
+              <label className="text-xs font-bold text-slate-300 block mb-1">Secret Password *</label>
+              <div className="relative">
+                <KeyRound className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="password"
+                  required
+                  placeholder="Create your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-slate-300 block mb-1">Contact Phone (Optional)</label>
+              <div className="relative">
+                <Phone className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="+92 300 1234567"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                />
+              </div>
+            </div>
+
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white font-bold text-xs shadow-lg shadow-amber-500/20 hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2 border border-amber-400/30"
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white font-bold text-xs shadow-lg hover:brightness-110 flex items-center justify-center gap-2 transition-all mt-2"
             >
-              {isLoading ? "Authenticating..." : <><LogIn className="w-4 h-4" /> Log In to Your Dashboard</>}
+              {isLoading ? "Creating Account..." : "Create Account & Enter Private Dashboard"}
             </button>
           </form>
         )}
 
-        <div className="pt-2 border-t border-slate-800 text-center">
-          <p className="text-[11px] text-slate-500 flex items-center justify-center gap-1">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> 100% Isolated Vault • Only you have access to your data
+        {/* Login Form */}
+        {activeTab === "LOGIN" && (
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="text-xs font-bold text-slate-300 block mb-1">Gmail / Email Address *</label>
+              <div className="relative">
+                <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="email"
+                  required
+                  placeholder="name@gmail.com"
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-3 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-slate-300 block mb-1">Secret Password *</label>
+              <div className="relative">
+                <KeyRound className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="password"
+                  required
+                  placeholder="Enter your password"
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-3 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white font-bold text-xs shadow-lg hover:brightness-110 flex items-center justify-center gap-2 transition-all"
+            >
+              {isLoading ? "Authenticating..." : "Login to Your Private Dashboard"}
+            </button>
+          </form>
+        )}
+
+        {/* Security Footer */}
+        <div className="pt-3 border-t border-slate-800 text-center">
+          <p className="text-[11px] text-slate-500 flex items-center justify-center gap-1 font-medium">
+            <Lock className="w-3.5 h-3.5 text-emerald-400" /> 100% Private Isolated Tenant Session (1-Hour Expiry)
           </p>
         </div>
       </div>

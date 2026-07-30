@@ -6,6 +6,7 @@ import { useTheme } from "@/components/theme-provider";
 import { useToast } from "@/components/ui/toast-provider";
 import { UserAuthModal } from "@/components/auth/user-auth-modal";
 import { EditProfileModal } from "@/components/auth/edit-profile-modal";
+import { getValidSession, clearSession } from "@/lib/session";
 
 interface HeaderProps {
   userName?: string;
@@ -26,13 +27,33 @@ export function Header({ userName: initialName = "Sarah Admin", userRole: initia
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
 
+  // Session 1-Hour Verification & Periodic Auto-Expiry Check
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("erp_user_session");
-      if (saved) {
-        setActiveSession(JSON.parse(saved));
+    const verify = () => {
+      const valid = getValidSession();
+      if (valid) {
+        setActiveSession(valid);
+      } else {
+        if (activeSession) {
+          showToast("Your session has expired after 1 hour. Please log in again!", "warning");
+        }
+        setActiveSession(null);
       }
-    } catch (e) {}
+    };
+
+    verify();
+
+    // Check every 30 seconds for 1-hour session expiration
+    const interval = setInterval(() => {
+      const valid = getValidSession();
+      if (!valid && activeSession) {
+        showToast("Your session has expired after 1 hour. Please log in again!", "warning");
+        setActiveSession(null);
+        setIsAuthModalOpen(true);
+      }
+    }, 30000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const fetchNotifications = async () => {
@@ -61,7 +82,7 @@ export function Header({ userName: initialName = "Sarah Admin", userRole: initia
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("erp_user_session");
+    clearSession();
     setActiveSession(null);
     setIsUserMenuOpen(false);
     showToast("Logged out of private account", "info");
@@ -303,7 +324,7 @@ export function Header({ userName: initialName = "Sarah Admin", userRole: initia
 
               <div className="pt-2 border-t border-slate-800 text-center">
                 <p className="text-[10px] text-slate-500 flex items-center justify-center gap-1 font-medium">
-                  <ShieldCheck className="w-3 h-3 text-emerald-400" /> 100% Private Isolated Tenant Vault
+                  <Clock className="w-3 h-3 text-emerald-400" /> 1-Hour Auto Expiration Active
                 </p>
               </div>
             </div>

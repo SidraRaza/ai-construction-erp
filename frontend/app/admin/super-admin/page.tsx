@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/toast-provider";
+import { saveSession, getValidSession, clearSession } from "@/lib/session";
 import {
   Building2,
   Globe2,
@@ -31,23 +32,18 @@ export default function SuperAdminPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [timeFilter, setTimeFilter] = useState("ALL");
 
-  // Owner Password Authentication Gatekeeper State (Completely Blank Inputs)
+  // Owner Password Authentication Gatekeeper State
   const [isSuperAdminAuth, setIsSuperAdminAuth] = useState(false);
   const [adminName, setAdminName] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
   const [authError, setAuthError] = useState("");
 
   const checkAuth = () => {
-    try {
-      const saved = localStorage.getItem("erp_user_session");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed?.user?.role === "SUPER_ADMIN") {
-          setIsSuperAdminAuth(true);
-          return true;
-        }
-      }
-    } catch (e) {}
+    const validSession = getValidSession();
+    if (validSession && validSession.user?.role === "SUPER_ADMIN") {
+      setIsSuperAdminAuth(true);
+      return true;
+    }
     setIsSuperAdminAuth(false);
     return false;
   };
@@ -76,6 +72,17 @@ export default function SuperAdminPage() {
     } else {
       setIsLoading(false);
     }
+
+    // Check for 1-hour session expiry every 30 seconds
+    const interval = setInterval(() => {
+      const valid = getValidSession();
+      if (!valid && isSuperAdminAuth) {
+        showToast("Super Admin session expired after 1 hour. Please log in again!", "warning");
+        setIsSuperAdminAuth(false);
+      }
+    }, 30000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const handleSuperAdminLogin = async (e: React.FormEvent) => {
@@ -88,7 +95,7 @@ export default function SuperAdminPage() {
       return;
     }
 
-    const superAdminSession = {
+    const superAdminSession = saveSession({
       user: {
         id: "super_admin_sidra",
         name: adminName.trim() || "Sidra",
@@ -100,16 +107,15 @@ export default function SuperAdminPage() {
         id: "cl_default_company",
         name: "Global Platform Control Center",
       },
-    };
+    });
 
-    localStorage.setItem("erp_user_session", JSON.stringify(superAdminSession));
     setIsSuperAdminAuth(true);
-    showToast(`Authenticated as Platform Owner (${adminName.trim() || "Sidra"})!`, "success");
+    showToast(`Authenticated as Platform Owner (${adminName.trim() || "Sidra"})! 1-Hour Session Active`, "success");
     fetchSuperAdminData();
   };
 
   const handleLogoutSuperAdmin = () => {
-    localStorage.removeItem("erp_user_session");
+    clearSession();
     setIsSuperAdminAuth(false);
     setAdminName("");
     setAdminPassword("");
@@ -142,7 +148,7 @@ export default function SuperAdminPage() {
     return true;
   });
 
-  // If NOT Authenticated as Super Admin: Render Full Screen Standalone Login Portal (NO Sidebar, NO Header, Blank Inputs)
+  // If NOT Authenticated as Super Admin: Render Full Screen Standalone Login Portal (NO Sidebar, NO Header)
   if (!isSuperAdminAuth) {
     return (
       <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4 relative overflow-hidden font-sans">
@@ -156,7 +162,7 @@ export default function SuperAdminPage() {
 
           <div className="space-y-1">
             <h2 className="text-2xl font-extrabold text-white">Platform Owner Portal</h2>
-            <p className="text-xs text-slate-400 font-medium">Enter owner name and password to unlock global user creation ledgers.</p>
+            <p className="text-xs text-slate-400 font-medium">Enter owner name and password to unlock global user creation ledgers (1-Hour Session Expiry).</p>
           </div>
 
           <form onSubmit={handleSuperAdminLogin} autoComplete="off" className="space-y-4 text-left">
@@ -201,7 +207,7 @@ export default function SuperAdminPage() {
           </form>
 
           <div className="pt-4 border-t border-slate-800/80 text-[11px] text-slate-500 flex items-center justify-center gap-1 font-medium">
-            <Lock className="w-3.5 h-3.5 text-emerald-400" /> Protected Standalone Owner Portal
+            <Lock className="w-3.5 h-3.5 text-emerald-400" /> Protected Standalone Owner Portal (1-Hour Session Expiry)
           </div>
         </div>
       </div>
