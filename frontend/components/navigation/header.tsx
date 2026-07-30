@@ -127,39 +127,39 @@ export function Header({ userName: initialName = "Sarah Admin", userRole: initia
   const displayRole = currentUser?.role ? `${currentUser.role}` : initialRole;
 
   return (
-    <header className="h-16 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30">
-      {/* Mobile Hamburger Menu Toggle + Search Bar */}
-      <div className="flex items-center gap-3 flex-1 max-w-md">
+    <header className="h-16 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-3 sm:px-6 flex items-center justify-between sticky top-0 z-30 min-w-0">
+      {/* Mobile Hamburger Menu Toggle + Adaptive Search Bar */}
+      <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0 max-w-xs sm:max-w-md pr-2">
         <button
           onClick={() => window.dispatchEvent(new Event("open-mobile-sidebar"))}
-          className="lg:hidden p-2 rounded-xl bg-slate-900 border border-slate-800 text-amber-400 hover:text-white hover:border-amber-500/40 transition-all"
+          className="lg:hidden p-2 rounded-xl bg-slate-900 border border-slate-800 text-amber-400 hover:text-white hover:border-amber-500/40 transition-all shrink-0"
           aria-label="Open Mobile Menu"
           title="Open Navigation Menu"
         >
           <Menu className="w-5 h-5 stroke-[2.5]" />
         </button>
 
-        <form onSubmit={handleGlobalSearch} className="relative w-full sm:w-72 lg:w-80">
-          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+        <form onSubmit={handleGlobalSearch} className="relative w-full">
+          <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Global search projects, invoices..."
-            className="w-full bg-slate-900/80 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500/50 transition-all"
+            placeholder="Search..."
+            className="w-full bg-slate-900/80 border border-slate-800 rounded-xl pl-8 sm:pl-10 pr-3 py-1.5 sm:py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500/50 transition-all truncate"
           />
         </form>
       </div>
 
-      {/* Action Controls */}
-      <div className="flex items-center gap-2 sm:gap-3">
-        {/* Custom Production Fields Shortcut Button in Header Toolbar */}
+      {/* Action Controls (100% Responsive Grid/Flex) */}
+      <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+        {/* Custom Production Fields Shortcut Button */}
         <Link
           href="/admin/custom-fields"
           title="Configure Self-Configurable Production Fields"
-          className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/20 text-xs font-bold transition-all"
+          className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/20 text-xs font-bold transition-all shrink-0"
         >
-          <SlidersHorizontal className="w-3.5 h-3.5" /> Custom Fields
+          <SlidersHorizontal className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Custom Fields</span><span className="sm:hidden text-[11px]">Fields</span>
         </Link>
 
         {/* Theme Toggle Button */}
@@ -168,14 +168,14 @@ export function Header({ userName: initialName = "Sarah Admin", userRole: initia
             toggleTheme();
             showToast(`Theme switched to ${theme === "dark" ? "Light" : "Dark"} Mode`, "info");
           }}
-          className="p-2 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 transition-all"
+          className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 transition-all shrink-0"
           aria-label="Toggle Theme"
         >
-          {theme === "dark" ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-slate-700" />}
+          {theme === "dark" ? <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-slate-700" />}
         </button>
 
         {/* Notifications Dropdown Toggle */}
-        <div className="relative">
+        <div className="relative shrink-0">
           <button
             onClick={() => {
               setIsNotifOpen(!isNotifOpen);
@@ -184,17 +184,17 @@ export function Header({ userName: initialName = "Sarah Admin", userRole: initia
                 setIsUserMenuOpen(false);
               }
             }}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 relative transition-all"
+            className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 relative transition-all"
           >
-            <Bell className="w-5 h-5" />
+            <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
             {dbNotifications.length > 0 && (
-              <span className="w-2 h-2 bg-amber-500 rounded-full absolute top-1.5 right-1.5 ring-4 ring-slate-950" />
+              <span className="w-2 h-2 bg-amber-500 rounded-full absolute top-1 right-1 ring-4 ring-slate-950" />
             )}
           </button>
 
           {/* System Notifications Dropdown */}
           {isNotifOpen && (
-            <div className="absolute right-0 mt-3 w-80 bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-2xl space-y-3 z-50">
+            <div className="absolute right-0 mt-3 w-72 sm:w-80 bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-2xl space-y-3 z-50">
               <div className="flex items-center justify-between border-b border-slate-800 pb-2">
                 <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
                   <Bell className="w-3.5 h-3.5 text-amber-400" /> System Notifications
@@ -237,18 +237,18 @@ export function Header({ userName: initialName = "Sarah Admin", userRole: initia
           )}
         </div>
 
-        <div className="h-6 w-px bg-slate-800 hidden sm:block" />
+        <div className="h-5 w-px bg-slate-800 hidden sm:block shrink-0" />
 
         {/* Clickable User Profile Badge with Dropdown Menu */}
-        <div className="relative">
+        <div className="relative shrink-0">
           <button
             onClick={() => {
               setIsUserMenuOpen(!isUserMenuOpen);
               setIsNotifOpen(false);
             }}
-            className="flex items-center gap-3 p-1 rounded-2xl hover:bg-slate-900 border border-transparent hover:border-slate-800 transition-all duration-200 text-left group"
+            className="flex items-center gap-2 p-1 rounded-2xl hover:bg-slate-900 border border-transparent hover:border-slate-800 transition-all duration-200 text-left group"
           >
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold text-sm shadow-md group-hover:scale-105 transition-transform">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-md group-hover:scale-105 transition-transform">
               {displayName.charAt(0)}
             </div>
             <div className="hidden sm:block">
@@ -256,7 +256,7 @@ export function Header({ userName: initialName = "Sarah Admin", userRole: initia
                 {displayName}
                 <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${isUserMenuOpen ? "rotate-180 text-amber-400" : ""}`} />
               </p>
-              <p className="text-[11px] text-slate-400 truncate max-w-[130px] font-medium">{displayRole}</p>
+              <p className="text-[11px] text-slate-400 truncate max-w-[120px] font-medium">{displayRole}</p>
             </div>
           </button>
 
