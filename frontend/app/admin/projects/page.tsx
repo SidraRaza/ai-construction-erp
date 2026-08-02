@@ -238,18 +238,18 @@ export default function ProjectsPage() {
                     className="bg-slate-900/60 rounded-3xl border border-slate-800/90 p-4 sm:p-6 space-y-4 hover:border-slate-700 transition-all duration-300 shadow-xl backdrop-blur-md relative overflow-hidden group flex flex-col justify-between"
                   >
                     <div className="space-y-3">
-                      <div className="flex items-start justify-between gap-2">
+                      <div className="flex flex-wrap sm:flex-nowrap items-start justify-between gap-2">
                         <div className="min-w-0 flex-1">
-                          <span className="text-[10px] font-bold tracking-widest text-amber-400 uppercase bg-amber-400/10 px-2.5 py-0.5 rounded-full border border-amber-400/20 inline-block mb-1.5">
+                          <span className="text-[10px] font-bold tracking-widest text-amber-400 uppercase bg-amber-400/10 px-2.5 py-0.5 rounded-full border border-amber-400/20 inline-block mb-1">
                             {p.priority || "MEDIUM"} Priority
                           </span>
-                          <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-amber-400 transition-colors truncate">
+                          <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-amber-400 transition-colors break-words">
                             {p.name}
                           </h3>
                           <p className="text-[11px] text-slate-400 font-mono truncate">ID: {p.id}</p>
                         </div>
                         <span
-                          className={`text-[11px] font-bold px-2.5 py-1 rounded-full border shrink-0 ${
+                          className={`text-[10px] sm:text-[11px] font-bold px-2.5 py-1 rounded-full border shrink-0 ${
                             p.status === "IN_PROGRESS"
                               ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
                               : p.status === "COMPLETED"
