@@ -594,7 +594,7 @@ function HomeContent() {
             </div>
 
             <div className="meta-line">
-              <span className="dot"></span> BUILT FOR REAL CONSTRUCTION COMPANIES — LAUNCHING NEXT WEEK
+              <span className="dot"></span> BUILT FOR REAL CONSTRUCTION COMPANIES — COMING SOON
             </div>
           </div>
 
