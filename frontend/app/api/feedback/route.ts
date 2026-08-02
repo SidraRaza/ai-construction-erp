@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
 export async function GET() {
   try {
     if (!db || !(db as any).userFeedback) {
@@ -35,6 +37,14 @@ export async function POST(req: Request) {
     if (!message || typeof message !== "string" || message.trim() === "") {
       return NextResponse.json(
         { success: false, error: { message: "Feedback message is required." } },
+        { status: 400 }
+      );
+    }
+
+    // Strict Email Security Validation Check
+    if (email && email.trim() !== "" && !EMAIL_REGEX.test(email.trim())) {
+      return NextResponse.json(
+        { success: false, error: { message: "Invalid email format. Please enter a valid email address (e.g. user@gmail.com)." } },
         { status: 400 }
       );
     }

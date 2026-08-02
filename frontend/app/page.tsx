@@ -27,6 +27,7 @@ import {
   MessageCircle,
   Lightbulb,
   Bug,
+  HelpCircle,
 } from "lucide-react";
 
 function HomeContent() {
@@ -52,11 +53,19 @@ function HomeContent() {
     }
   };
 
-  // Submit Feedback Handler
+  // Submit Feedback Handler with Strict Email Security Check
   const handleFeedbackSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!feedbackMessage) {
+
+    if (!feedbackMessage || feedbackMessage.trim() === "") {
       showToast("Please type a message before submitting!", "warning");
+      return;
+    }
+
+    // Strict Email Security Validation (Must be valid format like user@gmail.com)
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (feedbackEmail.trim() !== "" && !emailRegex.test(feedbackEmail.trim())) {
+      showToast("Please enter a valid email address (e.g. name@gmail.com)!", "warning");
       return;
     }
 
@@ -356,6 +365,13 @@ function HomeContent() {
 
         {/* Desktop Navigation Links */}
         <div className="hidden md:flex items-center gap-2 lg:gap-3">
+          <Link
+            href="/help"
+            className="text-xs font-semibold text-slate-300 hover:text-white px-3 py-2 rounded-xl transition-all flex items-center gap-1.5"
+          >
+            <HelpCircle className="w-3.5 h-3.5 text-amber-400" /> Help Center
+          </Link>
+
           <button
             onClick={() => handlePortalNavigation("/admin/custom-fields")}
             className="text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500/20 px-3 py-2 rounded-xl transition-all flex items-center gap-1.5"
@@ -394,12 +410,12 @@ function HomeContent() {
 
         {/* Mobile Controls */}
         <div className="flex md:hidden items-center gap-2">
-          <button
-            onClick={() => handlePortalNavigation("/admin/custom-fields")}
+          <Link
+            href="/help"
             className="text-[11px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1.5 rounded-lg flex items-center gap-1"
           >
-            <SlidersHorizontal className="w-3 h-3" /> Fields
-          </button>
+            <HelpCircle className="w-3 h-3" /> Help
+          </Link>
 
           <button
             onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}
@@ -416,6 +432,17 @@ function HomeContent() {
         <div className="md:hidden fixed inset-0 z-40 bg-slate-950/95 backdrop-blur-xl p-6 pt-20 flex flex-col justify-between animate-in fade-in duration-200">
           <div className="space-y-3">
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Portal Navigation</p>
+
+            <Link
+              href="/help"
+              onClick={() => setIsMobileNavOpen(false)}
+              className="w-full p-3.5 rounded-2xl bg-slate-900 border border-slate-800 text-amber-400 text-sm font-bold flex items-center justify-between"
+            >
+              <span className="flex items-center gap-2.5">
+                <HelpCircle className="w-4 h-4" /> Help & Support Documentation
+              </span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
 
             <button
               onClick={() => {
@@ -857,14 +884,14 @@ function HomeContent() {
 
               <form onSubmit={handleFeedbackSubmit} autoComplete="off" className="space-y-4">
                 <div>
-                  <label className="text-xs font-bold text-slate-300 block mb-1">Your Email Address (Optional)</label>
+                  <label className="text-xs font-bold text-slate-300 block mb-1">Your Email Address (Optional, e.g. name@gmail.com)</label>
                   <input
                     type="email"
                     autoComplete="off"
                     autoCorrect="off"
                     autoCapitalize="off"
                     spellCheck={false}
-                    placeholder="Enter your email address"
+                    placeholder="Enter valid email (e.g. name@gmail.com)"
                     value={feedbackEmail}
                     onChange={(e) => setFeedbackEmail(e.target.value)}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500 font-mono"
@@ -910,9 +937,18 @@ function HomeContent() {
         }}
       />
 
-      {/* Clean Minimal Footer */}
-      <footer className="border-t border-slate-800/80 px-6 py-5 text-center text-xs text-slate-400 font-medium bg-slate-950">
-        Created & Built by <strong className="text-amber-400">Sidra Raza</strong> (Platform Founder & Lead Architect) • AI Construction ERP v1.0
+      {/* Footer with Help Center Link */}
+      <footer className="border-t border-slate-800/80 px-6 py-5 bg-slate-950 text-xs text-slate-400 font-medium">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            Created & Built by <strong className="text-amber-400">Sidra Raza</strong> (Platform Founder & Lead Architect) • AI Construction ERP v1.0
+          </div>
+          <div className="flex items-center gap-4">
+            <Link href="/help" className="text-slate-300 hover:text-amber-400 font-bold transition-colors flex items-center gap-1.5 bg-slate-900 border border-slate-800 px-3.5 py-1.5 rounded-xl">
+              <HelpCircle className="w-3.5 h-3.5 text-amber-400" /> Help Center & Guides
+            </Link>
+          </div>
+        </div>
       </footer>
     </div>
   );
