@@ -359,8 +359,9 @@ function HomeContent() {
           }
           .diagram-box {
             width: 100%;
-            max-width: 320px;
+            max-width: 350px;
             margin: 0 auto;
+            padding: 0 16px;
             height: auto;
             aspect-ratio: 1 / 1;
             order: 2;
