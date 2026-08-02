@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-const SITE_URL = "https://ai-construction-erp.vercel.app";
+const SITE_URL = "https://ai-construction-erp-eight.vercel.app";
 
 export const metadata: Metadata = {
   title: "About Us & Leadership — Sidra Raza Architect",
