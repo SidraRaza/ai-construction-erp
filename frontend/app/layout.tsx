@@ -16,7 +16,12 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "AI Construction ERP — Enterprise SaaS Platform",
-  description: "Next.js App Router AI Construction Management ERP System",
+  description: "Next.js App Router AI Construction Management ERP System created by Sidra Raza",
+  icons: {
+    icon: "/logo.jpg",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({
