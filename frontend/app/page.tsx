@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { UserAuthModal } from "@/components/auth/user-auth-modal";
 import { useToast } from "@/components/ui/toast-provider";
 import {
@@ -18,31 +17,24 @@ import {
   X,
   LayoutDashboard,
   Users,
+  CheckCircle2,
+  Boxes,
+  FileText,
+  UserCheck,
 } from "lucide-react";
 
 function HomeContent() {
   const { showToast } = useToast();
-  const searchParams = useSearchParams();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-  useEffect(() => {
-    const authParam = searchParams.get("auth");
-    if (authParam === "required" || authParam === "login") {
-      setIsAuthModalOpen(true);
-      if (authParam === "required") {
-        showToast("Please log in or create an account to access private portals!", "warning");
-      }
-    }
-  }, [searchParams]);
-
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col justify-between overflow-x-hidden">
-      {/* Import Custom Google Fonts for Blueprint Hero */}
+      {/* Premium Google Fonts Import */}
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link
-        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap"
         rel="stylesheet"
       />
 
@@ -64,7 +56,7 @@ function HomeContent() {
           overflow: hidden;
           padding: 0;
           width: 100%;
-          min-height: 640px;
+          min-height: 620px;
           isolation: isolate;
         }
 
@@ -101,7 +93,7 @@ function HomeContent() {
           z-index: 2;
           max-width: 1240px;
           margin: 0 auto;
-          padding: 88px 32px 72px;
+          padding: 72px 32px 64px;
           display: grid;
           grid-template-columns: 1.05fr 0.95fr;
           gap: 48px;
@@ -142,7 +134,7 @@ function HomeContent() {
           display: flex;
           align-items: center;
           gap: 10px;
-          margin-bottom: 22px;
+          margin-bottom: 20px;
         }
         .eyebrow::before {
           content: "";
@@ -153,13 +145,13 @@ function HomeContent() {
         }
 
         h1.headline {
-          font-family: 'Space Grotesk', sans-serif;
-          font-weight: 600;
-          font-size: clamp(34px, 4.4vw, 54px);
-          line-height: 1.08;
-          letter-spacing: -0.015em;
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          font-weight: 800;
+          font-size: clamp(32px, 4.2vw, 52px);
+          line-height: 1.1;
+          letter-spacing: -0.02em;
           color: var(--off-white);
-          margin: 0 0 24px;
+          margin: 0 0 22px;
           max-width: 620px;
         }
         h1.headline .accent { color: var(--amber); }
@@ -171,22 +163,28 @@ function HomeContent() {
         }
 
         .subtext {
-          font-size: 16.5px;
+          font-family: 'Inter', sans-serif;
+          font-size: 16px;
           line-height: 1.65;
-          color: rgba(226,232,240,0.82);
-          max-width: 500px;
-          margin: 0 0 34px;
+          color: rgba(226,232,240,0.85);
+          max-width: 520px;
+          margin: 0 0 32px;
         }
-        .subtext b { color: var(--off-white); font-weight: 500; }
+        .subtext b { color: var(--off-white); font-weight: 600; }
 
-        .cta-row { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 40px; }
+        .cta-row {
+          display: flex;
+          gap: 14px;
+          flex-wrap: wrap;
+          margin-bottom: 36px;
+        }
 
         .btn-primary, .btn-secondary {
           font-family: 'Inter', sans-serif;
-          font-weight: 500;
+          font-weight: 600;
           font-size: 14.5px;
           padding: 13px 24px;
-          border-radius: 3px;
+          border-radius: 4px;
           cursor: pointer;
           transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
         }
@@ -211,7 +209,7 @@ function HomeContent() {
           font-family: 'IBM Plex Mono', monospace;
           font-size: 11.5px;
           letter-spacing: 0.06em;
-          color: rgba(226,232,240,0.5);
+          color: rgba(226,232,240,0.55);
           display: flex;
           align-items: center;
           gap: 8px;
@@ -238,11 +236,34 @@ function HomeContent() {
         .dim-line { stroke: rgba(148,163,184,0.55); stroke-width: 1; }
         .dim-line.amber { stroke: var(--amber); stroke-width: 1.2; }
 
+        /* Mobile Layout Optimizations: Text First, Chart Second, Buttons Side-by-Side */
         @media (max-width: 860px) {
-          .hero-inner { grid-template-columns: 1fr; padding: 96px 22px 48px; }
-          .diagram-box { height: 300px; order: -1; }
-          .stamp { width: 84px; height: 84px; top: 24px; right: 24px; }
-          .stamp span { font-size: 9px; }
+          .hero-inner {
+            grid-template-columns: 1fr;
+            padding: 56px 20px 40px;
+            gap: 36px;
+          }
+          .diagram-box {
+            height: 280px;
+            order: 2; /* Renders AFTER text on mobile screen! */
+          }
+          .cta-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Both buttons in 1 single line on mobile! */
+            gap: 10px;
+            width: 100%;
+          }
+          .btn-primary, .btn-secondary {
+            width: 100%;
+            text-align: center;
+            padding: 12px 8px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .stamp { width: 76px; height: 76px; top: 16px; right: 16px; }
+          .stamp span { font-size: 8.5px; }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -393,6 +414,7 @@ function HomeContent() {
         <div className="stamp"><span>AI<br />POWERED<br />SYSTEM</span></div>
 
         <div className="hero-inner">
+          {/* Text Content Block (Renders 1st on both Mobile and Desktop) */}
           <div>
             <div className="eyebrow">Construction ERP</div>
 
@@ -402,12 +424,13 @@ function HomeContent() {
             </h1>
 
             <p className="subtext">
-              Manage <b>projects</b>, <b>site labour</b>, <b>material inventory</b>, <b>expense tracking</b>, <b>client billing</b>, and <b>self-configurable custom production fields</b> — in one connected SaaS system powered by Next.js and Prisma.
+              Manage <b>projects</b>, <b>site labour</b>, <b>material inventory</b>, <b>expense tracking</b>, <b>client billing</b>, and <b>self-configurable custom production fields</b> — in one connected SaaS system.
             </p>
 
+            {/* Buttons Row (2 Side-by-Side in 1 Line on Mobile!) */}
             <div className="cta-row">
               <button onClick={() => setIsAuthModalOpen(true)} className="btn-primary">Get early access</button>
-              <Link href="/admin/dashboard" className="btn-secondary">See how it works</Link>
+              <Link href="#system-overview" className="btn-secondary">See how it works</Link>
             </div>
 
             <div className="meta-line">
@@ -415,6 +438,7 @@ function HomeContent() {
             </div>
           </div>
 
+          {/* CAD Diagram Box (Renders 2nd after Text on Mobile!) */}
           <div className="diagram-box">
             <svg viewBox="0 0 420 420" xmlns="http://www.w3.org/2000/svg">
               {/* dimension tick frame */}
@@ -465,7 +489,200 @@ function HomeContent() {
         </div>
       </div>
 
-      {/* Register / Login Gatekeeper Modal */}
+      {/* Overview & Portal Routes Section */}
+      <section id="system-overview" className="py-16 sm:py-24 max-w-6xl mx-auto px-4 sm:px-6 w-full space-y-12">
+        {/* Section Header */}
+        <div className="text-center space-y-3 max-w-2xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold uppercase tracking-wider">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Platform Architecture Overview
+          </div>
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
+            Integrated Enterprise Portal Routes
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+            Isolated multi-tenant portals designed for company owners, site engineers, administrators, and clients.
+          </p>
+        </div>
+
+        {/* Portal Routes Showcase Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Card 1: Enterprise Admin Portal */}
+          <div className="p-6 bg-slate-900/60 rounded-3xl border border-slate-800 space-y-4 hover:border-amber-500/30 transition-all flex flex-col justify-between group">
+            <div className="space-y-3">
+              <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+                <LayoutDashboard className="w-5 h-5" />
+              </div>
+              <h3 className="text-lg font-bold text-white">Enterprise Admin Portal</h3>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Central command for multi-project management, labour attendance tracking, materials inventory, supplier management, and invoice audit.
+              </p>
+              <ul className="space-y-1.5 text-xs text-slate-300 font-medium pt-1">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-amber-400" /> Project Milestones & Labour Payroll
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-amber-400" /> Material Purchase Orders & Suppliers
+                </li>
+              </ul>
+            </div>
+            <Link
+              href="/admin/dashboard"
+              className="mt-4 py-2.5 px-4 rounded-xl bg-slate-800 border border-slate-700/80 text-xs font-bold text-slate-100 hover:text-amber-400 hover:bg-slate-800/80 flex items-center justify-between transition-all"
+            >
+              <span>Explore Admin Portal</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          {/* Card 2: Site Engineer Command */}
+          <div className="p-6 bg-slate-900/60 rounded-3xl border border-slate-800 space-y-4 hover:border-amber-500/30 transition-all flex flex-col justify-between group">
+            <div className="space-y-3">
+              <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
+                <HardHat className="w-5 h-5" />
+              </div>
+              <h3 className="text-lg font-bold text-white">Site Engineer Command</h3>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Mobile-first field dashboard for site engineers to perform QR attendance check-ins, record daily site logs, and log expense receipts.
+              </p>
+              <ul className="space-y-1.5 text-xs text-slate-300 font-medium pt-1">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> QR Attendance & Site Logs
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Capped Site Expense Logging
+                </li>
+              </ul>
+            </div>
+            <Link
+              href="/engineer/dashboard"
+              className="mt-4 py-2.5 px-4 rounded-xl bg-slate-800 border border-slate-700/80 text-xs font-bold text-slate-100 hover:text-emerald-400 hover:bg-slate-800/80 flex items-center justify-between transition-all"
+            >
+              <span>Explore Engineer Portal</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          {/* Card 3: Custom Production Fields */}
+          <div className="p-6 bg-slate-900/60 rounded-3xl border border-amber-500/30 space-y-4 hover:border-amber-500 transition-all flex flex-col justify-between group">
+            <div className="space-y-3">
+              <div className="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+                <SlidersHorizontal className="w-5 h-5" />
+              </div>
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-white">Custom Fields Engine</h3>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 uppercase">Self-Configurable</span>
+              </div>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Define unique production schemas for your company. Create text, number, dropdown, date, and checkbox fields without touching core code.
+              </p>
+              <ul className="space-y-1.5 text-xs text-slate-300 font-medium pt-1">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-amber-400" /> Dynamic Schema Definition
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-amber-400" /> Isolated Production Record Entry
+                </li>
+              </ul>
+            </div>
+            <Link
+              href="/admin/custom-fields"
+              className="mt-4 py-2.5 px-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs font-bold text-amber-400 hover:bg-amber-500/20 flex items-center justify-between transition-all"
+            >
+              <span>Open Custom Fields</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          {/* Card 4: Client Project Portal */}
+          <div className="p-6 bg-slate-900/60 rounded-3xl border border-slate-800 space-y-4 hover:border-amber-500/30 transition-all flex flex-col justify-between group">
+            <div className="space-y-3">
+              <div className="w-10 h-10 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
+                <Users className="w-5 h-5" />
+              </div>
+              <h3 className="text-lg font-bold text-white">Client Project Portal</h3>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Dedicated client view for transparent progress tracking, verified invoice downloads, AI project cost estimations, and document archives.
+              </p>
+              <ul className="space-y-1.5 text-xs text-slate-300 font-medium pt-1">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" /> Verified Invoice Audit & Payments
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" /> Real-time Progress Tracking
+                </li>
+              </ul>
+            </div>
+            <Link
+              href="/client/dashboard"
+              className="mt-4 py-2.5 px-4 rounded-xl bg-slate-800 border border-slate-700/80 text-xs font-bold text-slate-100 hover:text-cyan-400 hover:bg-slate-800/80 flex items-center justify-between transition-all"
+            >
+              <span>Explore Client Portal</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          {/* Card 5: Super Admin Owner Portal */}
+          <div className="p-6 bg-slate-900/60 rounded-3xl border border-purple-500/30 space-y-4 hover:border-purple-500 transition-all flex flex-col justify-between group">
+            <div className="space-y-3">
+              <div className="w-10 h-10 rounded-2xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform">
+                <Crown className="w-5 h-5" />
+              </div>
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-white">Super Admin Portal</h3>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30 uppercase">Protected Gate</span>
+              </div>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Owner portal protected by security gatekeeper for platform governance, tenant isolation audits, and system configuration.
+              </p>
+              <ul className="space-y-1.5 text-xs text-slate-300 font-medium pt-1">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-purple-400" /> Platform Governance & Audit Logs
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-purple-400" /> Tenant Company Management
+                </li>
+              </ul>
+            </div>
+            <Link
+              href="/admin/super-admin"
+              className="mt-4 py-2.5 px-4 rounded-xl bg-purple-500/10 border border-purple-500/30 text-xs font-bold text-purple-400 hover:bg-purple-500/20 flex items-center justify-between transition-all"
+            >
+              <span>Access Owner Portal</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          {/* Card 6: AI Intelligence Engine */}
+          <div className="p-6 bg-slate-900/60 rounded-3xl border border-slate-800 space-y-4 hover:border-amber-500/30 transition-all flex flex-col justify-between group">
+            <div className="space-y-3">
+              <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+                <Bot className="w-5 h-5" />
+              </div>
+              <h3 className="text-lg font-bold text-white">AI Intelligence Engine</h3>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Built-in AI assistant for drafting daily progress reports, estimating project costs, and drafting client quotations.
+              </p>
+              <ul className="space-y-1.5 text-xs text-slate-300 font-medium pt-1">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-amber-400" /> Automated Cost Estimations
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-amber-400" /> Smart Daily Site Report Assistant
+                </li>
+              </ul>
+            </div>
+            <button
+              onClick={() => setIsAuthModalOpen(true)}
+              className="mt-4 py-2.5 px-4 rounded-xl bg-slate-800 border border-slate-700/80 text-xs font-bold text-slate-100 hover:text-amber-400 hover:bg-slate-800/80 flex items-center justify-between transition-all"
+            >
+              <span>Launch AI Intelligence</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Register / Login Gatekeeper Modal (Opens ONLY when user clicks a button) */}
       <UserAuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
