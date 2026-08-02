@@ -24,6 +24,9 @@ import {
   Lock,
   MessageSquareHeart,
   Send,
+  MessageCircle,
+  Lightbulb,
+  Bug,
 } from "lucide-react";
 
 function HomeContent() {
@@ -33,6 +36,7 @@ function HomeContent() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   // Standalone Feedback Form State
+  const [feedbackCategory, setFeedbackCategory] = useState<"FEATURE" | "BUG" | "GENERAL">("FEATURE");
   const [feedbackEmail, setFeedbackEmail] = useState("");
   const [feedbackMessage, setFeedbackMessage] = useState("");
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
@@ -58,7 +62,7 @@ function HomeContent() {
 
     setIsSubmittingFeedback(true);
     setTimeout(() => {
-      showToast("Thank you for your feedback! Platform Architect Sidra Raza will review your message.", "success");
+      showToast("Thank you! Platform Architect Sidra Raza will review your feedback.", "success");
       setFeedbackEmail("");
       setFeedbackMessage("");
       setIsSubmittingFeedback(false);
@@ -77,12 +81,12 @@ function HomeContent() {
 
       <style jsx global>{`
         :root {
-          --blueprint-deep: #0f172a; /* Rich Dark Grey */
+          --blueprint-deep: #0f172a; /* Dark Slate Grey */
           --blueprint-mid: #1e293b;  /* Slate Mid Grey */
           --blueprint-line: #94a3b8;
-          --cyan-white: #e2e8f0;
-          --amber: #f59e0b;
-          --off-white: #f8fafc;
+          --cyan-white: #f8fafc;
+          --amber: #f97316; /* Project Signature Warm Orange Accent (#f97316) */
+          --off-white: #ffffff;
         }
 
         .hero-wrap {
@@ -227,10 +231,10 @@ function HomeContent() {
         }
         .btn-primary {
           background: var(--amber);
-          color: var(--blueprint-deep);
+          color: #ffffff;
           border: 1px solid var(--amber);
         }
-        .btn-primary:hover { transform: translateY(-1px); background: #ffb84f; }
+        .btn-primary:hover { transform: translateY(-1px); background: #ea580c; }
         .btn-primary:focus-visible, .btn-secondary:focus-visible {
           outline: 2px solid var(--cyan-white);
           outline-offset: 3px;
@@ -273,7 +277,7 @@ function HomeContent() {
         .dim-line { stroke: rgba(148,163,184,0.55); stroke-width: 1; }
         .dim-line.amber { stroke: var(--amber); stroke-width: 1.2; }
 
-        /* Mobile Layout & Reduced Font Sizes: Compact & Balanced */
+        /* Mobile Layout & Reduced Font Sizes */
         @media (max-width: 860px) {
           .hero-inner {
             grid-template-columns: 1fr;
@@ -468,7 +472,7 @@ function HomeContent() {
         </div>
       )}
 
-      {/* Dark Grey Custom Blueprint Hero Section */}
+      {/* Dark Grey Custom Blueprint Hero Section (Project Orange Signature Accent) */}
       <div className="hero-wrap">
         <div className="grid-bg"></div>
         <div className="vignette"></div>
@@ -476,7 +480,7 @@ function HomeContent() {
         <div className="stamp"><span>AI<br />POWERED<br />SYSTEM</span></div>
 
         <div className="hero-inner">
-          {/* Text Content Block (Renders 1st on both Mobile and Desktop) */}
+          {/* Text Content Block */}
           <div>
             <div className="eyebrow">Construction ERP</div>
 
@@ -500,7 +504,7 @@ function HomeContent() {
             </div>
           </div>
 
-          {/* CAD Diagram Box (Renders 2nd after Text on Mobile!) */}
+          {/* CAD Diagram Box */}
           <div className="diagram-box">
             <svg viewBox="0 0 420 420" xmlns="http://www.w3.org/2000/svg">
               {/* dimension tick frame */}
@@ -510,8 +514,8 @@ function HomeContent() {
 
               {/* central hub */}
               <circle cx="210" cy="210" r="46" fill="none" stroke="var(--amber)" strokeWidth="1.4"/>
-              <text x="210" y="205" textAnchor="middle" className="node-label" fill="#F2A93B" fontSize="10.5">AI CONSTRUCTION</text>
-              <text x="210" y="219" textAnchor="middle" className="node-label" fill="#F2A93B" fontSize="10.5">ERP</text>
+              <text x="210" y="205" textAnchor="middle" className="node-label" fill="#f97316" fontSize="10.5">AI CONSTRUCTION</text>
+              <text x="210" y="219" textAnchor="middle" className="node-label" fill="#f97316" fontSize="10.5">ERP</text>
 
               {/* module nodes */}
               {/* Projects */}
@@ -541,8 +545,8 @@ function HomeContent() {
 
               {/* Custom fields */}
               <line x1="172" y1="235" x2="85" y2="300" className="dim-line amber"/>
-              <circle cx="85" cy="300" r="4" fill="#F2A93B"/>
-              <text x="20" y="304" className="node-label" fill="#F2A93B">CUSTOM FIELDS</text>
+              <circle cx="85" cy="300" r="4" fill="#f97316"/>
+              <text x="20" y="304" className="node-label" fill="#f97316">CUSTOM FIELDS</text>
 
               {/* scale tag */}
               <text x="20" y="400" className="node-label" fill="rgba(226,232,240,0.4)" fontSize="9.5">SCALE — ONE SYSTEM : ALL SITES</text>
@@ -751,64 +755,131 @@ function HomeContent() {
         </div>
       </section>
 
-      {/* Standalone Interactive User Feedback & Feature Request Section */}
-      <section id="feedback-section" className="py-16 bg-slate-900/40 border-t border-b border-slate-800/80 w-full">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <div className="bg-slate-900/90 backdrop-blur-xl p-8 sm:p-10 rounded-3xl border border-slate-800 shadow-2xl space-y-6 relative overflow-hidden">
-            {/* Top Decorative Accent Line */}
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600" />
-
-            <div className="text-center space-y-2">
+      {/* Standalone Polished User Feedback & Feature Request Section */}
+      <section id="feedback-section" className="py-16 sm:py-20 bg-slate-900/50 border-t border-b border-slate-800/80 w-full relative">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            {/* Left Column: Context & Branding */}
+            <div className="lg:col-span-5 space-y-5 text-left">
               <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold uppercase tracking-wider">
-                <MessageSquareHeart className="w-4 h-4" /> User Feedback & Feature Requests
+                <MessageSquareHeart className="w-4 h-4 text-orange-400" /> User Voice & Feedback
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white">Share Your Feedback with Sidra Raza</h2>
-              <p className="text-xs sm:text-sm text-slate-400 max-w-lg mx-auto leading-relaxed">
-                Have questions, suggestions, or feature requests? Send your feedback directly to Platform Founder & Lead Architect <strong className="text-amber-400 font-bold">Sidra Raza</strong>.
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
+                Help Us Build the Next Generation ERP
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                Send your suggestions, feature requests, or bug reports directly to Platform Founder & Lead Architect <strong className="text-amber-400 font-bold">Sidra Raza</strong>.
               </p>
+
+              <div className="space-y-2.5 pt-2">
+                <div className="p-3 rounded-2xl bg-slate-950/80 border border-slate-800 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 shrink-0">
+                    <Lightbulb className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-white">Feature Suggestions</h4>
+                    <p className="text-[11px] text-slate-400">Propose custom field types or workflow ideas.</p>
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-slate-950/80 border border-slate-800 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shrink-0">
+                    <Bug className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-white">Bug Reports</h4>
+                    <p className="text-[11px] text-slate-400">Report any UI issue or site log glitch.</p>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <form onSubmit={handleFeedbackSubmit} autoComplete="off" className="space-y-4 max-w-xl mx-auto">
+            {/* Right Column: Interactive Form Card */}
+            <div className="lg:col-span-7 bg-slate-900/90 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-2xl space-y-5 relative">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600" />
+
+              {/* Category Selector Tabs */}
               <div>
-                <label className="text-xs font-bold text-slate-300 block mb-1">Your Email Address (Optional)</label>
-                <input
-                  type="email"
-                  autoComplete="off"
-                  autoCorrect="off"
-                  autoCapitalize="off"
-                  spellCheck={false}
-                  placeholder="Enter your email address"
-                  value={feedbackEmail}
-                  onChange={(e) => setFeedbackEmail(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500 font-mono"
-                />
+                <label className="text-xs font-bold text-slate-300 block mb-2">Select Feedback Type</label>
+                <div className="grid grid-cols-3 gap-2 p-1 bg-slate-950 rounded-xl border border-slate-800">
+                  <button
+                    type="button"
+                    onClick={() => setFeedbackCategory("FEATURE")}
+                    className={`py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                      feedbackCategory === "FEATURE"
+                        ? "bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-sm"
+                        : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    <Lightbulb className="w-3.5 h-3.5" /> Idea
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFeedbackCategory("BUG")}
+                    className={`py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                      feedbackCategory === "BUG"
+                        ? "bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-sm"
+                        : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    <Bug className="w-3.5 h-3.5" /> Bug
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFeedbackCategory("GENERAL")}
+                    className={`py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                      feedbackCategory === "GENERAL"
+                        ? "bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-sm"
+                        : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    <MessageCircle className="w-3.5 h-3.5" /> Note
+                  </button>
+                </div>
               </div>
 
-              <div>
-                <label className="text-xs font-bold text-slate-300 block mb-1">Feedback / Message *</label>
-                <textarea
-                  required
-                  rows={4}
-                  autoComplete="off"
-                  autoCorrect="off"
-                  autoCapitalize="off"
-                  spellCheck={false}
-                  placeholder="Type your feedback, suggestions, or feature requests for Sidra Raza..."
-                  value={feedbackMessage}
-                  onChange={(e) => setFeedbackMessage(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500 resize-none"
-                />
-              </div>
+              <form onSubmit={handleFeedbackSubmit} autoComplete="off" className="space-y-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-300 block mb-1">Your Email Address (Optional)</label>
+                  <input
+                    type="email"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    placeholder="Enter your email address"
+                    value={feedbackEmail}
+                    onChange={(e) => setFeedbackEmail(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500 font-mono"
+                  />
+                </div>
 
-              <button
-                type="submit"
-                disabled={isSubmittingFeedback}
-                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white font-extrabold text-xs shadow-lg hover:brightness-110 flex items-center justify-center gap-2 transition-all"
-              >
-                <Send className="w-4 h-4" />
-                {isSubmittingFeedback ? "Sending Feedback..." : "Submit Feedback to Sidra Raza"}
-              </button>
-            </form>
+                <div>
+                  <label className="text-xs font-bold text-slate-300 block mb-1">Your Message / Suggestion *</label>
+                  <textarea
+                    required
+                    rows={4}
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    placeholder="Describe your feedback, feature request, or suggestion for Sidra Raza..."
+                    value={feedbackMessage}
+                    onChange={(e) => setFeedbackMessage(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500 resize-none"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmittingFeedback}
+                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white font-extrabold text-xs shadow-lg hover:brightness-110 flex items-center justify-center gap-2 transition-all"
+                >
+                  <Send className="w-4 h-4" />
+                  {isSubmittingFeedback ? "Submitting..." : "Send Feedback to Sidra Raza"}
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </section>
