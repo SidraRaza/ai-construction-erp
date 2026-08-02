@@ -48,12 +48,12 @@ function HomeContent() {
 
       <style jsx global>{`
         :root {
-          --blueprint-deep: #0F2D4A;
-          --blueprint-mid: #1E4A70;
-          --blueprint-line: #7FB8D6;
-          --cyan-white: #E4F1F7;
-          --amber: #F2A93B;
-          --off-white: #F5F1E8;
+          --blueprint-deep: #0f172a; /* Rich Dark Grey */
+          --blueprint-mid: #1e293b;  /* Slate Mid Grey */
+          --blueprint-line: #94a3b8;
+          --cyan-white: #e2e8f0;
+          --amber: #f59e0b;
+          --off-white: #f8fafc;
         }
 
         .hero-wrap {
@@ -84,8 +84,8 @@ function HomeContent() {
           position: absolute;
           inset: 0;
           background-image:
-            linear-gradient(rgba(127,184,214,0.5) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(127,184,214,0.5) 1px, transparent 1px);
+            linear-gradient(rgba(148,163,184,0.3) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(148,163,184,0.3) 1px, transparent 1px);
           background-size: 200px 200px;
         }
 
@@ -165,15 +165,15 @@ function HomeContent() {
         h1.headline .accent { color: var(--amber); }
         h1.headline .strike {
           text-decoration: line-through;
-          text-decoration-color: rgba(228,241,247,0.45);
+          text-decoration-color: rgba(226,232,240,0.45);
           text-decoration-thickness: 2px;
-          color: rgba(228,241,247,0.55);
+          color: rgba(226,232,240,0.55);
         }
 
         .subtext {
           font-size: 16.5px;
           line-height: 1.65;
-          color: rgba(228,241,247,0.82);
+          color: rgba(226,232,240,0.82);
           max-width: 500px;
           margin: 0 0 34px;
         }
@@ -203,7 +203,7 @@ function HomeContent() {
         .btn-secondary {
           background: transparent;
           color: var(--cyan-white);
-          border: 1px solid rgba(228,241,247,0.35);
+          border: 1px solid rgba(226,232,240,0.35);
         }
         .btn-secondary:hover { border-color: var(--cyan-white); transform: translateY(-1px); }
 
@@ -211,7 +211,7 @@ function HomeContent() {
           font-family: 'IBM Plex Mono', monospace;
           font-size: 11.5px;
           letter-spacing: 0.06em;
-          color: rgba(228,241,247,0.5);
+          color: rgba(226,232,240,0.5);
           display: flex;
           align-items: center;
           gap: 8px;
@@ -235,7 +235,7 @@ function HomeContent() {
           fill: var(--cyan-white);
           letter-spacing: 0.02em;
         }
-        .dim-line { stroke: rgba(127,184,214,0.55); stroke-width: 1; }
+        .dim-line { stroke: rgba(148,163,184,0.55); stroke-width: 1; }
         .dim-line.amber { stroke: var(--amber); stroke-width: 1.2; }
 
         @media (max-width: 860px) {
@@ -385,7 +385,7 @@ function HomeContent() {
         </div>
       )}
 
-      {/* Exact Custom Blueprint Hero Section */}
+      {/* Dark Grey Custom Blueprint Hero Section */}
       <div className="hero-wrap">
         <div className="grid-bg"></div>
         <div className="vignette"></div>
@@ -459,7 +459,7 @@ function HomeContent() {
               <text x="20" y="304" className="node-label" fill="#F2A93B">CUSTOM FIELDS</text>
 
               {/* scale tag */}
-              <text x="20" y="400" className="node-label" fill="rgba(228,241,247,0.4)" fontSize="9.5">SCALE — ONE SYSTEM : ALL SITES</text>
+              <text x="20" y="400" className="node-label" fill="rgba(226,232,240,0.4)" fontSize="9.5">SCALE — ONE SYSTEM : ALL SITES</text>
             </svg>
           </div>
         </div>
