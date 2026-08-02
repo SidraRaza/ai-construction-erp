@@ -125,7 +125,7 @@ function HomeContent() {
           overflow: hidden;
           padding: 0;
           width: 100%;
-          min-height: 600px;
+          min-height: 560px;
           isolation: isolate;
         }
 
@@ -162,7 +162,7 @@ function HomeContent() {
           z-index: 2;
           max-width: 1240px;
           margin: 0 auto;
-          padding: 72px 32px 64px;
+          padding: 64px 32px 56px;
           display: grid;
           grid-template-columns: 1.05fr 0.95fr;
           gap: 48px;
@@ -293,6 +293,7 @@ function HomeContent() {
         .diagram-box {
           position: relative;
           height: 420px;
+          width: 100%;
         }
         .diagram-box svg { width: 100%; height: 100%; overflow: visible; }
 
@@ -305,49 +306,65 @@ function HomeContent() {
         .dim-line { stroke: rgba(148,163,184,0.55); stroke-width: 1; }
         .dim-line.amber { stroke: var(--amber); stroke-width: 1.2; }
 
-        /* Mobile Layout & Reduced Font Sizes */
+        /* Perfect Mobile Responsiveness & Fluid Layout */
         @media (max-width: 860px) {
+          .hero-wrap {
+            min-height: auto;
+          }
           .hero-inner {
             grid-template-columns: 1fr;
-            padding: 48px 18px 36px;
-            gap: 28px;
+            padding: 36px 16px 32px;
+            gap: 24px;
+            text-align: left;
           }
-          h1.headline {
-            font-size: clamp(24px, 6.5vw, 36px);
-            line-height: 1.15;
-            margin-bottom: 16px;
-          }
-          .subtext {
-            font-size: 14px;
-            line-height: 1.55;
-            margin-bottom: 24px;
+          .stamp {
+            display: none; /* Hidden on mobile to prevent text collision */
           }
           .eyebrow {
             font-size: 11px;
-            margin-bottom: 14px;
+            letter-spacing: 0.12em;
+            margin-bottom: 12px;
           }
-          .diagram-box {
-            height: 250px;
-            order: 2;
+          h1.headline {
+            font-size: clamp(22px, 6vw, 32px);
+            line-height: 1.2;
+            margin-bottom: 14px;
+            max-width: 100%;
+          }
+          .subtext {
+            font-size: 13.5px;
+            line-height: 1.55;
+            margin-bottom: 20px;
+            max-width: 100%;
           }
           .cta-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            display: flex;
+            flex-direction: row;
             gap: 10px;
             width: 100%;
-            margin-bottom: 28px;
+            margin-bottom: 20px;
           }
           .btn-primary, .btn-secondary {
-            width: 100%;
+            flex: 1;
+            padding: 12px 8px;
+            font-size: 12px;
             text-align: center;
-            padding: 11px 6px;
-            font-size: 12.5px;
-            display: flex;
-            align-items: center;
             justify-content: center;
+            white-space: nowrap;
           }
-          .stamp { width: 72px; height: 72px; top: 14px; right: 14px; }
-          .stamp span { font-size: 8px; }
+          .meta-line {
+            font-size: 10.5px;
+            line-height: 1.4;
+            flex-wrap: wrap;
+          }
+          .diagram-box {
+            width: 100%;
+            max-width: 320px;
+            margin: 0 auto;
+            height: auto;
+            aspect-ratio: 1 / 1;
+            order: 2;
+          }
         }
 
         @media (prefers-reduced-motion: reduce) {
