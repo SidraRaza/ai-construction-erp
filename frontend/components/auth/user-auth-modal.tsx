@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useToast } from "@/components/ui/toast-provider";
 import { saveSession } from "@/lib/session";
-import { Lock, UserPlus, LogIn, Building2, Mail, KeyRound, Phone, ShieldCheck, CheckCircle2 } from "lucide-react";
+import { Lock, UserPlus, LogIn, Building2, Mail, KeyRound, Phone, ShieldCheck } from "lucide-react";
 
 interface UserAuthModalProps {
   isOpen: boolean;
@@ -15,14 +15,14 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
   const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState<"REGISTER" | "LOGIN">("REGISTER");
 
-  // Registration Form State
+  // Registration Form State (Completely Blank)
   const [companyName, setCompanyName] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
 
-  // Login Form State
+  // Login Form State (Completely Blank)
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
 
@@ -60,7 +60,7 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
 
         document.cookie = `x-company-id=${json.data.company.id}; path=/`;
 
-        showToast(`Account created! Welcome ${json.data.user.name} (1-Hour Session Active)`, "success");
+        showToast(`Account created! Welcome ${json.data.user.name}`, "success");
         onSuccess(sessionWithExpiry);
         onClose();
       } else {
@@ -105,7 +105,7 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
           document.cookie = `x-company-id=${json.data.companyId}; path=/`;
         }
 
-        showToast(`Logged in successfully! Welcome ${json.data.name} (1-Hour Session Active)`, "success");
+        showToast(`Logged in successfully! Welcome ${json.data.name}`, "success");
         onSuccess(sessionWithExpiry);
         onClose();
       } else {
@@ -161,9 +161,9 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
           </button>
         </div>
 
-        {/* Registration Form */}
+        {/* Registration Form (No Autofill Suggestions) */}
         {activeTab === "REGISTER" && (
-          <form onSubmit={handleRegister} className="space-y-3.5">
+          <form onSubmit={handleRegister} autoComplete="off" className="space-y-3.5">
             <div>
               <label className="text-xs font-bold text-slate-300 block mb-1">Company / Business Name *</label>
               <div className="relative">
@@ -171,7 +171,11 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
                 <input
                   type="text"
                   required
-                  placeholder="e.g. BuildCorp Enterprise"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  placeholder="Enter company name"
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 font-semibold"
@@ -186,7 +190,11 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Sarah Ahmed"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  placeholder="Enter your full name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 font-semibold"
@@ -201,7 +209,11 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
                 <input
                   type="email"
                   required
-                  placeholder="name@gmail.com"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  placeholder="Enter email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
@@ -216,10 +228,11 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
                 <input
                   type="password"
                   required
-                  placeholder="Create your password"
+                  autoComplete="new-password"
+                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 font-mono text-sm"
                 />
               </div>
             </div>
@@ -230,7 +243,11 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
                 <Phone className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
-                  placeholder="+92 300 1234567"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  placeholder="Enter phone number"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
@@ -248,9 +265,9 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
           </form>
         )}
 
-        {/* Login Form */}
+        {/* Login Form (No Autofill Suggestions) */}
         {activeTab === "LOGIN" && (
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} autoComplete="off" className="space-y-4">
             <div>
               <label className="text-xs font-bold text-slate-300 block mb-1">Gmail / Email Address *</label>
               <div className="relative">
@@ -258,7 +275,11 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
                 <input
                   type="email"
                   required
-                  placeholder="name@gmail.com"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  placeholder="Enter email address"
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-3 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
@@ -273,10 +294,11 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
                 <input
                   type="password"
                   required
-                  placeholder="Enter your password"
+                  autoComplete="new-password"
+                  placeholder="••••••••"
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-3 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-3 text-xs text-white focus:outline-none focus:border-amber-500 font-mono text-sm"
                 />
               </div>
             </div>
