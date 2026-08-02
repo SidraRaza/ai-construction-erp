@@ -26,8 +26,8 @@ export default function AboutPage() {
       {/* Navigation Header */}
       <header className="border-b border-slate-800/80 px-4 sm:px-8 py-3.5 flex items-center justify-between backdrop-blur-md bg-slate-950/90 sticky top-0 z-50">
         <div className="flex items-center gap-3">
-          <Link href="/" className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-white font-bold shadow-lg shadow-orange-500/20 shrink-0">
-            <Building2 className="w-5 h-5 sm:w-6 sm:h-6" />
+          <Link href="/" className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden shadow-lg shadow-orange-500/20 border border-amber-500/40 shrink-0">
+            <img src="/logo.jpg" alt="AI Construction ERP Logo" className="w-full h-full object-cover" />
           </Link>
           <div>
             <h1 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2">
