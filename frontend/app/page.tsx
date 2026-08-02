@@ -377,9 +377,7 @@ function HomeContent() {
       <nav className="border-b border-slate-800/80 px-4 sm:px-8 py-3.5 flex items-center justify-between backdrop-blur-md bg-slate-950/90 sticky top-0 z-50">
         {/* Brand Logo */}
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden shadow-lg shadow-orange-500/20 border border-amber-500/40 shrink-0">
-            <img src="/logo.jpg" alt="AI Construction ERP Logo" className="w-full h-full object-cover" />
-          </div>
+          <img src="/logo.png" alt="AI Construction ERP Logo" className="w-8 h-8 sm:w-9 sm:h-9 object-contain shrink-0" />
           <span className="text-base sm:text-lg font-bold text-white tracking-tight truncate">AI Construction ERP</span>
         </Link>
 
