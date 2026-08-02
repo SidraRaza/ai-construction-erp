@@ -313,8 +313,8 @@ function HomeContent() {
           }
           .hero-inner {
             grid-template-columns: 1fr;
-            padding: 36px 16px 32px;
-            gap: 24px;
+            padding: 56px 24px 40px;
+            gap: 28px;
             text-align: left;
           }
           .stamp {
