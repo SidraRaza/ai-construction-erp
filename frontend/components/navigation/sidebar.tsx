@@ -117,9 +117,7 @@ export function Sidebar({ role }: SidebarProps) {
         {/* Brand Header */}
         <div className="p-5 border-b border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-white font-bold shadow-lg shadow-orange-500/20">
-              <Building2 className="w-6 h-6" />
-            </div>
+            <img src="/logo-128px.png" alt="AI Construction ERP Logo" className="w-9 h-9 object-contain shrink-0" />
             <div>
               <h1 className="font-extrabold tracking-tight text-white text-base">BuildCorp ERP</h1>
               <span className="text-[10px] font-bold tracking-widest text-amber-400 uppercase bg-amber-400/10 px-2 py-0.5 rounded-full border border-amber-400/20">

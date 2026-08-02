@@ -18,9 +18,18 @@ export const metadata: Metadata = {
   title: "AI Construction ERP — Enterprise SaaS Platform",
   description: "Next.js App Router AI Construction Management ERP System created by Sidra Raza",
   icons: {
-    icon: "/logo.jpg",
-    shortcut: "/logo.png",
-    apple: "/logo.png",
+    icon: [
+      { url: "/logo-16px.png", sizes: "16x16", type: "image/png" },
+      { url: "/logo-32px.png", sizes: "32x32", type: "image/png" },
+      { url: "/logo-64px.png", sizes: "64x64", type: "image/png" },
+      { url: "/logo-128px.png", sizes: "128x128", type: "image/png" },
+      { url: "/logo-256px.png", sizes: "256x256", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: [
+      { url: "/logo-512px.png", sizes: "512x512", type: "image/png" },
+      { url: "/logo-256px.png", sizes: "256x256", type: "image/png" },
+    ],
   },
 };
 
@@ -36,8 +45,11 @@ export default function RootLayout({
     >
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/logo.png" type="image/png" />
-        <link rel="apple-touch-icon" href="/logo.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/logo-16px.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/logo-32px.png" />
+        <link rel="icon" type="image/png" sizes="64x64" href="/logo-64px.png" />
+        <link rel="icon" type="image/png" sizes="128x128" href="/logo-128px.png" />
+        <link rel="apple-touch-icon" sizes="512x512" href="/logo-512px.png" />
       </head>
       <body className="min-h-full flex flex-col bg-slate-950 text-slate-100 dark:bg-slate-950 dark:text-slate-100">
         <ThemeProvider>

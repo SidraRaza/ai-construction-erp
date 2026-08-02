@@ -60,7 +60,7 @@ export default function HelpPage() {
       <header className="border-b border-slate-800/80 px-4 sm:px-8 py-3.5 flex items-center justify-between backdrop-blur-md bg-slate-950/90 sticky top-0 z-50">
         <div className="flex items-center gap-3">
           <Link href="/">
-            <img src="/logo.png" alt="AI Construction ERP Logo" className="w-8 h-8 sm:w-9 sm:h-9 object-contain shrink-0" />
+            <img src="/logo-128px.png" alt="AI Construction ERP Logo" className="w-8 h-8 sm:w-9 sm:h-9 object-contain shrink-0" />
           </Link>
           <div>
             <h1 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2">
