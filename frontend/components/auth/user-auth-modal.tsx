@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useToast } from "@/components/ui/toast-provider";
 import { saveSession } from "@/lib/session";
-import { Lock, UserPlus, LogIn, Building2, Mail, KeyRound, Phone, ShieldCheck } from "lucide-react";
+import { Lock, UserPlus, LogIn, Building2, Mail, KeyRound, Phone, ShieldCheck, HelpCircle, ArrowLeft, CheckCircle2 } from "lucide-react";
 
 interface UserAuthModalProps {
   isOpen: boolean;
@@ -13,7 +13,7 @@ interface UserAuthModalProps {
 
 export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps) {
   const { showToast } = useToast();
-  const [activeTab, setActiveTab] = useState<"REGISTER" | "LOGIN">("REGISTER");
+  const [activeTab, setActiveTab] = useState<"REGISTER" | "LOGIN" | "FORGOT_PASSWORD">("REGISTER");
 
   // Registration Form State (Completely Blank)
   const [companyName, setCompanyName] = useState("");
@@ -25,6 +25,11 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
   // Login Form State (Completely Blank)
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+
+  // Forgot Password State
+  const [resetEmail, setResetEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [isResetDone, setIsResetDone] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -118,6 +123,38 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resetEmail || !newPassword) {
+      showToast("Please enter your email and new password!", "warning");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: resetEmail,
+          newPassword,
+        }),
+      });
+
+      const json = await res.json();
+      if (json.success) {
+        setIsResetDone(true);
+        showToast("Password reset successfully! You can now log in.", "success");
+      } else {
+        showToast(json.error?.message || "Password reset failed", "error");
+      }
+    } catch (err) {
+      showToast("Error resetting password", "error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
       <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-5 shadow-2xl relative overflow-hidden">
@@ -128,7 +165,9 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-5 h-5 text-amber-400" />
-            <h3 className="text-base font-bold text-white">Private Account Access</h3>
+            <h3 className="text-base font-bold text-white">
+              {activeTab === "FORGOT_PASSWORD" ? "Reset Password" : "Private Account Access"}
+            </h3>
           </div>
           <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
             ✕
@@ -139,29 +178,35 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
         <div className="flex bg-slate-950 p-1 rounded-2xl border border-slate-800">
           <button
             type="button"
-            onClick={() => setActiveTab("REGISTER")}
+            onClick={() => {
+              setActiveTab("REGISTER");
+              setIsResetDone(false);
+            }}
             className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
               activeTab === "REGISTER"
                 ? "bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-md"
                 : "text-slate-400 hover:text-white"
             }`}
           >
-            <UserPlus className="w-3.5 h-3.5" /> Create New Account
+            <UserPlus className="w-3.5 h-3.5" /> Create Account
           </button>
           <button
             type="button"
-            onClick={() => setActiveTab("LOGIN")}
+            onClick={() => {
+              setActiveTab("LOGIN");
+              setIsResetDone(false);
+            }}
             className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
               activeTab === "LOGIN"
                 ? "bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-md"
                 : "text-slate-400 hover:text-white"
             }`}
           >
-            <LogIn className="w-3.5 h-3.5" /> Login to Dashboard
+            <LogIn className="w-3.5 h-3.5" /> Login
           </button>
         </div>
 
-        {/* Registration Form (No Autofill Suggestions) */}
+        {/* Registration Form */}
         {activeTab === "REGISTER" && (
           <form onSubmit={handleRegister} autoComplete="off" className="space-y-3.5">
             <div>
@@ -172,9 +217,6 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
                   type="text"
                   required
                   autoComplete="off"
-                  autoCorrect="off"
-                  autoCapitalize="off"
-                  spellCheck={false}
                   placeholder="Enter company name"
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
@@ -191,9 +233,6 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
                   type="text"
                   required
                   autoComplete="off"
-                  autoCorrect="off"
-                  autoCapitalize="off"
-                  spellCheck={false}
                   placeholder="Enter your full name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -210,9 +249,6 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
                   type="email"
                   required
                   autoComplete="off"
-                  autoCorrect="off"
-                  autoCapitalize="off"
-                  spellCheck={false}
                   placeholder="Enter email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -244,9 +280,6 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
                 <input
                   type="text"
                   autoComplete="off"
-                  autoCorrect="off"
-                  autoCapitalize="off"
-                  spellCheck={false}
                   placeholder="Enter phone number"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
@@ -265,7 +298,7 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
           </form>
         )}
 
-        {/* Login Form (No Autofill Suggestions) */}
+        {/* Login Form */}
         {activeTab === "LOGIN" && (
           <form onSubmit={handleLogin} autoComplete="off" className="space-y-4">
             <div>
@@ -276,9 +309,6 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
                   type="email"
                   required
                   autoComplete="off"
-                  autoCorrect="off"
-                  autoCapitalize="off"
-                  spellCheck={false}
                   placeholder="Enter email address"
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
@@ -288,7 +318,19 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
             </div>
 
             <div>
-              <label className="text-xs font-bold text-slate-300 block mb-1">Secret Password *</label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs font-bold text-slate-300 block">Secret Password *</label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab("FORGOT_PASSWORD");
+                    setResetEmail(loginEmail);
+                  }}
+                  className="text-[11px] font-bold text-amber-400 hover:underline"
+                >
+                  Forgot Password?
+                </button>
+              </div>
               <div className="relative">
                 <KeyRound className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
@@ -311,6 +353,88 @@ export function UserAuthModal({ isOpen, onClose, onSuccess }: UserAuthModalProps
               {isLoading ? "Authenticating..." : "Login to Your Private Dashboard"}
             </button>
           </form>
+        )}
+
+        {/* Forgot Password Form */}
+        {activeTab === "FORGOT_PASSWORD" && (
+          <div className="space-y-4">
+            {isResetDone ? (
+              <div className="py-6 text-center space-y-3 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-4">
+                <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
+                <h4 className="text-sm font-bold text-white">Password Updated Successfully!</h4>
+                <p className="text-xs text-slate-300">
+                  Your password for <strong className="text-amber-400">{resetEmail}</strong> has been updated.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab("LOGIN");
+                    setLoginEmail(resetEmail);
+                    setIsResetDone(false);
+                  }}
+                  className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold text-xs"
+                >
+                  Proceed to Login
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleForgotPassword} autoComplete="off" className="space-y-4">
+                <p className="text-xs text-slate-400">
+                  Enter your registered account email and set a new password.
+                </p>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-300 block mb-1">Your Account Email *</label>
+                  <div className="relative">
+                    <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="email"
+                      required
+                      autoComplete="off"
+                      placeholder="Enter registered email"
+                      value={resetEmail}
+                      onChange={(e) => setResetEmail(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-3 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-300 block mb-1">Set New Password *</label>
+                  <div className="relative">
+                    <KeyRound className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="password"
+                      required
+                      autoComplete="new-password"
+                      placeholder="Enter new password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-3 text-xs text-white focus:outline-none focus:border-amber-500 font-mono text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("LOGIN")}
+                    className="flex-1 py-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-300 font-bold text-xs hover:text-white flex items-center justify-center gap-1"
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5 text-amber-400" /> Back
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="flex-[2] py-3 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white font-bold text-xs shadow-lg hover:brightness-110 transition-all"
+                  >
+                    {isLoading ? "Resetting..." : "Reset My Password"}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
         )}
 
         {/* Security Footer */}

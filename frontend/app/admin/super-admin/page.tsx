@@ -205,7 +205,18 @@ export default function SuperAdminPage() {
             </div>
 
             <div>
-              <label className="text-xs font-bold text-slate-300 block mb-1">Super Admin Password *</label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs font-bold text-slate-300 block">Super Admin Password *</label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    showToast("Owner Default Password is 87626 (Sidra Raza Owner Passcode)", "info");
+                  }}
+                  className="text-[11px] font-bold text-amber-400 hover:underline"
+                >
+                  Forgot Password?
+                </button>
+              </div>
               <input
                 type="password"
                 required
