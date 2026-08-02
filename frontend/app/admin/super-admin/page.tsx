@@ -29,6 +29,13 @@ import {
   Bug,
   MessageCircle,
   Mail,
+  Menu,
+  X,
+  ChevronDown,
+  HardHat,
+  SlidersHorizontal,
+  HelpCircle,
+  LayoutDashboard,
 } from "lucide-react";
 
 export default function SuperAdminPage() {
@@ -38,6 +45,8 @@ export default function SuperAdminPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [timeFilter, setTimeFilter] = useState("ALL");
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const [isPortalsDropdownOpen, setIsPortalsDropdownOpen] = useState(false);
 
   // Owner Password Authentication Gatekeeper State
   const [isSuperAdminAuth, setIsSuperAdminAuth] = useState(false);
@@ -233,57 +242,201 @@ export default function SuperAdminPage() {
   // Once Authenticated: Render Full-Width Standalone Owner Workspace (NO SIDEBAR)
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col">
-      {/* Standalone Owner Top Header Bar */}
-      <header className="min-h-[64px] h-auto bg-slate-900/90 border-b border-amber-500/20 px-4 sm:px-8 py-3 flex items-center justify-between flex-wrap sm:flex-nowrap gap-3 sticky top-0 z-30 shadow-xl backdrop-blur-xl">
-        <div className="flex items-center gap-3">
-          <Link href="/" className="shrink-0">
-            <img src="/logo-128px.png" alt="AI Construction ERP Logo" className="w-8 h-8 sm:w-9 sm:h-9 object-contain" />
+      {/* Navigation Header (Matching About & Home Page Style) */}
+      <nav className="border-b border-slate-800/80 px-4 sm:px-8 py-3.5 flex items-center justify-between backdrop-blur-md bg-slate-950/90 sticky top-0 z-50">
+        {/* Brand Logo & Title */}
+        <Link href="/" className="flex items-center gap-2.5">
+          <img src="/logo-128px.png" alt="AI Construction ERP Logo" className="w-8 h-8 sm:w-9 sm:h-9 object-contain shrink-0" />
+          <span className="text-base sm:text-lg font-bold text-white tracking-tight truncate">AI Construction ERP</span>
+          <span className="hidden sm:inline-block text-xs font-mono text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20 uppercase">Super Admin</span>
+        </Link>
+
+        {/* Desktop Navigation Links */}
+        <div className="hidden md:flex items-center gap-6">
+          <Link href="/" className="text-xs font-semibold text-slate-300 hover:text-white transition-colors">
+            Home
           </Link>
-          <div>
-            <h1 className="font-extrabold text-white text-sm sm:text-base tracking-tight flex items-center gap-1.5 sm:gap-2 flex-wrap">
-              AI Construction ERP <span className="text-[10px] sm:text-xs font-mono text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20 uppercase">Super Admin</span>
-            </h1>
-            <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium">Global Platform Owner Workspace</p>
+
+          <Link href="/about" className="text-xs font-semibold text-slate-300 hover:text-white transition-colors">
+            About Us
+          </Link>
+
+          <Link href="/help" className="text-xs font-semibold text-slate-300 hover:text-white transition-colors flex items-center gap-1.5">
+            <HelpCircle className="w-3.5 h-3.5 text-amber-400" /> Help Center
+          </Link>
+
+          {/* Portals Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setIsPortalsDropdownOpen(!isPortalsDropdownOpen)}
+              className="text-xs font-semibold text-slate-300 hover:text-white flex items-center gap-1.5 py-1.5 transition-colors"
+            >
+              Enterprise Portals <ChevronDown className={`w-3.5 h-3.5 text-amber-400 transition-transform ${isPortalsDropdownOpen ? "rotate-180" : ""}`} />
+            </button>
+
+            {isPortalsDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-64 bg-slate-900/95 border border-slate-800 rounded-2xl shadow-2xl p-2 z-50 backdrop-blur-xl animate-in fade-in duration-150 space-y-1">
+                <Link
+                  href="/admin/dashboard"
+                  onClick={() => setIsPortalsDropdownOpen(false)}
+                  className="w-full text-left p-2.5 rounded-xl hover:bg-slate-800/80 transition-colors flex items-center gap-2.5 text-xs text-slate-200 font-medium"
+                >
+                  <LayoutDashboard className="w-4 h-4 text-amber-400" /> Admin Portal
+                </Link>
+                <Link
+                  href="/engineer/dashboard"
+                  onClick={() => setIsPortalsDropdownOpen(false)}
+                  className="w-full text-left p-2.5 rounded-xl hover:bg-slate-800/80 transition-colors flex items-center gap-2.5 text-xs text-slate-200 font-medium"
+                >
+                  <HardHat className="w-4 h-4 text-emerald-400" /> Engineer Portal
+                </Link>
+                <Link
+                  href="/admin/custom-fields"
+                  onClick={() => setIsPortalsDropdownOpen(false)}
+                  className="w-full text-left p-2.5 rounded-xl hover:bg-slate-800/80 transition-colors flex items-center gap-2.5 text-xs text-slate-200 font-medium"
+                >
+                  <SlidersHorizontal className="w-4 h-4 text-amber-400" /> Custom Fields Engine
+                </Link>
+                <Link
+                  href="/client/dashboard"
+                  onClick={() => setIsPortalsDropdownOpen(false)}
+                  className="w-full text-left p-2.5 rounded-xl hover:bg-slate-800/80 transition-colors flex items-center gap-2.5 text-xs text-slate-200 font-medium"
+                >
+                  <Users className="w-4 h-4 text-cyan-400" /> Client Portal
+                </Link>
+                <div className="my-1 border-t border-slate-800" />
+                <Link
+                  href="/admin/super-admin"
+                  onClick={() => setIsPortalsDropdownOpen(false)}
+                  className="w-full text-left p-2.5 rounded-xl hover:bg-purple-500/10 transition-colors flex items-center gap-2.5 text-xs text-purple-400 font-bold"
+                >
+                  <Crown className="w-4 h-4" /> Super Admin Owner Portal
+                </Link>
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-          <Link
-            href="/"
-            className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-400 hover:text-white transition-all flex items-center gap-1.5 text-xs font-bold"
-          >
-            <ArrowRight className="w-3.5 h-3.5 rotate-180 text-amber-400" /> <span className="hidden sm:inline">Home</span>
-          </Link>
-
+        {/* Action Controls */}
+        <div className="hidden md:flex items-center gap-3">
           <button
             onClick={fetchSuperAdminData}
             title="Refresh Registration Ledger"
-            className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-400 hover:text-amber-400 hover:border-amber-500/40 transition-all flex items-center gap-1.5 text-xs font-bold"
+            className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-amber-400 hover:border-amber-500/40 transition-all flex items-center gap-2 text-xs font-bold"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin text-amber-400" : ""}`} /> <span className="hidden sm:inline">Sync Database</span>
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin text-amber-400" : ""}`} /> Sync Database
           </button>
 
-          <div className="hidden sm:block h-6 w-px bg-slate-800" />
+          <div className="h-6 w-px bg-slate-800" />
 
           {/* Owner Profile Badge & Lock Button */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-md shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold text-xs shadow-md shrink-0">
               {(adminName || "Sidra").charAt(0).toUpperCase()}
             </div>
-            <div className="hidden md:block text-left">
-              <p className="text-xs font-bold text-white">{adminName || "Sidra"} (Platform Owner)</p>
-              <p className="text-[10px] text-emerald-400 font-mono">SUPER_ADMIN Active</p>
+            <div className="text-left">
+              <p className="text-xs font-bold text-white">{adminName || "Sidra"}</p>
+              <p className="text-[10px] text-emerald-400 font-mono">SUPER_ADMIN</p>
             </div>
             <button
               onClick={handleLogoutSuperAdmin}
               title="Lock Super Admin Portal"
-              className="p-2 rounded-xl bg-slate-950 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 border border-slate-800 text-xs transition-all flex items-center gap-1.5 font-bold"
+              className="p-2 rounded-xl bg-slate-900 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 border border-slate-800 text-xs transition-all flex items-center gap-1.5 font-bold"
             >
-              <LogOut className="w-4 h-4 text-rose-400" /> <span className="hidden sm:inline">Lock Portal</span>
+              <LogOut className="w-4 h-4 text-rose-400" /> Lock Portal
             </button>
           </div>
         </div>
-      </header>
+
+        {/* Mobile Controls */}
+        <div className="flex md:hidden items-center gap-2">
+          <button
+            onClick={fetchSuperAdminData}
+            className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-amber-400"
+            title="Sync Database"
+          >
+            <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} />
+          </button>
+
+          <button
+            onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}
+            className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-amber-400 hover:text-white transition-all"
+            aria-label="Toggle Mobile Navigation"
+          >
+            {isMobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
+      </nav>
+
+      {/* Mobile Navigation Drawer */}
+      {isMobileNavOpen && (
+        <div className="md:hidden fixed inset-0 z-40 bg-slate-950/95 backdrop-blur-xl p-6 pt-20 flex flex-col justify-between animate-in fade-in duration-200">
+          <div className="space-y-3">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Owner Controls & Portals</p>
+
+            <Link
+              href="/"
+              onClick={() => setIsMobileNavOpen(false)}
+              className="w-full p-3 rounded-2xl bg-slate-900 border border-slate-800 text-slate-100 text-sm font-bold flex items-center justify-between"
+            >
+              <span>Home</span>
+              <ArrowRight className="w-4 h-4 text-amber-400" />
+            </Link>
+
+            <Link
+              href="/about"
+              onClick={() => setIsMobileNavOpen(false)}
+              className="w-full p-3 rounded-2xl bg-slate-900 border border-slate-800 text-slate-100 text-sm font-bold flex items-center justify-between"
+            >
+              <span>About Us</span>
+              <ArrowRight className="w-4 h-4 text-amber-400" />
+            </Link>
+
+            <Link
+              href="/help"
+              onClick={() => setIsMobileNavOpen(false)}
+              className="w-full p-3 rounded-2xl bg-slate-900 border border-slate-800 text-slate-100 text-sm font-bold flex items-center justify-between"
+            >
+              <span className="flex items-center gap-2.5">
+                <HelpCircle className="w-4 h-4 text-amber-400" /> Help Center
+              </span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+
+            <div className="my-2 border-t border-slate-800" />
+
+            <button
+              onClick={() => {
+                fetchSuperAdminData();
+                setIsMobileNavOpen(false);
+              }}
+              className="w-full p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-bold flex items-center justify-between"
+            >
+              <span className="flex items-center gap-2.5">
+                <RefreshCw className="w-4 h-4" /> Sync Database Ledger
+              </span>
+              <CheckCircle2 className="w-4 h-4 text-amber-400" />
+            </button>
+
+            <button
+              onClick={() => {
+                handleLogoutSuperAdmin();
+                setIsMobileNavOpen(false);
+              }}
+              className="w-full p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm font-bold flex items-center justify-between"
+            >
+              <span className="flex items-center gap-2.5">
+                <LogOut className="w-4 h-4" /> Lock Owner Portal
+              </span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="pt-6 border-t border-slate-800 text-center text-xs text-slate-400 font-medium">
+            Created & Designed by <strong className="text-amber-400">Sidra Raza</strong> • AI Construction ERP
+          </div>
+        </div>
+      )}
 
       {/* Main Full-Width Content Container */}
       <main className="p-4 sm:p-8 space-y-6 sm:space-y-8 flex-1 overflow-y-auto max-w-7xl w-full mx-auto">
