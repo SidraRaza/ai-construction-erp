@@ -38,6 +38,218 @@ function HomeContent() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col justify-between overflow-x-hidden">
+      {/* Import Custom Google Fonts for Blueprint Hero */}
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&display=swap"
+        rel="stylesheet"
+      />
+
+      <style jsx global>{`
+        :root {
+          --blueprint-deep: #0F2D4A;
+          --blueprint-mid: #1E4A70;
+          --blueprint-line: #7FB8D6;
+          --cyan-white: #E4F1F7;
+          --amber: #F2A93B;
+          --off-white: #F5F1E8;
+        }
+
+        .hero-wrap {
+          font-family: 'Inter', sans-serif;
+          background: var(--blueprint-deep);
+          color: var(--cyan-white);
+          position: relative;
+          overflow: hidden;
+          padding: 0;
+          width: 100%;
+          min-height: 640px;
+          isolation: isolate;
+        }
+
+        /* Blueprint grid */
+        .grid-bg {
+          position: absolute;
+          inset: 0;
+          background-image:
+            linear-gradient(var(--blueprint-mid) 1px, transparent 1px),
+            linear-gradient(90deg, var(--blueprint-mid) 1px, transparent 1px);
+          background-size: 40px 40px;
+          opacity: 0.35;
+          z-index: 0;
+        }
+        .grid-bg::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background-image:
+            linear-gradient(rgba(127,184,214,0.5) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(127,184,214,0.5) 1px, transparent 1px);
+          background-size: 200px 200px;
+        }
+
+        .vignette {
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(ellipse at 30% 40%, transparent 0%, var(--blueprint-deep) 78%);
+          z-index: 1;
+        }
+
+        .hero-inner {
+          position: relative;
+          z-index: 2;
+          max-width: 1240px;
+          margin: 0 auto;
+          padding: 88px 32px 72px;
+          display: grid;
+          grid-template-columns: 1.05fr 0.95fr;
+          gap: 48px;
+          align-items: center;
+        }
+
+        .stamp {
+          position: absolute;
+          top: 48px;
+          right: 48px;
+          z-index: 3;
+          width: 108px;
+          height: 108px;
+          border: 1.5px solid var(--amber);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transform: rotate(9deg);
+          opacity: 0.9;
+        }
+        .stamp span {
+          font-family: 'IBM Plex Mono', monospace;
+          font-size: 10.5px;
+          letter-spacing: 0.14em;
+          color: var(--amber);
+          text-align: center;
+          line-height: 1.5;
+          text-transform: uppercase;
+        }
+
+        .eyebrow {
+          font-family: 'IBM Plex Mono', monospace;
+          font-size: 12.5px;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: var(--amber);
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 22px;
+        }
+        .eyebrow::before {
+          content: "";
+          width: 28px;
+          height: 1px;
+          background: var(--amber);
+          display: inline-block;
+        }
+
+        h1.headline {
+          font-family: 'Space Grotesk', sans-serif;
+          font-weight: 600;
+          font-size: clamp(34px, 4.4vw, 54px);
+          line-height: 1.08;
+          letter-spacing: -0.015em;
+          color: var(--off-white);
+          margin: 0 0 24px;
+          max-width: 620px;
+        }
+        h1.headline .accent { color: var(--amber); }
+        h1.headline .strike {
+          text-decoration: line-through;
+          text-decoration-color: rgba(228,241,247,0.45);
+          text-decoration-thickness: 2px;
+          color: rgba(228,241,247,0.55);
+        }
+
+        .subtext {
+          font-size: 16.5px;
+          line-height: 1.65;
+          color: rgba(228,241,247,0.82);
+          max-width: 500px;
+          margin: 0 0 34px;
+        }
+        .subtext b { color: var(--off-white); font-weight: 500; }
+
+        .cta-row { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 40px; }
+
+        .btn-primary, .btn-secondary {
+          font-family: 'Inter', sans-serif;
+          font-weight: 500;
+          font-size: 14.5px;
+          padding: 13px 24px;
+          border-radius: 3px;
+          cursor: pointer;
+          transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+        }
+        .btn-primary {
+          background: var(--amber);
+          color: var(--blueprint-deep);
+          border: 1px solid var(--amber);
+        }
+        .btn-primary:hover { transform: translateY(-1px); background: #ffb84f; }
+        .btn-primary:focus-visible, .btn-secondary:focus-visible {
+          outline: 2px solid var(--cyan-white);
+          outline-offset: 3px;
+        }
+        .btn-secondary {
+          background: transparent;
+          color: var(--cyan-white);
+          border: 1px solid rgba(228,241,247,0.35);
+        }
+        .btn-secondary:hover { border-color: var(--cyan-white); transform: translateY(-1px); }
+
+        .meta-line {
+          font-family: 'IBM Plex Mono', monospace;
+          font-size: 11.5px;
+          letter-spacing: 0.06em;
+          color: rgba(228,241,247,0.5);
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .meta-line .dot {
+          width: 6px; height: 6px; border-radius: 50%;
+          background: var(--amber);
+          display: inline-block;
+        }
+
+        /* Diagram side */
+        .diagram-box {
+          position: relative;
+          height: 420px;
+        }
+        .diagram-box svg { width: 100%; height: 100%; overflow: visible; }
+
+        .node-label {
+          font-family: 'IBM Plex Mono', monospace;
+          font-size: 11px;
+          fill: var(--cyan-white);
+          letter-spacing: 0.02em;
+        }
+        .dim-line { stroke: rgba(127,184,214,0.55); stroke-width: 1; }
+        .dim-line.amber { stroke: var(--amber); stroke-width: 1.2; }
+
+        @media (max-width: 860px) {
+          .hero-inner { grid-template-columns: 1fr; padding: 96px 22px 48px; }
+          .diagram-box { height: 300px; order: -1; }
+          .stamp { width: 84px; height: 84px; top: 24px; right: 24px; }
+          .stamp span { font-size: 9px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .btn-primary, .btn-secondary { transition: none; }
+        }
+      `}</style>
+
       {/* Navigation Bar */}
       <nav className="border-b border-slate-800/80 px-4 sm:px-8 py-3.5 flex items-center justify-between backdrop-blur-md bg-slate-950/90 sticky top-0 z-50">
         {/* Brand Logo */}
@@ -173,49 +385,87 @@ function HomeContent() {
         </div>
       )}
 
-      {/* Hero Section */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-20 text-center space-y-6 sm:space-y-8 flex-1 flex flex-col justify-center items-center">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold uppercase tracking-wider">
-          <ShieldCheck className="w-4 h-4 text-emerald-400" /> Enterprise Multi-Tenant SaaS Platform by Sidra Raza
+      {/* Exact Custom Blueprint Hero Section */}
+      <div className="hero-wrap">
+        <div className="grid-bg"></div>
+        <div className="vignette"></div>
+
+        <div className="stamp"><span>AI<br />POWERED<br />SYSTEM</span></div>
+
+        <div className="hero-inner">
+          <div>
+            <div className="eyebrow">Construction ERP</div>
+
+            <h1 className="headline">
+              Replace <span className="strike">WhatsApp groups</span> &amp; <span className="strike">spreadsheets</span><br />
+              with <span className="accent">AI intelligence.</span>
+            </h1>
+
+            <p className="subtext">
+              Manage <b>projects</b>, <b>site labour</b>, <b>material inventory</b>, <b>expense tracking</b>, <b>client billing</b>, and <b>self-configurable custom production fields</b> — in one connected SaaS system powered by Next.js and Prisma.
+            </p>
+
+            <div className="cta-row">
+              <button onClick={() => setIsAuthModalOpen(true)} className="btn-primary">Get early access</button>
+              <Link href="/admin/dashboard" className="btn-secondary">See how it works</Link>
+            </div>
+
+            <div className="meta-line">
+              <span className="dot"></span> BUILT FOR REAL CONSTRUCTION COMPANIES — LAUNCHING NEXT WEEK
+            </div>
+          </div>
+
+          <div className="diagram-box">
+            <svg viewBox="0 0 420 420" xmlns="http://www.w3.org/2000/svg">
+              {/* dimension tick frame */}
+              <line x1="10" y1="10" x2="10" y2="410" className="dim-line" strokeDasharray="2 4"/>
+              <line x1="10" y1="10" x2="20" y2="10" className="dim-line"/>
+              <line x1="10" y1="410" x2="20" y2="410" className="dim-line"/>
+
+              {/* central hub */}
+              <circle cx="210" cy="210" r="46" fill="none" stroke="var(--amber)" strokeWidth="1.4"/>
+              <text x="210" y="205" textAnchor="middle" className="node-label" fill="#F2A93B" fontSize="10.5">AI CONSTRUCTION</text>
+              <text x="210" y="219" textAnchor="middle" className="node-label" fill="#F2A93B" fontSize="10.5">ERP</text>
+
+              {/* module nodes */}
+              {/* Projects */}
+              <line x1="210" y1="164" x2="210" y2="70" className="dim-line"/>
+              <circle cx="210" cy="70" r="4" fill="#E4F1F7"/>
+              <text x="222" y="74" className="node-label">PROJECTS</text>
+
+              {/* Labour */}
+              <line x1="248" y1="185" x2="335" y2="120" className="dim-line"/>
+              <circle cx="335" cy="120" r="4" fill="#E4F1F7"/>
+              <text x="347" y="124" className="node-label">SITE LABOUR</text>
+
+              {/* Materials */}
+              <line x1="256" y1="210" x2="368" y2="210" className="dim-line"/>
+              <circle cx="368" cy="210" r="4" fill="#E4F1F7"/>
+              <text x="380" y="214" className="node-label">MATERIALS</text>
+
+              {/* Expenses */}
+              <line x1="248" y1="235" x2="335" y2="300" className="dim-line"/>
+              <circle cx="335" cy="300" r="4" fill="#E4F1F7"/>
+              <text x="347" y="304" className="node-label">EXPENSES</text>
+
+              {/* Billing */}
+              <line x1="210" y1="256" x2="210" y2="350" className="dim-line"/>
+              <circle cx="210" cy="350" r="4" fill="#E4F1F7"/>
+              <text x="222" y="354" className="node-label">CLIENT BILLING</text>
+
+              {/* Custom fields */}
+              <line x1="172" y1="235" x2="85" y2="300" className="dim-line amber"/>
+              <circle cx="85" cy="300" r="4" fill="#F2A93B"/>
+              <text x="20" y="304" className="node-label" fill="#F2A93B">CUSTOM FIELDS</text>
+
+              {/* scale tag */}
+              <text x="20" y="400" className="node-label" fill="rgba(228,241,247,0.4)" fontSize="9.5">SCALE — ONE SYSTEM : ALL SITES</text>
+            </svg>
+          </div>
         </div>
+      </div>
 
-        <h1 className="text-3xl sm:text-6xl font-extrabold text-white tracking-tight leading-tight max-w-4xl">
-          Replace WhatsApp Groups & Spreadsheets with <span className="bg-gradient-to-r from-amber-400 via-orange-500 to-amber-600 bg-clip-text text-transparent">AI Intelligence</span>
-        </h1>
-
-        <p className="text-sm sm:text-lg text-slate-400 max-w-2xl leading-relaxed">
-          Manage projects, site labour, material inventory, expense tracking, client billing, and self-configurable custom production fields in one connected SaaS system powered by Next.js and Prisma.
-        </p>
-
-        {/* Feature Highlights Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 pt-8 sm:pt-12 text-left w-full">
-          <div className="p-5 sm:p-6 bg-slate-900/60 rounded-3xl border border-slate-800 space-y-3 hover:border-amber-500/30 transition-all">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-              <HardHat className="w-5 h-5" />
-            </div>
-            <h3 className="text-base font-bold text-white">Mobile-First Site Command</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">QR attendance check-ins, daily site reports, and capped expense logging for engineers in the field.</p>
-          </div>
-
-          <div className="p-5 sm:p-6 bg-slate-900/60 rounded-3xl border border-slate-800 space-y-3 hover:border-amber-500/30 transition-all">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-              <Receipt className="w-5 h-5" />
-            </div>
-            <h3 className="text-base font-bold text-white">Immutable Financial Audit</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">Versioned quotations and invoices with void-and-reissue audit trail ensuring full legal compliance.</p>
-          </div>
-
-          <div className="p-5 sm:p-6 bg-slate-900/60 rounded-3xl border border-slate-800 space-y-3 hover:border-amber-500/30 transition-all">
-            <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
-              <Bot className="w-5 h-5" />
-            </div>
-            <h3 className="text-base font-bold text-white">AI-Drafted Intelligence</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">Instant daily progress reports, cost estimators, and draft quotations requiring human admin sign-off.</p>
-          </div>
-        </div>
-      </main>
-
-      {/* Register / Login Gatekeeper Modal (Opens automatically on auth=required or auth=login) */}
+      {/* Register / Login Gatekeeper Modal */}
       <UserAuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
@@ -225,7 +475,7 @@ function HomeContent() {
       />
 
       {/* Footer */}
-      <footer className="border-t border-slate-800/80 px-6 py-5 text-center text-xs text-slate-400 font-medium">
+      <footer className="border-t border-slate-800/80 px-6 py-5 text-center text-xs text-slate-400 font-medium bg-slate-950">
         Created & Built by <strong className="text-amber-400">Sidra Raza</strong> (Platform Founder & Lead Architect) • AI Construction ERP v1.0
       </footer>
     </div>
