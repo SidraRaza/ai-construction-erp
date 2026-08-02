@@ -217,3 +217,13 @@ model CustomFieldEntry {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model UserFeedback {
+  id        String   @id @default(cuid())
+  category  String   @default("FEATURE") // FEATURE | BUG | GENERAL
+  email     String?
+  message   String
+  status    String   @default("UNREAD") // UNREAD | READ | RESOLVED
+  createdAt DateTime @default(now())
+}
+

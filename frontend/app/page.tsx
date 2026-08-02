@@ -53,7 +53,7 @@ function HomeContent() {
   };
 
   // Submit Feedback Handler
-  const handleFeedbackSubmit = (e: React.FormEvent) => {
+  const handleFeedbackSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!feedbackMessage) {
       showToast("Please type a message before submitting!", "warning");
@@ -61,12 +61,29 @@ function HomeContent() {
     }
 
     setIsSubmittingFeedback(true);
-    setTimeout(() => {
-      showToast("Thank you! Platform Architect Sidra Raza will review your feedback.", "success");
-      setFeedbackEmail("");
-      setFeedbackMessage("");
+    try {
+      const res = await fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          category: feedbackCategory,
+          email: feedbackEmail,
+          message: feedbackMessage,
+        }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        showToast("Thank you! Platform Architect Sidra Raza will review your feedback in the Owner Portal.", "success");
+        setFeedbackEmail("");
+        setFeedbackMessage("");
+      } else {
+        showToast(json.error?.message || "Failed to submit feedback", "error");
+      }
+    } catch (err) {
+      showToast("Failed to connect to feedback server", "error");
+    } finally {
       setIsSubmittingFeedback(false);
-    }, 600);
+    }
   };
 
   return (
