@@ -937,15 +937,18 @@ function HomeContent() {
         }}
       />
 
-      {/* Footer with Help Center Link */}
+      {/* Footer with About Us & Help Center Links */}
       <footer className="border-t border-slate-800/80 px-6 py-5 bg-slate-950 text-xs text-slate-400 font-medium">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             Created & Built by <strong className="text-amber-400">Sidra Raza</strong> (Platform Founder & Lead Architect) • AI Construction ERP v1.0
           </div>
-          <div className="flex items-center gap-4">
-            <Link href="/help" className="text-slate-300 hover:text-amber-400 font-bold transition-colors flex items-center gap-1.5 bg-slate-900 border border-slate-800 px-3.5 py-1.5 rounded-xl">
-              <HelpCircle className="w-3.5 h-3.5 text-amber-400" /> Help Center & Guides
+          <div className="flex items-center gap-3">
+            <Link href="/about" className="text-slate-300 hover:text-amber-400 font-bold transition-colors bg-slate-900 border border-slate-800 px-3.5 py-1.5 rounded-xl">
+              About Us
+            </Link>
+            <Link href="/help" className="text-slate-300 hover:text-amber-400 font-bold transition-colors bg-slate-900 border border-slate-800 px-3.5 py-1.5 rounded-xl flex items-center gap-1.5">
+              <HelpCircle className="w-3.5 h-3.5 text-amber-400" /> Help Center
             </Link>
           </div>
         </div>
