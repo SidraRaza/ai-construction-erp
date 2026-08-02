@@ -37,7 +37,7 @@ export default function ClientDashboardPage() {
       <div className="flex-1 flex flex-col min-w-0">
         <Header userName="Acme Representative" userRole="Client Portal User" />
 
-        <main className="p-8 space-y-6 flex-1 overflow-y-auto">
+        <main className="p-4 sm:p-6 lg:p-8 space-y-6 flex-1 overflow-y-auto">
           {/* Header Banner */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-amber-500/15 via-orange-500/5 to-slate-900 p-6 rounded-3xl border border-amber-500/25 shadow-xl">
             <div>

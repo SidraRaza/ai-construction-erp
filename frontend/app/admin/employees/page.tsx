@@ -103,7 +103,7 @@ export default function EmployeesPage() {
       <div className="flex-1 flex flex-col min-w-0">
         <Header userName="Sarah Admin" userRole="Company Admin" />
 
-        <main className="p-8 space-y-6 flex-1 overflow-y-auto">
+        <main className="p-4 sm:p-6 lg:p-8 space-y-6 flex-1 overflow-y-auto">
           {/* Header Banner */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-gradient-to-r from-slate-900 via-amber-950/20 to-slate-900 p-6 rounded-3xl border border-amber-500/20 shadow-2xl backdrop-blur-xl">
             <div className="space-y-1">
