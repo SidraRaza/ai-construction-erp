@@ -163,13 +163,24 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="512x512" href="/logo-512px.png" />
 
         {/* Explicit Social Link Preview Tags for WhatsApp, iMessage, Skype, and LinkedIn */}
+        <meta itemProp="name" content="AI Construction ERP" />
+        <meta itemProp="description" content="AI Construction Management ERP System created by Founder Sidra Raza" />
+        <meta itemProp="image" content={`${SITE_URL}/logo-512px.png`} />
+
+        <meta property="og:site_name" content="AI Construction ERP" />
+        <meta property="og:title" content="AI Construction ERP — Enterprise Construction Management SaaS" />
+        <meta property="og:description" content="Eliminate WhatsApp group chaos and unverified site logs. Next-gen AI Construction Management ERP with QR attendance, capped expense controls, and dynamic custom fields created by Founder Sidra Raza." />
         <meta property="og:image" content={`${SITE_URL}/logo-512px.png`} />
+        <meta property="og:image:url" content={`${SITE_URL}/logo-512px.png`} />
         <meta property="og:image:secure_url" content={`${SITE_URL}/logo-512px.png`} />
         <meta property="og:image:type" content="image/png" />
         <meta property="og:image:width" content="512" />
         <meta property="og:image:height" content="512" />
         <meta property="og:image:alt" content="AI Construction ERP Logo Preview" />
 
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="AI Construction ERP — Next-Gen SaaS Platform" />
+        <meta name="twitter:description" content="Enterprise multi-tenant construction ERP created by Founder Sidra Raza" />
         <meta name="twitter:image" content={`${SITE_URL}/logo-512px.png`} />
         <meta name="twitter:image:alt" content="AI Construction ERP Logo Preview" />
 
