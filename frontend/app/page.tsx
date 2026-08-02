@@ -321,20 +321,20 @@ function HomeContent() {
             display: none; /* Hidden on mobile to prevent text collision */
           }
           .eyebrow {
-            font-size: 11px;
-            letter-spacing: 0.12em;
+            font-size: 12px;
+            letter-spacing: 0.14em;
             margin-bottom: 12px;
           }
           h1.headline {
-            font-size: clamp(22px, 6vw, 32px);
-            line-height: 1.2;
-            margin-bottom: 14px;
+            font-size: clamp(26px, 7vw, 38px);
+            line-height: 1.22;
+            margin-bottom: 16px;
             max-width: 100%;
           }
           .subtext {
-            font-size: 13.5px;
-            line-height: 1.55;
-            margin-bottom: 20px;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 22px;
             max-width: 100%;
           }
           .cta-row {
@@ -342,18 +342,18 @@ function HomeContent() {
             flex-direction: row;
             gap: 10px;
             width: 100%;
-            margin-bottom: 20px;
+            margin-bottom: 22px;
           }
           .btn-primary, .btn-secondary {
             flex: 1;
-            padding: 12px 8px;
-            font-size: 12px;
+            padding: 12.5px 10px;
+            font-size: 13.5px;
             text-align: center;
             justify-content: center;
             white-space: nowrap;
           }
           .meta-line {
-            font-size: 10.5px;
+            font-size: 11.5px;
             line-height: 1.4;
             flex-wrap: wrap;
           }
