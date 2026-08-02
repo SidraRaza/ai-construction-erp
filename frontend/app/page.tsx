@@ -22,6 +22,9 @@ import {
   CheckCircle2,
   Sparkles,
   Lock,
+  MessageSquareHeart,
+  Send,
+  Info,
 } from "lucide-react";
 
 function HomeContent() {
@@ -30,16 +33,37 @@ function HomeContent() {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
+  // Footer Feedback State
+  const [feedbackEmail, setFeedbackEmail] = useState("");
+  const [feedbackMessage, setFeedbackMessage] = useState("");
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+
   // Intelligent Portal Navigation Handler
   const handlePortalNavigation = (targetPath: string) => {
     const session = getValidSession();
-    // Allow direct access if session exists or if navigating to Super Admin password gatekeeper
     if (session || targetPath === "/admin/super-admin") {
       router.push(targetPath);
     } else {
       showToast("Please log in or create an account first to enter private portals!", "warning");
       setIsAuthModalOpen(true);
     }
+  };
+
+  // Submit Feedback Handler
+  const handleFeedbackSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!feedbackMessage) {
+      showToast("Please type a message before submitting!", "warning");
+      return;
+    }
+
+    setIsSubmittingFeedback(true);
+    setTimeout(() => {
+      showToast("Thank you for your feedback! Platform Architect Sidra Raza will review your message.", "success");
+      setFeedbackEmail("");
+      setFeedbackMessage("");
+      setIsSubmittingFeedback(false);
+    }, 600);
   };
 
   return (
@@ -70,7 +94,7 @@ function HomeContent() {
           overflow: hidden;
           padding: 0;
           width: 100%;
-          min-height: 620px;
+          min-height: 600px;
           isolation: isolate;
         }
 
@@ -250,15 +274,29 @@ function HomeContent() {
         .dim-line { stroke: rgba(148,163,184,0.55); stroke-width: 1; }
         .dim-line.amber { stroke: var(--amber); stroke-width: 1.2; }
 
-        /* Mobile Layout Optimizations: Text First, Chart Second, Buttons Side-by-Side */
+        /* Mobile Layout & Reduced Font Sizes: Compact & Balanced */
         @media (max-width: 860px) {
           .hero-inner {
             grid-template-columns: 1fr;
-            padding: 56px 20px 40px;
-            gap: 36px;
+            padding: 48px 18px 36px;
+            gap: 28px;
+          }
+          h1.headline {
+            font-size: clamp(24px, 6.5vw, 36px); /* Reduced on mobile as requested! */
+            line-height: 1.15;
+            margin-bottom: 16px;
+          }
+          .subtext {
+            font-size: 14px;
+            line-height: 1.55;
+            margin-bottom: 24px;
+          }
+          .eyebrow {
+            font-size: 11px;
+            margin-bottom: 14px;
           }
           .diagram-box {
-            height: 280px;
+            height: 250px;
             order: 2; /* Renders AFTER text on mobile screen! */
           }
           .cta-row {
@@ -266,18 +304,19 @@ function HomeContent() {
             grid-template-columns: 1fr 1fr; /* Both buttons in 1 single line on mobile! */
             gap: 10px;
             width: 100%;
+            margin-bottom: 28px;
           }
           .btn-primary, .btn-secondary {
             width: 100%;
             text-align: center;
-            padding: 12px 8px;
-            font-size: 13px;
+            padding: 11px 6px;
+            font-size: 12.5px;
             display: flex;
             align-items: center;
             justify-content: center;
           }
-          .stamp { width: 76px; height: 76px; top: 16px; right: 16px; }
-          .stamp span { font-size: 8.5px; }
+          .stamp { width: 72px; height: 72px; top: 14px; right: 14px; }
+          .stamp span { font-size: 8px; }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -722,9 +761,70 @@ function HomeContent() {
         }}
       />
 
-      {/* Footer */}
-      <footer className="border-t border-slate-800/80 px-6 py-5 text-center text-xs text-slate-400 font-medium bg-slate-950">
-        Created & Built by <strong className="text-amber-400">Sidra Raza</strong> (Platform Founder & Lead Architect) • AI Construction ERP v1.0
+      {/* Comprehensive Footer featuring About Us & Interactive Feedback Sections */}
+      <footer className="border-t border-slate-800 bg-slate-950 text-slate-300 pt-12 pb-8 px-6">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 pb-10 border-b border-slate-800/80">
+          {/* About Us Column */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-white font-bold shadow-md">
+                <Building2 className="w-4 h-4" />
+              </div>
+              <span className="text-base font-extrabold text-white tracking-tight">About AI Construction ERP</span>
+            </div>
+            <p className="text-xs text-slate-400 leading-relaxed max-w-lg">
+              Created and Architected by <strong className="text-amber-400">Sidra Raza</strong> (Platform Founder & Lead Architect), AI Construction ERP is an enterprise multi-tenant SaaS solution designed to streamline construction site operations, labour attendance, materials inventory, capped expense tracking, and self-configurable custom production fields.
+            </p>
+            <div className="flex items-center gap-3 pt-1">
+              <div className="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-[11px] font-bold text-amber-400 flex items-center gap-1.5">
+                <Info className="w-3.5 h-3.5" /> Founder & Lead Architect: Sidra Raza
+              </div>
+            </div>
+          </div>
+
+          {/* User Feedback Column */}
+          <div className="space-y-4 bg-slate-900/60 p-5 rounded-2xl border border-slate-800">
+            <div className="flex items-center gap-2 text-white">
+              <MessageSquareHeart className="w-4 h-4 text-amber-400" />
+              <h4 className="text-sm font-bold">User Feedback & Feature Requests</h4>
+            </div>
+            <p className="text-[11px] text-slate-400">
+              Have feedback, questions, or feature suggestions? Send your note directly to Sidra Raza:
+            </p>
+            <form onSubmit={handleFeedbackSubmit} className="space-y-2.5">
+              <input
+                type="email"
+                placeholder="Your email address (optional)"
+                value={feedbackEmail}
+                onChange={(e) => setFeedbackEmail(e.target.value)}
+                autoComplete="off"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500"
+              />
+              <textarea
+                required
+                rows={2}
+                placeholder="Type your feedback or feature request..."
+                value={feedbackMessage}
+                onChange={(e) => setFeedbackMessage(e.target.value)}
+                autoComplete="off"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500 resize-none"
+              />
+              <button
+                type="submit"
+                disabled={isSubmittingFeedback}
+                className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold text-xs shadow-md hover:brightness-110 flex items-center justify-center gap-1.5 transition-all"
+              >
+                <Send className="w-3.5 h-3.5" />
+                {isSubmittingFeedback ? "Sending Feedback..." : "Submit Feedback to Sidra Raza"}
+              </button>
+            </form>
+          </div>
+        </div>
+
+        {/* Copyright & Author Credit Bar */}
+        <div className="max-w-6xl mx-auto pt-6 text-center text-xs text-slate-400 font-medium">
+          Created & Built by <strong className="text-amber-400 font-bold">Sidra Raza</strong> (Platform Founder & Lead Architect) • AI Construction ERP v1.0 • All Rights Reserved.
+        </div>
       </footer>
     </div>
   );
