@@ -233,52 +233,59 @@ export default function SuperAdminPage() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col">
       {/* Standalone Owner Top Header Bar */}
-      <header className="h-16 bg-slate-900/90 border-b border-amber-500/20 px-8 flex items-center justify-between sticky top-0 z-30 shadow-xl backdrop-blur-xl">
+      <header className="min-h-[64px] h-auto bg-slate-900/90 border-b border-amber-500/20 px-4 sm:px-8 py-3 flex items-center justify-between flex-wrap sm:flex-nowrap gap-3 sticky top-0 z-30 shadow-xl backdrop-blur-xl">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-white font-bold shadow-lg shadow-orange-500/20">
-            <Crown className="w-6 h-6" />
-          </div>
+          <Link href="/" className="shrink-0">
+            <img src="/logo-128px.png" alt="AI Construction ERP Logo" className="w-8 h-8 sm:w-9 sm:h-9 object-contain" />
+          </Link>
           <div>
-            <h1 className="font-extrabold text-white text-base tracking-tight flex items-center gap-2">
-              BuildCorp ERP <span className="text-xs font-mono text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20 uppercase">Super Admin</span>
+            <h1 className="font-extrabold text-white text-sm sm:text-base tracking-tight flex items-center gap-1.5 sm:gap-2 flex-wrap">
+              AI Construction ERP <span className="text-[10px] sm:text-xs font-mono text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20 uppercase">Super Admin</span>
             </h1>
-            <p className="text-[11px] text-slate-400 font-medium">Global Platform Owner Workspace</p>
+            <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium">Global Platform Owner Workspace</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+          <Link
+            href="/"
+            className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-400 hover:text-white transition-all flex items-center gap-1.5 text-xs font-bold"
+          >
+            <ArrowRight className="w-3.5 h-3.5 rotate-180 text-amber-400" /> <span className="hidden sm:inline">Home</span>
+          </Link>
+
           <button
             onClick={fetchSuperAdminData}
             title="Refresh Registration Ledger"
-            className="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-400 hover:text-amber-400 hover:border-amber-500/40 transition-all flex items-center gap-2 text-xs font-bold"
+            className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-400 hover:text-amber-400 hover:border-amber-500/40 transition-all flex items-center gap-1.5 text-xs font-bold"
           >
-            <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin text-amber-400" : ""}`} /> Sync Database
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin text-amber-400" : ""}`} /> <span className="hidden sm:inline">Sync Database</span>
           </button>
 
-          <div className="h-6 w-px bg-slate-800" />
+          <div className="hidden sm:block h-6 w-px bg-slate-800" />
 
           {/* Owner Profile Badge & Lock Button */}
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold text-sm shadow-md">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-md shrink-0">
               {(adminName || "Sidra").charAt(0).toUpperCase()}
             </div>
-            <div className="hidden sm:block text-left">
+            <div className="hidden md:block text-left">
               <p className="text-xs font-bold text-white">{adminName || "Sidra"} (Platform Owner)</p>
-              <p className="text-[11px] text-emerald-400 font-mono">SUPER_ADMIN Active</p>
+              <p className="text-[10px] text-emerald-400 font-mono">SUPER_ADMIN Active</p>
             </div>
             <button
               onClick={handleLogoutSuperAdmin}
               title="Lock Super Admin Portal"
               className="p-2 rounded-xl bg-slate-950 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 border border-slate-800 text-xs transition-all flex items-center gap-1.5 font-bold"
             >
-              <LogOut className="w-4 h-4 text-rose-400" /> Lock Portal
+              <LogOut className="w-4 h-4 text-rose-400" /> <span className="hidden sm:inline">Lock Portal</span>
             </button>
           </div>
         </div>
       </header>
 
       {/* Main Full-Width Content Container */}
-      <main className="p-8 space-y-8 flex-1 overflow-y-auto max-w-7xl w-full mx-auto">
+      <main className="p-4 sm:p-8 space-y-6 sm:space-y-8 flex-1 overflow-y-auto max-w-7xl w-full mx-auto">
         {/* Header Banner */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-gradient-to-r from-purple-950/40 via-amber-950/20 to-slate-900 p-6 rounded-3xl border border-amber-500/30 shadow-2xl backdrop-blur-xl">
           <div className="space-y-1">
