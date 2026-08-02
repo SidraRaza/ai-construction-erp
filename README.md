@@ -1,4 +1,4 @@
-# 🏗️ AI Construction ERP — Enterprise Multi-Tenant SaaS Platform..
+# 🏗️ AI Construction ERP — Enterprise Multi-Tenant SaaS Platform.
 
 > **Created & Built by:** **Sidra Raza** (Platform Founder & Lead Architect)  
 > **Official Repository:** [https://github.com/SidraRaza/ai-construction-erp.git](https://github.com/SidraRaza/ai-construction-erp.git)
