@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 
 /**
- * Global Edge Security Middleware for Multi-Tenant Route Protection
+ * Global Edge Security Middleware for Route & Tenant Protection
  */
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Define public paths that bypass route security
+  // 1. Bypass public static assets, images, API auth routes, and public landing page
   const isPublicPath =
     pathname === "/" ||
     pathname.startsWith("/api/auth") ||
@@ -18,28 +18,42 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Check for company ID cookie or active session header
+  // 2. Allow direct access to Super Admin login password gatekeeper page
+  if (pathname === "/admin/super-admin") {
+    return NextResponse.next();
+  }
+
+  // 3. Extract Session Cookies
+  const erpSession = req.cookies.get("erp_session")?.value;
   const companyCookie = req.cookies.get("x-company-id")?.value;
   const companyHeader = req.headers.get("x-company-id");
+  const roleCookie = req.cookies.get("erp_role")?.value;
 
-  const hasAccessCredential = companyCookie || companyHeader;
+  const hasValidCompany = Boolean(companyCookie || companyHeader);
+  const isAuthenticated = Boolean(erpSession === "active" || hasValidCompany);
 
-  // Protect internal modules (/admin, /engineer, /client)
+  // 4. Protect Internal Routes (/admin, /engineer, /client)
   const isProtectedArea =
     pathname.startsWith("/admin") ||
     pathname.startsWith("/engineer") ||
     pathname.startsWith("/client");
 
-  if (isProtectedArea && !hasAccessCredential) {
-    // If accessing Super Admin password gatekeeper page directly, allow loading client gatekeeper
-    if (pathname === "/admin/super-admin") {
-      return NextResponse.next();
-    }
-
-    // Redirect unauthenticated visitors to landing page with security warning
+  if (isProtectedArea && !isAuthenticated) {
+    // Redirect unauthenticated visitors back to home page with auth=required parameter
     const loginUrl = new URL("/", req.url);
     loginUrl.searchParams.set("auth", "required");
     return NextResponse.redirect(loginUrl);
+  }
+
+  // 5. Role-Based Access Control (RBAC) Route Guard
+  if (pathname.startsWith("/admin") && roleCookie && roleCookie === "CLIENT") {
+    const clientUrl = new URL("/client/dashboard", req.url);
+    return NextResponse.redirect(clientUrl);
+  }
+
+  if (pathname.startsWith("/engineer") && roleCookie && roleCookie === "CLIENT") {
+    const clientUrl = new URL("/client/dashboard", req.url);
+    return NextResponse.redirect(clientUrl);
   }
 
   return NextResponse.next();

@@ -1,5 +1,5 @@
 /**
- * Session Security Helper for 1-Hour Automatic Expiration
+ * Session Security Helper for 1-Hour Automatic Expiration & Cookie Sync
  */
 
 export const SESSION_KEY = "erp_user_session";
@@ -26,6 +26,27 @@ export interface UserSessionData {
 }
 
 /**
+ * Sync session state into browser cookies for Next.js Edge Middleware
+ */
+function syncSessionCookies(session: UserSessionData | null) {
+  if (typeof document === "undefined") return;
+
+  if (session && session.expiresAt && Date.now() < session.expiresAt) {
+    const remainingSeconds = Math.max(1, Math.floor((session.expiresAt - Date.now()) / 1000));
+    const companyId = session.user?.companyId || session.company?.id || "cl_default_company";
+    const role = session.user?.role || "ADMIN";
+
+    document.cookie = `erp_session=active; path=/; max-age=${remainingSeconds}; SameSite=Lax`;
+    document.cookie = `x-company-id=${companyId}; path=/; max-age=${remainingSeconds}; SameSite=Lax`;
+    document.cookie = `erp_role=${role}; path=/; max-age=${remainingSeconds}; SameSite=Lax`;
+  } else {
+    document.cookie = "erp_session=; path=/; max-age=0; SameSite=Lax";
+    document.cookie = "x-company-id=; path=/; max-age=0; SameSite=Lax";
+    document.cookie = "erp_role=; path=/; max-age=0; SameSite=Lax";
+  }
+}
+
+/**
  * Save user/company session data with a 1-hour expiration timestamp.
  */
 export function saveSession(data: UserSessionData): UserSessionData {
@@ -38,6 +59,7 @@ export function saveSession(data: UserSessionData): UserSessionData {
 
   try {
     localStorage.setItem(SESSION_KEY, JSON.stringify(sessionWithExpiry));
+    syncSessionCookies(sessionWithExpiry);
   } catch (e) {
     console.error("Failed to save session to localStorage", e);
   }
@@ -51,7 +73,10 @@ export function saveSession(data: UserSessionData): UserSessionData {
 export function getValidSession(): UserSessionData | null {
   try {
     const saved = localStorage.getItem(SESSION_KEY);
-    if (!saved) return null;
+    if (!saved) {
+      syncSessionCookies(null);
+      return null;
+    }
 
     const parsed: UserSessionData = JSON.parse(saved);
     const now = Date.now();
@@ -63,6 +88,8 @@ export function getValidSession(): UserSessionData | null {
       return null;
     }
 
+    // Keep cookies fresh and in sync
+    syncSessionCookies(parsed);
     return parsed;
   } catch (e) {
     clearSession();
@@ -71,10 +98,11 @@ export function getValidSession(): UserSessionData | null {
 }
 
 /**
- * Clear current active session from localStorage.
+ * Clear current active session from localStorage & cookies.
  */
 export function clearSession(): void {
   try {
     localStorage.removeItem(SESSION_KEY);
+    syncSessionCookies(null);
   } catch (e) {}
 }
