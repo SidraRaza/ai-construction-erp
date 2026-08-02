@@ -2,8 +2,10 @@
 
 import { useState, Suspense } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { UserAuthModal } from "@/components/auth/user-auth-modal";
 import { useToast } from "@/components/ui/toast-provider";
+import { getValidSession } from "@/lib/session";
 import {
   Building2,
   ArrowRight,
@@ -18,15 +20,27 @@ import {
   LayoutDashboard,
   Users,
   CheckCircle2,
-  Boxes,
-  FileText,
-  UserCheck,
+  Sparkles,
+  Lock,
 } from "lucide-react";
 
 function HomeContent() {
+  const router = useRouter();
   const { showToast } = useToast();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  // Intelligent Portal Navigation Handler
+  const handlePortalNavigation = (targetPath: string) => {
+    const session = getValidSession();
+    // Allow direct access if session exists or if navigating to Super Admin password gatekeeper
+    if (session || targetPath === "/admin/super-admin") {
+      router.push(targetPath);
+    } else {
+      showToast("Please log in or create an account first to enter private portals!", "warning");
+      setIsAuthModalOpen(true);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col justify-between overflow-x-hidden">
@@ -283,50 +297,50 @@ function HomeContent() {
 
         {/* Desktop Navigation Links */}
         <div className="hidden md:flex items-center gap-2 lg:gap-3">
-          <Link
-            href="/admin/custom-fields"
+          <button
+            onClick={() => handlePortalNavigation("/admin/custom-fields")}
             className="text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500/20 px-3 py-2 rounded-xl transition-all flex items-center gap-1.5"
           >
             <SlidersHorizontal className="w-3.5 h-3.5" /> Custom Fields
-          </Link>
+          </button>
 
-          <Link
-            href="/admin/super-admin"
+          <button
+            onClick={() => handlePortalNavigation("/admin/super-admin")}
             className="text-xs font-bold text-purple-400 bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 px-3 py-2 rounded-xl transition-all flex items-center gap-1.5"
           >
             <Crown className="w-3.5 h-3.5" /> Owner Portal
-          </Link>
+          </button>
 
-          <Link
-            href="/admin/dashboard"
+          <button
+            onClick={() => handlePortalNavigation("/admin/dashboard")}
             className="text-xs font-medium text-slate-300 hover:text-white px-3 py-2 rounded-xl transition-all"
           >
             Admin Portal
-          </Link>
+          </button>
 
-          <Link
-            href="/engineer/dashboard"
+          <button
+            onClick={() => handlePortalNavigation("/engineer/dashboard")}
             className="text-xs font-medium text-slate-300 hover:text-white px-3 py-2 rounded-xl transition-all"
           >
             Engineer Portal
-          </Link>
+          </button>
 
-          <Link
-            href="/client/dashboard"
+          <button
+            onClick={() => handlePortalNavigation("/client/dashboard")}
             className="text-xs font-semibold px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-lg shadow-orange-500/20 hover:brightness-110 transition-all flex items-center gap-1.5"
           >
             Client Portal <ArrowRight className="w-4 h-4" />
-          </Link>
+          </button>
         </div>
 
         {/* Mobile Controls */}
         <div className="flex md:hidden items-center gap-2">
-          <Link
-            href="/admin/custom-fields"
+          <button
+            onClick={() => handlePortalNavigation("/admin/custom-fields")}
             className="text-[11px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1.5 rounded-lg flex items-center gap-1"
           >
             <SlidersHorizontal className="w-3 h-3" /> Fields
-          </Link>
+          </button>
 
           <button
             onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}
@@ -344,60 +358,70 @@ function HomeContent() {
           <div className="space-y-3">
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Portal Navigation</p>
 
-            <Link
-              href="/admin/custom-fields"
-              onClick={() => setIsMobileNavOpen(false)}
-              className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-bold flex items-center justify-between"
+            <button
+              onClick={() => {
+                setIsMobileNavOpen(false);
+                handlePortalNavigation("/admin/custom-fields");
+              }}
+              className="w-full p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-bold flex items-center justify-between"
             >
               <span className="flex items-center gap-2.5">
                 <SlidersHorizontal className="w-4 h-4" /> Custom Production Fields
               </span>
               <ArrowRight className="w-4 h-4" />
-            </Link>
+            </button>
 
-            <Link
-              href="/admin/super-admin"
-              onClick={() => setIsMobileNavOpen(false)}
-              className="p-3.5 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-between"
+            <button
+              onClick={() => {
+                setIsMobileNavOpen(false);
+                handlePortalNavigation("/admin/super-admin");
+              }}
+              className="w-full p-3.5 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-between"
             >
               <span className="flex items-center gap-2.5">
                 <Crown className="w-4 h-4" /> Super Admin Owner Portal
               </span>
               <ArrowRight className="w-4 h-4" />
-            </Link>
+            </button>
 
-            <Link
-              href="/admin/dashboard"
-              onClick={() => setIsMobileNavOpen(false)}
-              className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 text-slate-100 text-sm font-bold flex items-center justify-between"
+            <button
+              onClick={() => {
+                setIsMobileNavOpen(false);
+                handlePortalNavigation("/admin/dashboard");
+              }}
+              className="w-full p-3.5 rounded-2xl bg-slate-900 border border-slate-800 text-slate-100 text-sm font-bold flex items-center justify-between"
             >
               <span className="flex items-center gap-2.5">
                 <LayoutDashboard className="w-4 h-4 text-slate-400" /> Enterprise Admin Portal
               </span>
               <ArrowRight className="w-4 h-4" />
-            </Link>
+            </button>
 
-            <Link
-              href="/engineer/dashboard"
-              onClick={() => setIsMobileNavOpen(false)}
-              className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 text-slate-100 text-sm font-bold flex items-center justify-between"
+            <button
+              onClick={() => {
+                setIsMobileNavOpen(false);
+                handlePortalNavigation("/engineer/dashboard");
+              }}
+              className="w-full p-3.5 rounded-2xl bg-slate-900 border border-slate-800 text-slate-100 text-sm font-bold flex items-center justify-between"
             >
               <span className="flex items-center gap-2.5">
                 <HardHat className="w-4 h-4 text-slate-400" /> Site Engineer Command
               </span>
               <ArrowRight className="w-4 h-4" />
-            </Link>
+            </button>
 
-            <Link
-              href="/client/dashboard"
-              onClick={() => setIsMobileNavOpen(false)}
-              className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 text-white text-sm font-bold flex items-center justify-between shadow-lg shadow-orange-500/20"
+            <button
+              onClick={() => {
+                setIsMobileNavOpen(false);
+                handlePortalNavigation("/client/dashboard");
+              }}
+              className="w-full p-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 text-white text-sm font-bold flex items-center justify-between shadow-lg shadow-orange-500/20"
             >
               <span className="flex items-center gap-2.5">
                 <Users className="w-4 h-4" /> Client Project Portal
               </span>
               <ArrowRight className="w-4 h-4" />
-            </Link>
+            </button>
           </div>
 
           <div className="pt-6 border-t border-slate-800 text-center text-xs text-slate-400 font-medium">
@@ -430,7 +454,7 @@ function HomeContent() {
             {/* Buttons Row (2 Side-by-Side in 1 Line on Mobile!) */}
             <div className="cta-row">
               <button onClick={() => setIsAuthModalOpen(true)} className="btn-primary">Get early access</button>
-              <Link href="#system-overview" className="btn-secondary">See how it works</Link>
+              <a href="#system-overview" className="btn-secondary">See how it works</a>
             </div>
 
             <div className="meta-line">
@@ -500,19 +524,19 @@ function HomeContent() {
             Integrated Enterprise Portal Routes
           </h2>
           <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-            Isolated multi-tenant portals designed for company owners, site engineers, administrators, and clients.
+            Click any portal below to enter its private dashboard or authenticate your company.
           </p>
         </div>
 
-        {/* Portal Routes Showcase Grid */}
+        {/* Portal Routes Showcase Grid with Interactive Navigation */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Card 1: Enterprise Admin Portal */}
-          <div className="p-6 bg-slate-900/60 rounded-3xl border border-slate-800 space-y-4 hover:border-amber-500/30 transition-all flex flex-col justify-between group">
+          <div className="p-6 bg-slate-900/80 backdrop-blur-xl rounded-3xl border border-slate-800 space-y-4 hover:border-amber-500/50 hover:shadow-2xl hover:shadow-amber-500/10 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group">
             <div className="space-y-3">
-              <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+              <div className="w-11 h-11 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-110 group-hover:bg-amber-500/20 transition-all">
                 <LayoutDashboard className="w-5 h-5" />
               </div>
-              <h3 className="text-lg font-bold text-white">Enterprise Admin Portal</h3>
+              <h3 className="text-lg font-bold text-white group-hover:text-amber-400 transition-colors">Enterprise Admin Portal</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
                 Central command for multi-project management, labour attendance tracking, materials inventory, supplier management, and invoice audit.
               </p>
@@ -525,22 +549,22 @@ function HomeContent() {
                 </li>
               </ul>
             </div>
-            <Link
-              href="/admin/dashboard"
-              className="mt-4 py-2.5 px-4 rounded-xl bg-slate-800 border border-slate-700/80 text-xs font-bold text-slate-100 hover:text-amber-400 hover:bg-slate-800/80 flex items-center justify-between transition-all"
+            <button
+              onClick={() => handlePortalNavigation("/admin/dashboard")}
+              className="mt-5 py-3 px-4 rounded-xl bg-slate-800/80 border border-slate-700/80 text-xs font-bold text-slate-100 hover:text-amber-400 hover:bg-slate-800 hover:border-amber-500/40 flex items-center justify-between transition-all"
             >
               <span>Explore Admin Portal</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+              <ArrowRight className="w-4 h-4 text-amber-400 group-hover:translate-x-1 transition-transform" />
+            </button>
           </div>
 
           {/* Card 2: Site Engineer Command */}
-          <div className="p-6 bg-slate-900/60 rounded-3xl border border-slate-800 space-y-4 hover:border-amber-500/30 transition-all flex flex-col justify-between group">
+          <div className="p-6 bg-slate-900/80 backdrop-blur-xl rounded-3xl border border-slate-800 space-y-4 hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group">
             <div className="space-y-3">
-              <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
+              <div className="w-11 h-11 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 group-hover:bg-emerald-500/20 transition-all">
                 <HardHat className="w-5 h-5" />
               </div>
-              <h3 className="text-lg font-bold text-white">Site Engineer Command</h3>
+              <h3 className="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors">Site Engineer Command</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
                 Mobile-first field dashboard for site engineers to perform QR attendance check-ins, record daily site logs, and log expense receipts.
               </p>
@@ -553,23 +577,23 @@ function HomeContent() {
                 </li>
               </ul>
             </div>
-            <Link
-              href="/engineer/dashboard"
-              className="mt-4 py-2.5 px-4 rounded-xl bg-slate-800 border border-slate-700/80 text-xs font-bold text-slate-100 hover:text-emerald-400 hover:bg-slate-800/80 flex items-center justify-between transition-all"
+            <button
+              onClick={() => handlePortalNavigation("/engineer/dashboard")}
+              className="mt-5 py-3 px-4 rounded-xl bg-slate-800/80 border border-slate-700/80 text-xs font-bold text-slate-100 hover:text-emerald-400 hover:bg-slate-800 hover:border-emerald-500/40 flex items-center justify-between transition-all"
             >
               <span>Explore Engineer Portal</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+              <ArrowRight className="w-4 h-4 text-emerald-400 group-hover:translate-x-1 transition-transform" />
+            </button>
           </div>
 
           {/* Card 3: Custom Production Fields */}
-          <div className="p-6 bg-slate-900/60 rounded-3xl border border-amber-500/30 space-y-4 hover:border-amber-500 transition-all flex flex-col justify-between group">
+          <div className="p-6 bg-slate-900/80 backdrop-blur-xl rounded-3xl border border-amber-500/30 space-y-4 hover:border-amber-500 hover:shadow-2xl hover:shadow-amber-500/15 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group">
             <div className="space-y-3">
-              <div className="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+              <div className="w-11 h-11 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 group-hover:scale-110 group-hover:bg-amber-500/30 transition-all">
                 <SlidersHorizontal className="w-5 h-5" />
               </div>
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-bold text-white">Custom Fields Engine</h3>
+                <h3 className="text-lg font-bold text-white group-hover:text-amber-400 transition-colors">Custom Fields Engine</h3>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 uppercase">Self-Configurable</span>
               </div>
               <p className="text-xs text-slate-400 leading-relaxed">
@@ -584,22 +608,22 @@ function HomeContent() {
                 </li>
               </ul>
             </div>
-            <Link
-              href="/admin/custom-fields"
-              className="mt-4 py-2.5 px-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs font-bold text-amber-400 hover:bg-amber-500/20 flex items-center justify-between transition-all"
+            <button
+              onClick={() => handlePortalNavigation("/admin/custom-fields")}
+              className="mt-5 py-3 px-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs font-bold text-amber-400 hover:bg-amber-500/20 flex items-center justify-between transition-all"
             >
               <span>Open Custom Fields</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </button>
           </div>
 
           {/* Card 4: Client Project Portal */}
-          <div className="p-6 bg-slate-900/60 rounded-3xl border border-slate-800 space-y-4 hover:border-amber-500/30 transition-all flex flex-col justify-between group">
+          <div className="p-6 bg-slate-900/80 backdrop-blur-xl rounded-3xl border border-slate-800 space-y-4 hover:border-cyan-500/50 hover:shadow-2xl hover:shadow-cyan-500/10 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group">
             <div className="space-y-3">
-              <div className="w-10 h-10 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
+              <div className="w-11 h-11 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:scale-110 group-hover:bg-cyan-500/20 transition-all">
                 <Users className="w-5 h-5" />
               </div>
-              <h3 className="text-lg font-bold text-white">Client Project Portal</h3>
+              <h3 className="text-lg font-bold text-white group-hover:text-cyan-400 transition-colors">Client Project Portal</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
                 Dedicated client view for transparent progress tracking, verified invoice downloads, AI project cost estimations, and document archives.
               </p>
@@ -612,24 +636,26 @@ function HomeContent() {
                 </li>
               </ul>
             </div>
-            <Link
-              href="/client/dashboard"
-              className="mt-4 py-2.5 px-4 rounded-xl bg-slate-800 border border-slate-700/80 text-xs font-bold text-slate-100 hover:text-cyan-400 hover:bg-slate-800/80 flex items-center justify-between transition-all"
+            <button
+              onClick={() => handlePortalNavigation("/client/dashboard")}
+              className="mt-5 py-3 px-4 rounded-xl bg-slate-800/80 border border-slate-700/80 text-xs font-bold text-slate-100 hover:text-cyan-400 hover:bg-slate-800 hover:border-cyan-500/40 flex items-center justify-between transition-all"
             >
               <span>Explore Client Portal</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+              <ArrowRight className="w-4 h-4 text-cyan-400 group-hover:translate-x-1 transition-transform" />
+            </button>
           </div>
 
           {/* Card 5: Super Admin Owner Portal */}
-          <div className="p-6 bg-slate-900/60 rounded-3xl border border-purple-500/30 space-y-4 hover:border-purple-500 transition-all flex flex-col justify-between group">
+          <div className="p-6 bg-slate-900/80 backdrop-blur-xl rounded-3xl border border-purple-500/30 space-y-4 hover:border-purple-500 hover:shadow-2xl hover:shadow-purple-500/15 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group">
             <div className="space-y-3">
-              <div className="w-10 h-10 rounded-2xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform">
+              <div className="w-11 h-11 rounded-2xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-400 group-hover:scale-110 group-hover:bg-purple-500/30 transition-all">
                 <Crown className="w-5 h-5" />
               </div>
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-bold text-white">Super Admin Portal</h3>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30 uppercase">Protected Gate</span>
+                <h3 className="text-lg font-bold text-white group-hover:text-purple-400 transition-colors">Super Admin Portal</h3>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30 uppercase flex items-center gap-1">
+                  <Lock className="w-2.5 h-2.5" /> Gatekeeper
+                </span>
               </div>
               <p className="text-xs text-slate-400 leading-relaxed">
                 Owner portal protected by security gatekeeper for platform governance, tenant isolation audits, and system configuration.
@@ -643,46 +669,51 @@ function HomeContent() {
                 </li>
               </ul>
             </div>
-            <Link
-              href="/admin/super-admin"
-              className="mt-4 py-2.5 px-4 rounded-xl bg-purple-500/10 border border-purple-500/30 text-xs font-bold text-purple-400 hover:bg-purple-500/20 flex items-center justify-between transition-all"
+            <button
+              onClick={() => handlePortalNavigation("/admin/super-admin")}
+              className="mt-5 py-3 px-4 rounded-xl bg-purple-500/10 border border-purple-500/30 text-xs font-bold text-purple-400 hover:bg-purple-500/20 flex items-center justify-between transition-all"
             >
               <span>Access Owner Portal</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </button>
           </div>
 
           {/* Card 6: AI Intelligence Engine */}
-          <div className="p-6 bg-slate-900/60 rounded-3xl border border-slate-800 space-y-4 hover:border-amber-500/30 transition-all flex flex-col justify-between group">
+          <div className="p-6 bg-slate-900/80 backdrop-blur-xl rounded-3xl border border-slate-800 space-y-4 hover:border-orange-500/50 hover:shadow-2xl hover:shadow-orange-500/10 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group">
             <div className="space-y-3">
-              <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+              <div className="w-11 h-11 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 group-hover:scale-110 group-hover:bg-orange-500/20 transition-all">
                 <Bot className="w-5 h-5" />
               </div>
-              <h3 className="text-lg font-bold text-white">AI Intelligence Engine</h3>
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-white group-hover:text-orange-400 transition-colors">AI Intelligence Engine</h3>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30 uppercase flex items-center gap-1">
+                  <Sparkles className="w-2.5 h-2.5 text-amber-400" /> AI Assistant
+                </span>
+              </div>
               <p className="text-xs text-slate-400 leading-relaxed">
                 Built-in AI assistant for drafting daily progress reports, estimating project costs, and drafting client quotations.
               </p>
               <ul className="space-y-1.5 text-xs text-slate-300 font-medium pt-1">
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-amber-400" /> Automated Cost Estimations
+                  <CheckCircle2 className="w-3.5 h-3.5 text-orange-400" /> Automated Cost Estimations
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-amber-400" /> Smart Daily Site Report Assistant
+                  <CheckCircle2 className="w-3.5 h-3.5 text-orange-400" /> Smart Daily Site Report Assistant
                 </li>
               </ul>
             </div>
             <button
               onClick={() => setIsAuthModalOpen(true)}
-              className="mt-4 py-2.5 px-4 rounded-xl bg-slate-800 border border-slate-700/80 text-xs font-bold text-slate-100 hover:text-amber-400 hover:bg-slate-800/80 flex items-center justify-between transition-all"
+              className="mt-5 py-3 px-4 rounded-xl bg-slate-800/80 border border-slate-700/80 text-xs font-bold text-slate-100 hover:text-orange-400 hover:bg-slate-800 hover:border-orange-500/40 flex items-center justify-between transition-all"
             >
               <span>Launch AI Intelligence</span>
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-4 h-4 text-orange-400 group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
         </div>
       </section>
 
-      {/* Register / Login Gatekeeper Modal (Opens ONLY when user clicks a button) */}
+      {/* Register / Login Gatekeeper Modal */}
       <UserAuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
