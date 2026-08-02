@@ -24,7 +24,6 @@ import {
   Lock,
   MessageSquareHeart,
   Send,
-  Info,
 } from "lucide-react";
 
 function HomeContent() {
@@ -33,7 +32,7 @@ function HomeContent() {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-  // Footer Feedback State
+  // Standalone Feedback Form State
   const [feedbackEmail, setFeedbackEmail] = useState("");
   const [feedbackMessage, setFeedbackMessage] = useState("");
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
@@ -282,7 +281,7 @@ function HomeContent() {
             gap: 28px;
           }
           h1.headline {
-            font-size: clamp(24px, 6.5vw, 36px); /* Reduced on mobile as requested! */
+            font-size: clamp(24px, 6.5vw, 36px);
             line-height: 1.15;
             margin-bottom: 16px;
           }
@@ -297,11 +296,11 @@ function HomeContent() {
           }
           .diagram-box {
             height: 250px;
-            order: 2; /* Renders AFTER text on mobile screen! */
+            order: 2;
           }
           .cta-row {
             display: grid;
-            grid-template-columns: 1fr 1fr; /* Both buttons in 1 single line on mobile! */
+            grid-template-columns: 1fr 1fr;
             gap: 10px;
             width: 100%;
             margin-bottom: 28px;
@@ -752,6 +751,68 @@ function HomeContent() {
         </div>
       </section>
 
+      {/* Standalone Interactive User Feedback & Feature Request Section */}
+      <section id="feedback-section" className="py-16 bg-slate-900/40 border-t border-b border-slate-800/80 w-full">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          <div className="bg-slate-900/90 backdrop-blur-xl p-8 sm:p-10 rounded-3xl border border-slate-800 shadow-2xl space-y-6 relative overflow-hidden">
+            {/* Top Decorative Accent Line */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600" />
+
+            <div className="text-center space-y-2">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold uppercase tracking-wider">
+                <MessageSquareHeart className="w-4 h-4" /> User Feedback & Feature Requests
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white">Share Your Feedback with Sidra Raza</h2>
+              <p className="text-xs sm:text-sm text-slate-400 max-w-lg mx-auto leading-relaxed">
+                Have questions, suggestions, or feature requests? Send your feedback directly to Platform Founder & Lead Architect <strong className="text-amber-400 font-bold">Sidra Raza</strong>.
+              </p>
+            </div>
+
+            <form onSubmit={handleFeedbackSubmit} autoComplete="off" className="space-y-4 max-w-xl mx-auto">
+              <div>
+                <label className="text-xs font-bold text-slate-300 block mb-1">Your Email Address (Optional)</label>
+                <input
+                  type="email"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  placeholder="Enter your email address"
+                  value={feedbackEmail}
+                  onChange={(e) => setFeedbackEmail(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500 font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-300 block mb-1">Feedback / Message *</label>
+                <textarea
+                  required
+                  rows={4}
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  placeholder="Type your feedback, suggestions, or feature requests for Sidra Raza..."
+                  value={feedbackMessage}
+                  onChange={(e) => setFeedbackMessage(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500 resize-none"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmittingFeedback}
+                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white font-extrabold text-xs shadow-lg hover:brightness-110 flex items-center justify-center gap-2 transition-all"
+              >
+                <Send className="w-4 h-4" />
+                {isSubmittingFeedback ? "Sending Feedback..." : "Submit Feedback to Sidra Raza"}
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
       {/* Register / Login Gatekeeper Modal */}
       <UserAuthModal
         isOpen={isAuthModalOpen}
@@ -761,70 +822,9 @@ function HomeContent() {
         }}
       />
 
-      {/* Comprehensive Footer featuring About Us & Interactive Feedback Sections */}
-      <footer className="border-t border-slate-800 bg-slate-950 text-slate-300 pt-12 pb-8 px-6">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 pb-10 border-b border-slate-800/80">
-          {/* About Us Column */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-white font-bold shadow-md">
-                <Building2 className="w-4 h-4" />
-              </div>
-              <span className="text-base font-extrabold text-white tracking-tight">About AI Construction ERP</span>
-            </div>
-            <p className="text-xs text-slate-400 leading-relaxed max-w-lg">
-              Created and Architected by <strong className="text-amber-400">Sidra Raza</strong> (Platform Founder & Lead Architect), AI Construction ERP is an enterprise multi-tenant SaaS solution designed to streamline construction site operations, labour attendance, materials inventory, capped expense tracking, and self-configurable custom production fields.
-            </p>
-            <div className="flex items-center gap-3 pt-1">
-              <div className="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-[11px] font-bold text-amber-400 flex items-center gap-1.5">
-                <Info className="w-3.5 h-3.5" /> Founder & Lead Architect: Sidra Raza
-              </div>
-            </div>
-          </div>
-
-          {/* User Feedback Column */}
-          <div className="space-y-4 bg-slate-900/60 p-5 rounded-2xl border border-slate-800">
-            <div className="flex items-center gap-2 text-white">
-              <MessageSquareHeart className="w-4 h-4 text-amber-400" />
-              <h4 className="text-sm font-bold">User Feedback & Feature Requests</h4>
-            </div>
-            <p className="text-[11px] text-slate-400">
-              Have feedback, questions, or feature suggestions? Send your note directly to Sidra Raza:
-            </p>
-            <form onSubmit={handleFeedbackSubmit} className="space-y-2.5">
-              <input
-                type="email"
-                placeholder="Your email address (optional)"
-                value={feedbackEmail}
-                onChange={(e) => setFeedbackEmail(e.target.value)}
-                autoComplete="off"
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500"
-              />
-              <textarea
-                required
-                rows={2}
-                placeholder="Type your feedback or feature request..."
-                value={feedbackMessage}
-                onChange={(e) => setFeedbackMessage(e.target.value)}
-                autoComplete="off"
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500 resize-none"
-              />
-              <button
-                type="submit"
-                disabled={isSubmittingFeedback}
-                className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold text-xs shadow-md hover:brightness-110 flex items-center justify-center gap-1.5 transition-all"
-              >
-                <Send className="w-3.5 h-3.5" />
-                {isSubmittingFeedback ? "Sending Feedback..." : "Submit Feedback to Sidra Raza"}
-              </button>
-            </form>
-          </div>
-        </div>
-
-        {/* Copyright & Author Credit Bar */}
-        <div className="max-w-6xl mx-auto pt-6 text-center text-xs text-slate-400 font-medium">
-          Created & Built by <strong className="text-amber-400 font-bold">Sidra Raza</strong> (Platform Founder & Lead Architect) • AI Construction ERP v1.0 • All Rights Reserved.
-        </div>
+      {/* Clean Minimal Footer */}
+      <footer className="border-t border-slate-800/80 px-6 py-5 text-center text-xs text-slate-400 font-medium bg-slate-950">
+        Created & Built by <strong className="text-amber-400">Sidra Raza</strong> (Platform Founder & Lead Architect) • AI Construction ERP v1.0
       </footer>
     </div>
   );
