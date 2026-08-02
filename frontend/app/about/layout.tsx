@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+const SITE_URL = "https://ai-construction-erp.vercel.app";
+
 export const metadata: Metadata = {
   title: "About Us & Leadership — Sidra Raza Architect",
   description:
@@ -7,7 +9,21 @@ export const metadata: Metadata = {
   openGraph: {
     title: "About Us — Sidra Raza Founder & Architect",
     description: "Architectural vision behind AI Construction ERP platform.",
-    images: ["/logo-512px.png"],
+    images: [
+      {
+        url: `${SITE_URL}/logo-512px.png`,
+        width: 512,
+        height: 512,
+        type: "image/png",
+        alt: "About Us - AI Construction ERP Logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About Us — Sidra Raza Founder & Architect",
+    description: "Architectural vision behind AI Construction ERP platform.",
+    images: [`${SITE_URL}/logo-512px.png`],
   },
 };
 
