@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/db";
 
 export async function GET() {
   try {
-    const feedbacks = await prisma.userFeedback.findMany({
+    const feedbacks = await db.userFeedback.findMany({
       orderBy: { createdAt: "desc" },
     });
 
@@ -32,7 +32,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const newFeedback = await prisma.userFeedback.create({
+    const newFeedback = await db.userFeedback.create({
       data: {
         category: category || "FEATURE",
         email: email ? email.trim() : null,
