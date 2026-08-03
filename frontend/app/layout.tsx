@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     url: SITE_URL,
     images: [
       {
-        url: "/logo-16px.png",
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "AI Construction ERP",
@@ -71,7 +71,7 @@ export const metadata: Metadata = {
     title: "AI Construction ERP — Enterprise Construction Management SaaS",
     description:
       "Manage projects, site labour, materials, expenses, and client billing in one AI-powered construction management system.",
-    images: ["/logo-16px.png"],
+    images: ["/123.ico"],
   },
   icons: {
     icon: [
@@ -123,7 +123,7 @@ export default function RootLayout({
         <meta property="og:title" content="AI Construction ERP — Enterprise Construction Management SaaS" />
         <meta property="og:description" content="Manage projects, site labour, materials, expenses, and client billing in one AI-powered construction management system." />
         <meta property="og:url" content={SITE_URL} />
-        <meta property="og:image" content={`${SITE_URL}/logo-16px.png`} />
+        <meta property="og:image" content={`${SITE_URL}/123.ico`} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:image:alt" content="AI Construction ERP" />
@@ -133,7 +133,7 @@ export default function RootLayout({
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="AI Construction ERP — Enterprise Construction Management SaaS" />
         <meta name="twitter:description" content="Manage projects, site labour, materials, expenses, and client billing in one AI-powered construction management system." />
-        <meta name="twitter:image" content={`${SITE_URL}/logo-16px.png`} />
+        <meta name="twitter:image" content={`${SITE_URL}/123.ico`} />
 
         {/* Structured Data (JSON-LD) */}
         <script
