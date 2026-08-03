@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F2D4A" />
+      <stop offset="100%" stop-color="#1E4D7B" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#2563EB" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#D97706" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)" />
+  <!-- Construction Helmet / Structure Motif -->
+  <path d="M 256 112 C 176 112 128 160 128 240 L 384 240 C 384 160 336 112 256 112 Z" fill="url(#goldGrad)" />
+  <rect x="112" y="240" width="288" height="28" rx="8" fill="url(#goldGrad)" />
+  <!-- Building / Digital Grid Lines -->
+  <path d="M 160 288 L 160 384 L 224 384 L 224 288 Z" fill="url(#accentGrad)" opacity="0.9" />
+  <path d="M 240 288 L 240 384 L 304 384 L 304 288 Z" fill="url(#accentGrad)" opacity="0.9" />
+  <path d="M 320 288 L 320 384 L 352 384 L 352 288 Z" fill="url(#accentGrad)" opacity="0.9" />
+  <!-- AI Spark / Node Dot -->
+  <circle cx="256" cy="176" r="16" fill="#FFFFFF" />
+  <path d="M 256 144 L 256 208 M 224 176 L 288 176" stroke="#0F2D4A" stroke-width="6" stroke-linecap="round" />
+</svg>

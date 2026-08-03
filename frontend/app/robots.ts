@@ -1,14 +1,15 @@
 import { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = "https://ai-construction-erp-eight.vercel.app";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://ai-construction-erp-eight.vercel.app";
 
   return {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/api/"],
+      disallow: ["/dashboard/", "/api/", "/admin/", "/engineer/", "/client/"],
     },
     sitemap: `${baseUrl}/sitemap.xml`,
   };
 }
+
