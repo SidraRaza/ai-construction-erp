@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     url: SITE_URL,
     images: [
       {
-        url: "/og-image.jpg",
+        url: "/lgo.png",
         width: 1200,
         height: 630,
         alt: "AI Construction ERP",
@@ -71,15 +71,16 @@ export const metadata: Metadata = {
     title: "AI Construction ERP — Enterprise Construction Management SaaS",
     description:
       "Manage projects, site labour, materials, expenses, and client billing in one AI-powered construction management system.",
-    images: ["/123.ico"],
+    images: ["/lgo.png"],
   },
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
       { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/lgo.png", type: "image/png" },
     ],
     apple: [
-      { url: "/apple-touch-icon.png", sizes: "180x180" },
+      { url: "/lgo.png", sizes: "180x180" },
     ],
   },
   manifest: "/site.webmanifest",
@@ -113,8 +114,8 @@ export default function RootLayout({
     >
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="icon" href="/lgo.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/lgo.png" />
         <link rel="manifest" href="/site.webmanifest" />
 
         {/* WhatsApp & Social Media Open Graph Tags */}
@@ -123,7 +124,7 @@ export default function RootLayout({
         <meta property="og:title" content="AI Construction ERP — Enterprise Construction Management SaaS" />
         <meta property="og:description" content="Manage projects, site labour, materials, expenses, and client billing in one AI-powered construction management system." />
         <meta property="og:url" content={SITE_URL} />
-        <meta property="og:image" content={`${SITE_URL}/123.ico`} />
+        <meta property="og:image" content={`${SITE_URL}/lgo.png`} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:image:alt" content="AI Construction ERP" />
@@ -133,7 +134,7 @@ export default function RootLayout({
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="AI Construction ERP — Enterprise Construction Management SaaS" />
         <meta name="twitter:description" content="Manage projects, site labour, materials, expenses, and client billing in one AI-powered construction management system." />
-        <meta name="twitter:image" content={`${SITE_URL}/123.ico`} />
+        <meta name="twitter:image" content={`${SITE_URL}/lgo.png`} />
 
         {/* Structured Data (JSON-LD) */}
         <script
