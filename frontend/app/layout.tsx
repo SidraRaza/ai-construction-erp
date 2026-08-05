@@ -119,26 +119,6 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/lgo.png" />
         <link rel="manifest" href="/site.webmanifest" />
 
-        {/* WhatsApp & Social Media Open Graph Tags */}
-        <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="AI Construction ERP" />
-        <meta property="og:title" content="AI Construction ERP — Enterprise Construction Management SaaS" />
-        <meta property="og:description" content="Manage projects, site labour, materials, expenses, and client billing in one AI-powered construction management system." />
-        <meta property="og:url" content={SITE_URL} />
-        <meta property="og:image" content={`${SITE_URL}/lgo.png`} />
-        <meta property="og:image:secure_url" content={`${SITE_URL}/lgo.png`} />
-        <meta property="og:image:type" content="image/png" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta property="og:image:alt" content="AI Construction ERP" />
-        <meta property="og:locale" content="en_US" />
-
-        {/* Twitter Card Tags */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="AI Construction ERP — Enterprise Construction Management SaaS" />
-        <meta name="twitter:description" content="Manage projects, site labour, materials, expenses, and client billing in one AI-powered construction management system." />
-        <meta name="twitter:image" content={`${SITE_URL}/lgo.png`} />
-
         {/* Structured Data (JSON-LD) */}
         <script
           type="application/ld+json"
