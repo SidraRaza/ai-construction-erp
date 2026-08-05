@@ -58,9 +58,11 @@ export const metadata: Metadata = {
     url: SITE_URL,
     images: [
       {
-        url: "/lgo.png",
+        url: `${SITE_URL}/lgo.png`,
+        secureUrl: `${SITE_URL}/lgo.png`,
         width: 1200,
         height: 630,
+        type: "image/png",
         alt: "AI Construction ERP",
       },
     ],
@@ -71,12 +73,11 @@ export const metadata: Metadata = {
     title: "AI Construction ERP — Enterprise Construction Management SaaS",
     description:
       "Manage projects, site labour, materials, expenses, and client billing in one AI-powered construction management system.",
-    images: ["/lgo.png"],
+    images: [`${SITE_URL}/lgo.png`],
   },
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
-      { url: "/icon.svg", type: "image/svg+xml" },
       { url: "/lgo.png", type: "image/png" },
     ],
     apple: [
@@ -125,6 +126,8 @@ export default function RootLayout({
         <meta property="og:description" content="Manage projects, site labour, materials, expenses, and client billing in one AI-powered construction management system." />
         <meta property="og:url" content={SITE_URL} />
         <meta property="og:image" content={`${SITE_URL}/lgo.png`} />
+        <meta property="og:image:secure_url" content={`${SITE_URL}/lgo.png`} />
+        <meta property="og:image:type" content="image/png" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:image:alt" content="AI Construction ERP" />
