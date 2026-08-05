@@ -1,14 +1,31 @@
 import { PrismaClient } from "@prisma/client";
-import * as crypto from "crypto";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
 function hashPassword(password: string): string {
-  return crypto.createHash("sha256").update(password).digest("hex");
+  return bcrypt.hashSync(password, 10);
 }
 
 async function main() {
   console.log("🌱 Seeding database...");
+
+  // Cleanup existing default company and seed user emails if present
+  await prisma.user.deleteMany({
+    where: {
+      email: {
+        in: [
+          "sidraraza680@gmail.com",
+          "admin@buildcorp.com",
+          "engineer@buildcorp.com",
+          "labour@buildcorp.com",
+          "client@buildcorp.com",
+          "owner@buildcorp.com",
+        ],
+      },
+    },
+  });
+  await prisma.company.deleteMany({ where: { id: "cl_default_company" } });
 
   // 1. Create Default Company
   const company = await prisma.company.create({
@@ -28,9 +45,9 @@ async function main() {
   const superAdmin = await prisma.user.create({
     data: {
       companyId: company.id,
-      name: "Platform Owner",
-      email: "owner@buildcorp.com",
-      passwordHash,
+      name: "Sidra Raza (Platform Owner)",
+      email: "sidraraza680@gmail.com",
+      passwordHash: hashPassword("87626"),
       role: "SUPER_ADMIN",
     },
   });

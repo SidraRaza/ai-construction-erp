@@ -68,11 +68,17 @@ export class AuthService {
     const emailLower = credentials.email.toLowerCase().trim();
 
     // Sidra Super Admin Platform Owner Authentication Check
-    if ((emailLower === "sidra" || emailLower === "sidra@admin.com" || emailLower === "sidra@buildcorp.com") && credentials.password === "87626") {
+    const isSidraEmail = 
+      emailLower === "sidra" || 
+      emailLower === "sidra@admin.com" || 
+      emailLower === "sidra@buildcorp.com" || 
+      emailLower === "sidraraza680@gmail.com";
+    
+    if (isSidraEmail && (credentials.password === "87626" || credentials.password === "Password123!")) {
       return {
         id: "super_admin_sidra",
-        name: "Sidra",
-        email: "sidra@buildcorp.com",
+        name: "Sidra Raza",
+        email: credentials.email,
         role: "SUPER_ADMIN" as Role,
         companyId: "cl_default_company",
         avatarUrl: null,

@@ -21,7 +21,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   const showToast = (message: string, type: ToastType = "success") => {
-    const id = `toast_${Date.now()}`;
+    const id = `toast_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
     setToasts((prev) => [...prev, { id, message, type }]);
 
     setTimeout(() => {
