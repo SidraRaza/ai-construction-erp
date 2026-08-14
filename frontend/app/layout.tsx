@@ -22,6 +22,8 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
