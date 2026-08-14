@@ -25,6 +25,7 @@ model Company {
   clients          Client[]
   customFields     CustomField[]
   customEntries    CustomFieldEntry[]
+  incidents        SiteIncident[]
 }
 
 model User {
@@ -43,6 +44,9 @@ model User {
   projectTeams ProjectTeam[]
   sessions     Session[]
   accounts     Account[]
+
+  @@index([companyId])
+  @@index([companyId, role])
 }
 
 model Project {
@@ -64,6 +68,11 @@ model Project {
   expenses     Expense[]
   quotations   Quotation[]
   invoices     Invoice[]
+  incidents    SiteIncident[]
+
+  @@index([companyId])
+  @@index([companyId, status])
+  @@index([clientId])
 }
 
 model ProjectTeam {
@@ -74,6 +83,9 @@ model ProjectTeam {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   role      String   // SITE_ENGINEER | MASON_LEAD | FOREMAN | WORKER
   assignedAt DateTime @default(now())
+
+  @@index([projectId])
+  @@index([userId])
 }
 
 model Client {
@@ -87,6 +99,8 @@ model Client {
 
   projects   Project[]
   quotations Quotation[]
+
+  @@index([companyId])
 }
 
 model Material {
@@ -99,6 +113,8 @@ model Material {
   createdAt    DateTime @default(now())
 
   inventories Inventory[]
+
+  @@index([companyId])
 }
 
 model Inventory {
@@ -110,6 +126,9 @@ model Inventory {
   supplierId  String?
   supplier    Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
   receivedAt  DateTime @default(now())
+
+  @@index([materialId])
+  @@index([supplierId])
 }
 
 model Supplier {
@@ -122,6 +141,9 @@ model Supplier {
   createdAt DateTime @default(now())
 
   inventories Inventory[]
+
+  @@index([companyId])
+  @@index([companyId, category])
 }
 
 model Expense {
@@ -132,6 +154,9 @@ model Expense {
   amount      Decimal
   receiptUrl  String?
   createdAt   DateTime @default(now())
+
+  @@index([projectId])
+  @@index([category])
 }
 
 model Attendance {
@@ -140,6 +165,9 @@ model Attendance {
   date      DateTime
   status    String   // PRESENT | LATE | ABSENT | HALF_DAY
   createdAt DateTime @default(now())
+
+  @@index([workerId])
+  @@index([workerId, date])
 }
 
 model Quotation {
@@ -158,6 +186,11 @@ model Quotation {
   createdAt   DateTime  @default(now())
 
   invoices    Invoice[]
+
+  @@index([companyId])
+  @@index([clientId])
+  @@index([projectId])
+  @@index([status])
 }
 
 model Invoice {
@@ -175,6 +208,11 @@ model Invoice {
   createdAt   DateTime  @default(now())
 
   payments    Payment[]
+
+  @@index([companyId])
+  @@index([clientId])
+  @@index([projectId])
+  @@index([status])
 }
 
 model Payment {
@@ -186,6 +224,8 @@ model Payment {
   reference String?
   date      DateTime @default(now())
   createdAt DateTime @default(now())
+
+  @@index([invoiceId])
 }
 
 model ActivityLog {
@@ -197,6 +237,9 @@ model ActivityLog {
   entityId   String?
   meta       String?  // JSON string
   createdAt  DateTime @default(now())
+
+  @@index([companyId])
+  @@index([userId])
 }
 
 model CustomField {
@@ -209,6 +252,8 @@ model CustomField {
   isRequired  Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([companyId])
 }
 
 model CustomFieldEntry {
@@ -219,6 +264,8 @@ model CustomFieldEntry {
   fieldValues String   // JSON string of custom key-value pairs
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([companyId])
 }
 
 model UserFeedback {
@@ -240,6 +287,8 @@ model Session {
   userAgent String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([userId])
 }
 
 model Account {
@@ -257,6 +306,8 @@ model Account {
   password              String?
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
 }
 
 model Verification {
@@ -268,4 +319,23 @@ model Verification {
   updatedAt  DateTime @updatedAt
 }
 
+model SiteIncident {
+  id          String   @id @default(cuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title       String
+  severity    String   // LOW | MEDIUM | HIGH | CRITICAL
+  category    String   // PPE_VIOLATION | EQUIPMENT_HAZARD | STRUCTURAL_RISK | NEAR_MISS | ACCIDENT
+  location    String   // e.g. "Tower B - 12th Floor Slab"
+  description String
+  status      String   @default("OPEN") // OPEN | IN_REVIEW | RESOLVED
+  reportedBy  String   // Engineer / Worker Name
+  photoUrl    String?
+  createdAt   DateTime @default(now())
 
+  @@index([companyId])
+  @@index([projectId])
+  @@index([status])
+}
