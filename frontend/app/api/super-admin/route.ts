@@ -1,8 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getAuthContext } from "@/lib/auth-helpers";
 
 export async function GET(req: NextRequest) {
   try {
+    const { userRole } = getAuthContext(req);
+    if (userRole !== "SUPER_ADMIN") {
+      return NextResponse.json(
+        {
+          success: false,
+          error: { message: "Unauthorized: Platform Super Admin role required to view global ledgers." },
+        },
+        { status: 403 }
+      );
+    }
+
     let companies: any[] = [];
     let allUsers: any[] = [];
     let totalProjects = 0;

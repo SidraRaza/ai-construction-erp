@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getAuthContext } from "@/lib/auth-helpers";
 import { z } from "zod";
 
 const createIncidentSchema = z.object({
-  companyId: z.string().default("cl_default_company"),
-  projectId: z.string().default("cmsg59fki000dk2ig1jmufc5d"),
+  projectId: z.string().min(1, "Project ID required"),
   title: z.string().min(3, "Incident title must be at least 3 characters"),
   severity: z.enum(["LOW", "MEDIUM", "HIGH", "CRITICAL"]).default("MEDIUM"),
   category: z.enum(["PPE_VIOLATION", "EQUIPMENT_HAZARD", "STRUCTURAL_RISK", "NEAR_MISS", "ACCIDENT"]).default("PPE_VIOLATION"),
@@ -16,8 +16,7 @@ const createIncidentSchema = z.object({
 
 export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const companyId = searchParams.get("companyId") || "cl_default_company";
+    const { companyId } = getAuthContext(req);
 
     const incidents = await (db as any).siteIncident.findMany({
       where: { companyId },
@@ -34,58 +33,29 @@ export async function GET(req: NextRequest) {
       data: incidents,
     });
   } catch (error: any) {
-    // Fallback if table is empty or freshly migrated
-    return NextResponse.json({
-      success: true,
-      data: [
-        {
-          id: "inc_1",
-          companyId: "cl_default_company",
-          projectId: "cmsg59fki000dk2ig1jmufc5d",
-          project: { name: "Skyline Luxury Towers - Phase 1" },
-          title: "Worker Missing Safety Helmet at Height",
-          severity: "HIGH",
-          category: "PPE_VIOLATION",
-          location: "Tower B - 12th Floor Slab",
-          description: "Subcontractor mason working near perimeter edge without safety harness and helmet.",
-          status: "OPEN",
-          reportedBy: "Lead Site Engineer",
-          createdAt: new Date().toISOString(),
-        },
-        {
-          id: "inc_2",
-          companyId: "cl_default_company",
-          projectId: "cmsg59fki000dk2ig1jmufc5d",
-          project: { name: "Skyline Luxury Towers - Phase 1" },
-          title: "Exposed Electrical Cable Near Water Drain",
-          severity: "CRITICAL",
-          category: "EQUIPMENT_HAZARD",
-          location: "Basement Parking Level 2",
-          description: "High-voltage generator power cable damaged near active water drainage pump.",
-          status: "IN_REVIEW",
-          reportedBy: "Safety Inspector",
-          createdAt: new Date(Date.now() - 3600000 * 5).toISOString(),
-        },
-      ],
-    });
+    return NextResponse.json(
+      { success: false, error: { message: error.message || "Failed to fetch incidents" } },
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(req: NextRequest) {
   try {
+    const { companyId, userId } = getAuthContext(req);
     const body = await req.json();
     const validated = createIncidentSchema.parse(body);
 
     const incident = await (db as any).siteIncident.create({
       data: {
-        companyId: validated.companyId,
+        companyId,
         projectId: validated.projectId,
         title: validated.title,
         severity: validated.severity,
         category: validated.category,
         location: validated.location,
         description: validated.description,
-        reportedBy: validated.reportedBy,
+        reportedBy: validated.reportedBy || userId,
         photoUrl: validated.photoUrl || null,
         status: "OPEN",
       },
@@ -99,7 +69,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: error.message || "Failed to log site safety incident",
+        error: { message: error.message || "Failed to log site safety incident" },
       },
       { status: 400 }
     );
@@ -108,8 +78,20 @@ export async function POST(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
+    const { companyId } = getAuthContext(req);
     const body = await req.json();
     const { id, status } = body;
+
+    const existing = await (db as any).siteIncident.findFirst({
+      where: { id, companyId },
+    });
+
+    if (!existing) {
+      return NextResponse.json(
+        { success: false, error: { message: "Incident record not found in your company" } },
+        { status: 404 }
+      );
+    }
 
     const updated = await (db as any).siteIncident.update({
       where: { id },
@@ -124,9 +106,10 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: error.message || "Failed to update incident status",
+        error: { message: error.message || "Failed to update incident status" },
       },
       { status: 400 }
     );
   }
 }
+

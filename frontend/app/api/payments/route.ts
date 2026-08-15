@@ -1,13 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { ActivityLogService } from "@/services/activity-log.service";
+import { getAuthContext } from "@/lib/auth-helpers";
 import { Prisma } from "@prisma/client";
 
 export async function GET(req: NextRequest) {
   try {
-    const companyId = req.headers.get("x-company-id") || "cl_default_company";
+    const { companyId } = getAuthContext(req);
 
     const payments = await db.payment.findMany({
+      where: {
+        invoice: {
+          companyId,
+        },
+      },
       include: {
         invoice: {
           include: {
@@ -33,8 +39,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const companyId = req.headers.get("x-company-id") || "cl_default_company";
-    const userId = req.headers.get("x-user-id") || "cl_default_user";
+    const { companyId, userId } = getAuthContext(req);
 
     const body = await req.json();
     const { invoiceId, clientName, projectId, amount, method, reference } = body;
@@ -78,12 +83,25 @@ export async function POST(req: NextRequest) {
       });
       targetInvoiceId = invoice.id;
     } else {
+      // Verify target invoice belongs strictly to requester's tenant company
+      const existingInvoice = await db.invoice.findFirst({
+        where: { id: targetInvoiceId, companyId },
+      });
+
+      if (!existingInvoice) {
+        return NextResponse.json(
+          { success: false, error: { message: "Invoice not found in your company" } },
+          { status: 404 }
+        );
+      }
+
       // Mark existing Invoice as PAID
       await db.invoice.update({
         where: { id: targetInvoiceId },
         data: { status: "PAID" },
       });
     }
+
 
     // 2. Create Payment Record
     const payment = await db.payment.create({

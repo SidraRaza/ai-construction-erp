@@ -107,7 +107,15 @@ export class AttendanceService {
   }
 
   static async getAttendanceHistory(companyId: string, projectId?: string, date?: string) {
-    const whereClause: Record<string, unknown> = {};
+    const companyUsers = await db.user.findMany({
+      where: { companyId },
+      select: { id: true },
+    });
+    const userIds = companyUsers.map((u) => u.id);
+
+    const whereClause: Record<string, unknown> = {
+      workerId: { in: userIds },
+    };
     if (date) {
       const parsedDate = new Date(date);
       parsedDate.setHours(0, 0, 0, 0);

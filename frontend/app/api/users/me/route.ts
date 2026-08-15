@@ -1,24 +1,40 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { ActivityLogService } from "@/services/activity-log.service";
+import { getAuthContext } from "@/lib/auth-helpers";
 
 export async function GET(req: NextRequest) {
   try {
-    const userId = req.headers.get("x-user-id");
-    const companyId = req.headers.get("x-company-id") || "cl_default_company";
+    const { companyId, userId } = getAuthContext(req);
 
-    if (!userId) {
-      // Return default company/user if no header
-      const user = await db.user.findFirst({
-        where: { companyId },
-        include: { company: true },
-      });
-      return NextResponse.json({ success: true, data: user });
-    }
-
-    const user = await db.user.findUnique({
-      where: { id: userId },
-      include: { company: true },
+    const user = await db.user.findFirst({
+      where: {
+        ...(userId && userId !== "cl_default_user" ? { id: userId } : {}),
+        companyId,
+      },
+      select: {
+        id: true,
+        companyId: true,
+        name: true,
+        email: true,
+        phone: true,
+        role: true,
+        status: true,
+        avatarUrl: true,
+        createdAt: true,
+        company: {
+          select: {
+            id: true,
+            name: true,
+            logoUrl: true,
+            address: true,
+            country: true,
+            taxNumber: true,
+            subscriptionPlan: true,
+            status: true,
+          },
+        },
+      },
     });
 
     return NextResponse.json({
@@ -35,34 +51,49 @@ export async function GET(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
+    const { companyId, userId: sessionUserId } = getAuthContext(req);
     const body = await req.json();
     const { userId, name, phone, companyName, country, taxNumber, address } = body;
 
-    if (!userId) {
+    const targetUserId = userId || sessionUserId;
+
+    if (!targetUserId) {
       return NextResponse.json(
         { success: false, error: { message: "User ID is required to update profile" } },
         { status: 400 }
       );
     }
 
-    const existingUser = await db.user.findUnique({
-      where: { id: userId },
+    // Verify user strictly exists in requester's company scope
+    const existingUser = await db.user.findFirst({
+      where: { id: targetUserId, companyId },
       include: { company: true },
     });
 
     if (!existingUser) {
       return NextResponse.json(
-        { success: false, error: { message: "User profile not found in database" } },
+        { success: false, error: { message: "User profile not found in your company" } },
         { status: 404 }
       );
     }
 
     // Update User Record
     const updatedUser = await db.user.update({
-      where: { id: userId },
+      where: { id: targetUserId },
       data: {
         name: name || existingUser.name,
         phone: phone !== undefined ? phone : existingUser.phone,
+      },
+      select: {
+        id: true,
+        companyId: true,
+        name: true,
+        email: true,
+        phone: true,
+        role: true,
+        status: true,
+        avatarUrl: true,
+        createdAt: true,
       },
     });
 
@@ -82,10 +113,10 @@ export async function PUT(req: NextRequest) {
 
     await ActivityLogService.log({
       companyId: existingUser.companyId,
-      userId,
+      userId: targetUserId,
       action: "UPDATE_USER_PROFILE",
       entityType: "User",
-      entityId: userId,
+      entityId: targetUserId,
       meta: { name: updatedUser.name, companyName: updatedCompany.name, country: updatedCompany.country },
     });
 
@@ -103,3 +134,4 @@ export async function PUT(req: NextRequest) {
     );
   }
 }
+

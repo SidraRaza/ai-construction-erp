@@ -1,10 +1,22 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getAuthContext } from "@/lib/auth-helpers";
 
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    const { userRole } = getAuthContext(req);
+    if (userRole !== "SUPER_ADMIN") {
+      return NextResponse.json(
+        {
+          success: false,
+          error: { message: "Unauthorized: Platform Super Admin role required to view feedback submissions." },
+        },
+        { status: 403 }
+      );
+    }
+
     let feedbacks: any[] = [];
     if (db && (db as any).userFeedback) {
       try {

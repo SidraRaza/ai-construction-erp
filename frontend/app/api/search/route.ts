@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getAuthContext } from "@/lib/auth-helpers";
 import { ApiResponse } from "@/types/api";
 
 export async function GET(req: Request) {
   try {
-    const companyId = req.headers.get("x-company-id") || "cl_default_company";
+    const { companyId } = getAuthContext(req);
     const { searchParams } = new URL(req.url);
     const query = searchParams.get("q") || "";
+
 
     if (!query || query.trim().length < 2) {
       return NextResponse.json<ApiResponse>({

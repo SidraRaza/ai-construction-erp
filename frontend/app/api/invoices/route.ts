@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getAuthContext } from "@/lib/auth-helpers";
 
 export async function GET(req: NextRequest) {
   try {
-    const companyId = req.headers.get("x-company-id") || "cl_default_company";
+    const { companyId } = getAuthContext(req);
 
     const invoices = await db.invoice.findMany({
       where: { companyId },
@@ -13,6 +14,7 @@ export async function GET(req: NextRequest) {
       },
       orderBy: { createdAt: "desc" },
     });
+
 
     return NextResponse.json({
       success: true,

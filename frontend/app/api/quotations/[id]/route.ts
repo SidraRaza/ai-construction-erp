@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { ActivityLogService } from "@/services/activity-log.service";
+import { getAuthContext } from "@/lib/auth-helpers";
 
 export async function PUT(
   req: NextRequest,
@@ -8,8 +9,8 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const companyId = req.headers.get("x-company-id") || "cl_default_company";
-    const userId = req.headers.get("x-user-id") || "cl_default_user";
+    const { companyId, userId } = getAuthContext(req);
+
 
     const body = await req.json();
     const { newId, projectId, status, amount, notes } = body;

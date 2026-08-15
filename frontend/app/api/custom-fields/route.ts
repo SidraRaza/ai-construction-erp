@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getAuthContext } from "@/lib/auth-helpers";
 
 export async function GET(req: NextRequest) {
   try {
-    const companyId = req.headers.get("x-company-id") || "cl_default_company";
+    const { companyId } = getAuthContext(req);
 
     const customFields = await db.customField.findMany({
       where: { companyId },
@@ -24,7 +25,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const companyId = req.headers.get("x-company-id") || "cl_default_company";
+    const { companyId } = getAuthContext(req);
     const body = await req.json();
     const { fieldName, fieldType, options, isRequired } = body;
 
@@ -59,9 +60,10 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const companyId = req.headers.get("x-company-id") || "cl_default_company";
+    const { companyId } = getAuthContext(req);
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
+
 
     if (!id) {
       return NextResponse.json(

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { AIService } from "@/services/ai.service";
+import { getAuthContext } from "@/lib/auth-helpers";
 import { ApiResponse } from "@/types/api";
 import { z } from "zod";
 
@@ -10,11 +11,11 @@ const reportSchema = z.object({
 
 export async function POST(req: Request) {
   try {
-    const engineerId = req.headers.get("x-user-id") || "cl_default_engineer";
+    const { companyId, userId } = getAuthContext(req);
     const body = await req.json();
     const { projectId, rawInput } = reportSchema.parse(body);
 
-    const report = await AIService.generateDailyReport(projectId, engineerId, rawInput);
+    const report = await AIService.generateDailyReport(companyId, projectId, userId, rawInput);
 
     return NextResponse.json<ApiResponse<typeof report>>(
       { success: true, data: report },
@@ -28,3 +29,4 @@ export async function POST(req: Request) {
     );
   }
 }
+

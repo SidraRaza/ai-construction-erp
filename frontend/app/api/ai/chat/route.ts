@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { AIService } from "@/services/ai.service";
+import { getAuthContext } from "@/lib/auth-helpers";
 import { ApiResponse } from "@/types/api";
 import { z } from "zod";
 
@@ -10,11 +11,12 @@ const chatSchema = z.object({
 
 export async function POST(req: Request) {
   try {
-    const companyId = req.headers.get("x-company-id") || "cl_default_company";
+    const { companyId } = getAuthContext(req);
     const body = await req.json();
     const { projectId, question } = chatSchema.parse(body);
 
     const chatResponse = await AIService.chatAssistant(companyId, projectId, question);
+
 
     return NextResponse.json<ApiResponse<typeof chatResponse>>(
       { success: true, data: chatResponse },

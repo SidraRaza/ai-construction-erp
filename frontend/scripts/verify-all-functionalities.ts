@@ -279,7 +279,7 @@ async function runVerificationSuite() {
     // ---------------------------------------------------------
     console.log("\n--- 7. Testing AIService Features ---");
 
-    const dailyReport = await AIService.generateDailyReport(project.id, engineerUser.id, "Finished 2nd floor column reinforcement.");
+    const dailyReport = await AIService.generateDailyReport(companyId, project.id, engineerUser.id, "Finished 2nd floor column reinforcement.");
     assert(dailyReport.aiGeneratedReport.includes("Official Site Daily Progress Report"), "AI Daily Report formatted");
 
     const costEstimate = await AIService.estimateProjectCost("5 Marla Residential House Construction");

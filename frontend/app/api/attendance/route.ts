@@ -12,17 +12,23 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
 
-    // Fetch today's attendance records
+    // Fetch today's attendance records for company workers only
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    const userIds = users.map((u) => u.id);
+
     const attendanceRecords = await db.attendance.findMany({
       where: {
+        workerId: {
+          in: userIds,
+        },
         date: {
           gte: today,
         },
       },
     });
+
 
     // Map users to attendance status
     const roster = users.map((u) => {

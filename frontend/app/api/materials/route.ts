@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { createMaterialSchema } from "@/validations/material.validation";
 import { MaterialService } from "@/services/material.service";
+import { getAuthContext } from "@/lib/auth-helpers";
 import { ApiResponse } from "@/types/api";
-import { Role } from "@/lib/rbac";
 
 export async function GET(req: Request) {
   try {
-    const companyId = req.headers.get("x-company-id") || "cl_default_company";
+    const { companyId } = getAuthContext(req);
     const materials = await MaterialService.getMaterials(companyId);
 
     return NextResponse.json<ApiResponse<typeof materials>>({
@@ -24,14 +24,13 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const companyId = req.headers.get("x-company-id") || "cl_default_company";
-    const userId = req.headers.get("x-user-id") || "cl_default_user";
-    const userRole = (req.headers.get("x-user-role") as Role) || "ADMIN";
+    const { companyId, userId, userRole } = getAuthContext(req);
 
     const body = await req.json();
     const validated = createMaterialSchema.parse(body);
 
     const material = await MaterialService.createMaterial(companyId, userId, userRole, validated);
+
 
     return NextResponse.json<ApiResponse<typeof material>>(
       { success: true, data: material },

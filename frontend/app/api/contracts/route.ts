@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { ContractService } from "@/services/contract.service";
+import { getAuthContext } from "@/lib/auth-helpers";
 import { ApiResponse } from "@/types/api";
-import { Role } from "@/lib/rbac";
 import { z } from "zod";
 
 const contractSchema = z.object({
@@ -13,7 +13,7 @@ const contractSchema = z.object({
 
 export async function GET(req: Request) {
   try {
-    const companyId = req.headers.get("x-company-id") || "cl_default_company";
+    const { companyId } = getAuthContext(req);
     const contracts = await ContractService.getContracts(companyId);
 
     return NextResponse.json<ApiResponse<typeof contracts>>({
@@ -31,14 +31,13 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const companyId = req.headers.get("x-company-id") || "cl_default_company";
-    const userId = req.headers.get("x-user-id") || "cl_default_user";
-    const userRole = (req.headers.get("x-user-role") as Role) || "ADMIN";
+    const { companyId, userId, userRole } = getAuthContext(req);
 
     const body = await req.json();
     const validated = contractSchema.parse(body);
 
     const contract = await ContractService.createContract(companyId, userId, userRole, validated);
+
 
     return NextResponse.json<ApiResponse<typeof contract>>(
       { success: true, data: contract },

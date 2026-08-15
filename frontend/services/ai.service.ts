@@ -4,13 +4,13 @@ import { ActivityLogService } from "@/services/activity-log.service";
 import { Role } from "@/lib/rbac";
 
 export class AIService {
-  static async generateDailyReport(projectId: string, engineerId: string, rawInput: string) {
-    const project = await db.project.findUnique({
-      where: { id: projectId },
+  static async generateDailyReport(companyId: string, projectId: string, engineerId: string, rawInput: string) {
+    const project = await db.project.findFirst({
+      where: { id: projectId, companyId },
     });
 
     if (!project) {
-      throw new Error("Project not found");
+      throw new Error("Project not found in your company scope");
     }
 
     const timestamp = new Date().toLocaleDateString("en-US", {

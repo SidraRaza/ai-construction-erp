@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import bcrypt from "bcryptjs";
+import { ActivityLogService } from "@/services/activity-log.service";
 
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
@@ -15,9 +17,9 @@ export async function POST(req: Request) {
       );
     }
 
-    if (!newPassword || newPassword.length < 4) {
+    if (!newPassword || newPassword.length < 6) {
       return NextResponse.json(
-        { success: false, error: { message: "New password must be at least 4 characters long." } },
+        { success: false, error: { message: "New password must be at least 6 characters long." } },
         { status: 400 }
       );
     }
@@ -25,22 +27,25 @@ export async function POST(req: Request) {
     const trimmedEmail = email.trim().toLowerCase();
 
     // Check if user exists in DB
-    let user: any = null;
-    if (db && (db as any).user) {
-      try {
-        user = await (db as any).user.findUnique({
-          where: { email: trimmedEmail },
-        });
+    const user = await db.user.findUnique({
+      where: { email: trimmedEmail },
+    });
 
-        if (user) {
-          await (db as any).user.update({
-            where: { email: trimmedEmail },
-            data: { password: newPassword },
-          });
-        }
-      } catch (dbErr) {
-        console.warn("DB password reset error:", dbErr);
-      }
+    if (user) {
+      const passwordHash = await bcrypt.hash(newPassword, 10);
+      await db.user.update({
+        where: { id: user.id },
+        data: { passwordHash },
+      });
+
+      await ActivityLogService.log({
+        companyId: user.companyId,
+        userId: user.id,
+        action: "PASSWORD_RESET",
+        entityType: "User",
+        entityId: user.id,
+        meta: { email: trimmedEmail, timestamp: new Date().toISOString() },
+      });
     }
 
     return NextResponse.json({
