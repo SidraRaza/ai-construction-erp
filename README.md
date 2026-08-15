@@ -1,8 +1,17 @@
 # 🏗️ AI Construction ERP — Enterprise Multi-Tenant SaaS Platform
 
+[![Next.js](https://img.shields.io/badge/Next.js-16.2-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
+[![Prisma](https://img.shields.io/badge/Prisma-5.22-2D3748?style=flat-square&logo=prisma)](https://www.prisma.io/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon_Serverless-4169E1?style=flat-square&logo=postgresql)](https://neon.tech/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.0-38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
+[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](./LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen.svg?style=flat-square)](https://github.com/SidraRaza/ai-construction-erp/pulls)
+
 > **Created & Built by:** **Sidra Raza** (Platform Founder & Lead Architect)  
 > **Official Repository:** [https://github.com/SidraRaza/ai-construction-erp.git](https://github.com/SidraRaza/ai-construction-erp.git)  
-> **Complete User & Developer Guide:** [📖 Read DOCUMENTATION.md](./DOCUMENTATION.md)
+> **Complete User & Website Guide:** [📖 Read DOCUMENTATION.md](./DOCUMENTATION.md)
+
 
 AI Construction ERP is a full-stack, enterprise-grade Construction Resource Planning (ERP) platform designed, conceptualized, and built by **Sidra Raza**. Powered by Next.js, Prisma, and Artificial Intelligence, it serves construction firms, civil engineers, contractors, real estate developers, skilled workers, and project investors across the globe, providing complete end-to-end management of construction sites, workforce attendance, material inventory, financial billing, multi-channel payment processing, and AI-driven site intelligence.
 
