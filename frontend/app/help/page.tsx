@@ -95,9 +95,14 @@ export default function HelpPage() {
             About Us
           </Link>
 
+          <Link href="/docs" className="text-xs font-semibold text-slate-300 hover:text-white transition-colors">
+            Docs
+          </Link>
+
           <Link href="/help" className="text-xs font-bold text-amber-400 border-b-2 border-amber-500 pb-0.5 transition-colors flex items-center gap-1.5">
             <HelpCircle className="w-3.5 h-3.5 text-amber-400" /> Help Center
           </Link>
+
 
           {/* Portals Dropdown */}
           <div className="relative">
@@ -215,6 +220,17 @@ export default function HelpPage() {
             </Link>
 
             <Link
+              href="/docs"
+              onClick={() => setIsMobileNavOpen(false)}
+              className="w-full p-3 rounded-2xl bg-slate-900 border border-slate-800 text-slate-100 text-sm font-bold flex items-center justify-between"
+            >
+              <span className="flex items-center gap-2.5">
+                <BookOpen className="w-4 h-4 text-amber-400" /> Documentation
+              </span>
+              <ArrowRight className="w-4 h-4 text-amber-400" />
+            </Link>
+
+            <Link
               href="/help"
               onClick={() => setIsMobileNavOpen(false)}
               className="w-full p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-bold flex items-center justify-between"
@@ -224,6 +240,7 @@ export default function HelpPage() {
               </span>
               <CheckCircle2 className="w-4 h-4 text-amber-400" />
             </Link>
+
 
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wider pt-2 mb-1">Enterprise Portals</p>
 

@@ -28,8 +28,10 @@ import {
   Lightbulb,
   Bug,
   HelpCircle,
+  BookOpen,
   ChevronDown,
 } from "lucide-react";
+
 
 function HomeContent() {
   const router = useRouter();
@@ -387,9 +389,14 @@ function HomeContent() {
             About Us
           </Link>
 
+          <Link href="/docs" className="text-xs font-semibold text-slate-300 hover:text-white transition-colors flex items-center gap-1.5">
+            <BookOpen className="w-3.5 h-3.5 text-amber-400" /> Docs
+          </Link>
+
           <Link href="/help" className="text-xs font-semibold text-slate-300 hover:text-white transition-colors flex items-center gap-1.5">
             <HelpCircle className="w-3.5 h-3.5 text-amber-400" /> Help Center
           </Link>
+
 
           {/* Portals Dropdown */}
           <div className="relative">
@@ -498,6 +505,17 @@ function HomeContent() {
             </Link>
 
             <Link
+              href="/docs"
+              onClick={() => setIsMobileNavOpen(false)}
+              className="w-full p-3 rounded-2xl bg-slate-900 border border-slate-800 text-slate-100 text-sm font-bold flex items-center justify-between"
+            >
+              <span className="flex items-center gap-2.5">
+                <BookOpen className="w-4 h-4 text-amber-400" /> Documentation
+              </span>
+              <ArrowRight className="w-4 h-4 text-amber-400" />
+            </Link>
+
+            <Link
               href="/help"
               onClick={() => setIsMobileNavOpen(false)}
               className="w-full p-3 rounded-2xl bg-slate-900 border border-slate-800 text-amber-400 text-sm font-bold flex items-center justify-between"
@@ -507,6 +525,7 @@ function HomeContent() {
               </span>
               <ArrowRight className="w-4 h-4" />
             </Link>
+
 
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wider pt-2 mb-1">Enterprise Portals</p>
 
