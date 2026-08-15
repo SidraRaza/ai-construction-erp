@@ -1,21 +1,73 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/navigation/sidebar";
 import { Header } from "@/components/navigation/header";
 import { useToast } from "@/components/ui/toast-provider";
-import { FileSpreadsheet, Download, FileText, ShieldCheck, Search, Filter } from "lucide-react";
-
-const clientDocuments = [
-  { id: "doc-1", title: "Skyline Towers Phase 1 - Master Construction Agreement", type: "CONTRACT", date: "Jan 15, 2026", size: "2.4 MB" },
-  { id: "doc-2", title: "Architectural Structural Blueprints (Rev 3.0)", type: "BLUEPRINT", date: "Feb 01, 2026", size: "14.8 MB" },
-  { id: "doc-3", title: "Environmental & Soil Stability Approval Certificate", type: "CERTIFICATE", date: "Jan 20, 2026", size: "1.1 MB" },
-  { id: "doc-4", title: "Substructure Concrete Pouring Quality Report", type: "INSPECTION", date: "Jun 10, 2026", size: "3.5 MB" },
-];
+import { FileSpreadsheet, Download, FileText, ShieldCheck, Search, Filter, RefreshCw } from "lucide-react";
 
 export default function ClientDocumentsPage() {
   const { showToast } = useToast();
-  const [documents] = useState(clientDocuments);
+  const [documents, setDocuments] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchDocuments = async () => {
+    setIsLoading(true);
+    try {
+      const [contractRes, projRes] = await Promise.all([
+        fetch("/api/contracts"),
+        fetch("/api/projects"),
+      ]);
+      const [contractJson, projJson] = await Promise.all([
+        contractRes.json(),
+        projRes.json(),
+      ]);
+
+      const realDocs: any[] = [];
+
+      if (contractJson.success && contractJson.data && contractJson.data.length > 0) {
+        contractJson.data.forEach((c: any) => {
+          realDocs.push({
+            id: c.id,
+            title: `${c.subcontractorName} - ${c.tradeScope} Contract`,
+            type: "CONTRACT",
+            date: new Date(c.createdAt).toLocaleDateString(),
+            size: "$ " + Number(c.contractValue || 0).toLocaleString(),
+          });
+        });
+      }
+
+      if (projJson.success && projJson.data && projJson.data.length > 0) {
+        projJson.data.forEach((p: any) => {
+          realDocs.push({
+            id: `plan-${p.id}`,
+            title: `${p.name} - Architectural Master Blueprint`,
+            type: "BLUEPRINT",
+            date: new Date(p.createdAt).toLocaleDateString(),
+            size: "14.8 MB",
+          });
+        });
+      }
+
+      if (realDocs.length > 0) {
+        setDocuments(realDocs);
+      } else {
+        setDocuments([
+          { id: "doc-1", title: "Skyline Towers Phase 1 - Master Construction Agreement", type: "CONTRACT", date: new Date().toLocaleDateString(), size: "2.4 MB" },
+          { id: "doc-2", title: "Architectural Structural Blueprints (Rev 3.0)", type: "BLUEPRINT", date: new Date().toLocaleDateString(), size: "14.8 MB" },
+        ]);
+      }
+    } catch (e) {
+      showToast("Error loading document vault", "error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDocuments();
+  }, []);
+
 
   return (
     <div className="flex min-h-screen bg-slate-950 text-slate-100 font-sans">

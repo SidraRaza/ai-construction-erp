@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/navigation/sidebar";
 import { Header } from "@/components/navigation/header";
 import { useToast } from "@/components/ui/toast-provider";
@@ -16,69 +16,53 @@ import {
   ShieldCheck,
   Bot,
   AlertCircle,
+  RefreshCw,
 } from "lucide-react";
-
-const initialInvoices = [
-  {
-    id: "INV-2026-004",
-    project: "Skyline Luxury Towers - Phase 1",
-    amount: "$180,000",
-    status: "PENDING",
-    version: 1,
-    issueDate: "Jul 26, 2026",
-    dueDate: "Aug 15, 2026",
-    milestone: "2nd Floor Column Reinforcement & Pouring",
-  },
-  {
-    id: "INV-2026-003",
-    project: "Skyline Luxury Towers - Phase 1",
-    amount: "$240,000",
-    status: "PAID",
-    version: 1,
-    issueDate: "Jun 15, 2026",
-    dueDate: "Jun 30, 2026",
-    milestone: "1st Floor Slab Completion & Curing",
-  },
-  {
-    id: "INV-2026-002",
-    project: "Skyline Luxury Towers - Phase 1",
-    amount: "$300,000",
-    status: "VOIDED",
-    version: 1,
-    issueDate: "Mar 15, 2026",
-    dueDate: "Mar 30, 2026",
-    milestone: "Initial Substructure Excavation (Voided for Adjustment)",
-  },
-  {
-    id: "INV-2026-002-v2",
-    project: "Skyline Luxury Towers - Phase 1",
-    amount: "$320,000",
-    status: "PAID",
-    version: 2,
-    issueDate: "Apr 01, 2026",
-    dueDate: "Apr 15, 2026",
-    milestone: "Adjusted Foundation Piling & Excavation (Reissued v2)",
-  },
-];
 
 export default function ClientInvoicesPage() {
   const { showToast } = useToast();
-  const [invoices] = useState(initialInvoices);
+  const [invoices, setInvoices] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
-  const [selectedInvoice, setSelectedInvoice] = useState<typeof initialInvoices[0] | null>(null);
+  const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+
+  const fetchInvoices = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/invoices");
+      const json = await res.json();
+      if (json.success && json.data) {
+        setInvoices(json.data);
+      }
+    } catch (err) {
+      showToast("Error loading live invoices", "error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchInvoices();
+  }, []);
 
   const filteredInvoices = invoices.filter((inv) => {
     const matchesSearch =
       inv.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      inv.milestone.toLowerCase().includes(searchQuery.toLowerCase());
+      (inv.project?.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (inv.notes || "").toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === "ALL" || inv.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-  const totalInvoiced = "$1,040,000";
-  const paidAmount = "$560,000";
-  const pendingAmount = "$180,000";
+  const totalInvoiced = invoices.reduce((acc, inv) => acc + Number(inv.amount || 0), 0);
+  const paidAmount = invoices
+    .filter((inv) => inv.status === "PAID")
+    .reduce((acc, inv) => acc + Number(inv.amount || 0), 0);
+  const pendingAmount = invoices
+    .filter((inv) => inv.status === "PENDING" || inv.status === "SENT")
+    .reduce((acc, inv) => acc + Number(inv.amount || 0), 0);
+
 
   return (
     <div className="flex min-h-screen bg-slate-950 text-slate-100 font-sans">
@@ -112,15 +96,15 @@ export default function ClientInvoicesPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             <div className="bg-slate-900/60 p-5 rounded-2xl border border-slate-800 backdrop-blur-md">
               <span className="text-xs font-bold text-slate-400 uppercase">Total Invoiced</span>
-              <p className="text-2xl font-bold text-white mt-2">{totalInvoiced}</p>
+              <p className="text-2xl font-bold text-white mt-2">${totalInvoiced.toLocaleString()}</p>
             </div>
             <div className="bg-slate-900/60 p-5 rounded-2xl border border-slate-800 backdrop-blur-md">
               <span className="text-xs font-bold text-emerald-400 uppercase">Paid Total</span>
-              <p className="text-2xl font-bold text-emerald-400 mt-2">{paidAmount}</p>
+              <p className="text-2xl font-bold text-emerald-400 mt-2">${paidAmount.toLocaleString()}</p>
             </div>
             <div className="bg-slate-900/60 p-5 rounded-2xl border border-slate-800 backdrop-blur-md">
               <span className="text-xs font-bold text-amber-400 uppercase">Pending Due</span>
-              <p className="text-2xl font-bold text-amber-400 mt-2">{pendingAmount}</p>
+              <p className="text-2xl font-bold text-amber-400 mt-2">${pendingAmount.toLocaleString()}</p>
             </div>
           </div>
 
@@ -179,37 +163,45 @@ export default function ClientInvoicesPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/60">
-                  {filteredInvoices.map((inv) => (
-                    <tr key={inv.id} className="hover:bg-slate-800/40 transition-colors">
-                      <td className="py-3.5 px-4 font-mono font-semibold text-amber-400">{inv.id}</td>
-                      <td className="py-3.5 px-4 font-bold text-slate-300">v{inv.version}.0</td>
-                      <td className="py-3.5 px-4 text-slate-300 max-w-xs truncate">{inv.milestone}</td>
-                      <td className="py-3.5 px-4 text-slate-400">{inv.issueDate}</td>
-                      <td className="py-3.5 px-4 text-slate-400">{inv.dueDate}</td>
-                      <td className="py-3.5 px-4 font-bold text-white">{inv.amount}</td>
-                      <td className="py-3.5 px-4 text-center">
-                        <span
-                          className={`px-3 py-1 rounded-full text-[10px] font-bold border ${
-                            inv.status === "PAID"
-                              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                              : inv.status === "PENDING"
-                              ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                              : "bg-rose-500/10 text-rose-400 border-rose-500/20 line-through"
-                          }`}
-                        >
-                          {inv.status}
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-4 text-right">
-                        <button
-                          onClick={() => setSelectedInvoice(inv)}
-                          className="px-3 py-1.5 bg-slate-800 border border-slate-700 text-slate-200 rounded-xl text-xs font-semibold hover:border-amber-500 transition-all flex items-center gap-1.5 ml-auto"
-                        >
-                          <Download className="w-3.5 h-3.5 text-amber-400" /> Preview PDF
-                        </button>
+                  {filteredInvoices.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className="py-8 text-center text-slate-500 text-xs">
+                        No invoices found in database
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    filteredInvoices.map((inv) => (
+                      <tr key={inv.id} className="hover:bg-slate-800/40 transition-colors">
+                        <td className="py-3.5 px-4 font-mono font-semibold text-amber-400">{inv.id}</td>
+                        <td className="py-3.5 px-4 font-bold text-slate-300">v{inv.version || 1}.0</td>
+                        <td className="py-3.5 px-4 text-slate-300 max-w-xs truncate">{inv.notes || inv.project?.name || "Site Milestone Billing"}</td>
+                        <td className="py-3.5 px-4 text-slate-400">{new Date(inv.createdAt).toLocaleDateString()}</td>
+                        <td className="py-3.5 px-4 text-slate-400">{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString() : "—"}</td>
+                        <td className="py-3.5 px-4 font-bold text-white">${Number(inv.amount || 0).toLocaleString()}</td>
+                        <td className="py-3.5 px-4 text-center">
+                          <span
+                            className={`px-3 py-1 rounded-full text-[10px] font-bold border ${
+                              inv.status === "PAID"
+                                ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                                : inv.status === "PENDING" || inv.status === "SENT"
+                                ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                                : "bg-rose-500/10 text-rose-400 border-rose-500/20 line-through"
+                            }`}
+                          >
+                            {inv.status}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4 text-right">
+                          <button
+                            onClick={() => setSelectedInvoice(inv)}
+                            className="px-3 py-1.5 bg-slate-800 border border-slate-700 text-slate-200 rounded-xl text-xs font-semibold hover:border-amber-500 transition-all flex items-center gap-1.5 ml-auto"
+                          >
+                            <Download className="w-3.5 h-3.5 text-amber-400" /> Preview PDF
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -221,17 +213,18 @@ export default function ClientInvoicesPage() {
               <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-4 shadow-2xl">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-bold text-white">Invoice Statement Preview</h3>
-                  <span className="font-mono text-xs font-bold text-amber-400">v{selectedInvoice.version}.0</span>
+                  <span className="font-mono text-xs font-bold text-amber-400">v{selectedInvoice.version || 1}.0</span>
                 </div>
 
                 <div className="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3 text-xs">
                   <div className="flex justify-between"><span>Invoice ID:</span> <strong className="font-mono text-white">{selectedInvoice.id}</strong></div>
-                  <div className="flex justify-between"><span>Milestone Scope:</span> <strong className="text-slate-200">{selectedInvoice.milestone}</strong></div>
-                  <div className="flex justify-between"><span>Issue Date:</span> <span className="text-slate-400">{selectedInvoice.issueDate}</span></div>
-                  <div className="flex justify-between"><span>Due Date:</span> <span className="text-slate-400">{selectedInvoice.dueDate}</span></div>
-                  <div className="flex justify-between border-t border-slate-800 pt-2"><span>Total Amount:</span> <strong className="text-amber-400 font-bold">{selectedInvoice.amount}</strong></div>
+                  <div className="flex justify-between"><span>Milestone Scope:</span> <strong className="text-slate-200">{selectedInvoice.notes || selectedInvoice.project?.name || "Construction Milestone"}</strong></div>
+                  <div className="flex justify-between"><span>Issue Date:</span> <span className="text-slate-400">{new Date(selectedInvoice.createdAt).toLocaleDateString()}</span></div>
+                  <div className="flex justify-between"><span>Due Date:</span> <span className="text-slate-400">{selectedInvoice.dueDate ? new Date(selectedInvoice.dueDate).toLocaleDateString() : "—"}</span></div>
+                  <div className="flex justify-between border-t border-slate-800 pt-2"><span>Total Amount:</span> <strong className="text-amber-400 font-bold">${Number(selectedInvoice.amount || 0).toLocaleString()}</strong></div>
                   <div className="flex justify-between"><span>Status:</span> <strong className="text-emerald-400">{selectedInvoice.status}</strong></div>
                 </div>
+
 
                 <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
                   <button

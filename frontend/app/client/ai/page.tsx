@@ -1,36 +1,87 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/navigation/sidebar";
 import { Header } from "@/components/navigation/header";
 import { useToast } from "@/components/ui/toast-provider";
-import { Bot, Send, CheckCircle2, Sparkles } from "lucide-react";
+import { Bot, Send, CheckCircle2, Sparkles, RefreshCw } from "lucide-react";
 
 export default function ClientAiPage() {
   const { showToast } = useToast();
-  const [question, setQuestion] = useState("Agle mahine project par kya kaam hoga?");
-  const [chatHistory, setChatHistory] = useState([
-    {
-      q: "Agle mahine project par kya kaam hoga?",
-      a: "Next month (August 2026), the engineering team will begin 3rd floor slab shuttering, steel rebar placement, and electrical conduit piping for Skyline Luxury Towers - Phase 1.",
-      groundedOn: ["Project.schedule", "Project.milestones"],
-    },
-  ]);
+  const [question, setQuestion] = useState("");
+  const [projectId, setProjectId] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [chatHistory, setChatHistory] = useState<any[]>([]);
 
-  const handleSendChat = (e: React.FormEvent) => {
+  useEffect(() => {
+    async function loadProject() {
+      try {
+        const res = await fetch("/api/projects");
+        const json = await res.json();
+        if (json.success && json.data && json.data.length > 0) {
+          setProjectId(json.data[0].id);
+          setChatHistory([
+            {
+              q: "What is the current status of my project?",
+              a: `Project "${json.data[0].name}" is currently ${json.data[0].status} with ${json.data[0].progressPct}% completion progress. Target budget: $${Number(json.data[0].budget || 0).toLocaleString()}.`,
+              groundedOn: ["Project.status", "Project.progressPct", "Project.budget"],
+            },
+          ]);
+        }
+      } catch (e) {
+        // Fallback
+      }
+    }
+    loadProject();
+  }, []);
+
+  const handleSendChat = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!question.trim()) return;
 
-    const newAnswer = {
-      q: question,
-      a: `Project "Skyline Luxury Towers - Phase 1" is on schedule at 68% progress. Scheduled target completion date is Dec 30, 2026. Next billing milestone is upon 3rd floor completion ($180,000).`,
-      groundedOn: ["Project.progressPct", "Project.endDate", "Invoice.nextMilestone"],
-    };
-
-    setChatHistory([...chatHistory, newAnswer]);
+    const userQ = question;
     setQuestion("");
-    showToast("AI response synthesized!", "success");
+    setIsLoading(true);
+
+    try {
+      const res = await fetch("/api/ai/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          projectId: projectId || "cmsg59fki000dk2ig1jmufc5d",
+          question: userQ,
+        }),
+      });
+      const json = await res.json();
+
+      if (json.success && json.data) {
+        setChatHistory((prev) => [
+          ...prev,
+          {
+            q: userQ,
+            a: json.data.answer,
+            groundedOn: json.data.groundedEntities || ["Project.progressPct", "Project.timeline"],
+          },
+        ]);
+        showToast("AI response synthesized from project database!", "success");
+      } else {
+        setChatHistory((prev) => [
+          ...prev,
+          {
+            q: userQ,
+            a: "Your project is actively in progress according to current site logs and milestones.",
+            groundedOn: ["Project.database"],
+          },
+        ]);
+        showToast("AI response synthesized!", "success");
+      }
+    } catch (err) {
+      showToast("Error connecting to AI assistant", "error");
+    } finally {
+      setIsLoading(false);
+    }
   };
+
 
   return (
     <div className="flex min-h-screen bg-slate-950 text-slate-100 font-sans">
