@@ -22,26 +22,35 @@ import {
   LayoutDashboard,
   ArrowRight,
   Receipt,
-  FileCode2,
-  Database,
+  FileText,
   Lock,
   HelpCircle,
-  Copy,
-  Check,
-  Server,
   Zap,
   Bot,
   Building2,
-  Terminal,
-  ExternalLink,
+  Truck,
+  Package,
+  Calendar,
+  CreditCard,
+  QrCode,
+  DollarSign,
+  UserCheck,
+  Download,
+  Share2,
+  Sun,
+  Moon,
+  MessageCircle,
+  Eye,
+  PlusCircle,
+  Sliders,
+  Compass,
 } from "lucide-react";
 
 export default function DocsPage() {
   const router = useRouter();
   const { showToast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTopic, setActiveTopic] = useState<string>("getting-started");
-  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const [activeTopic, setActiveTopic] = useState<string>("user-onboarding");
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isPortalsDropdownOpen, setIsPortalsDropdownOpen] = useState(false);
@@ -56,25 +65,18 @@ export default function DocsPage() {
     }
   };
 
-  const copyToClipboard = (text: string, id: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedCode(id);
-    showToast("Command copied to clipboard!", "success");
-    setTimeout(() => setCopiedCode(null), 2000);
-  };
-
   const topics = [
-    { id: "getting-started", name: "Quickstart & Setup", icon: Zap, badge: "Start Here" },
-    { id: "admin-guide", name: "Company Admin Guide", icon: Building2, badge: "Core" },
-    { id: "engineer-guide", name: "Site Engineer Field Guide", icon: HardHat, badge: "Mobile" },
-    { id: "client-guide", name: "Client Transparency Portal", icon: Users, badge: "Client" },
-    { id: "super-admin", name: "Super Admin Command Center", icon: Crown, badge: "Owner" },
-    { id: "custom-fields", name: "Custom Production Fields", icon: SlidersHorizontal, badge: "Flexible" },
-    { id: "ai-studio", name: "AI Intelligence Studio", icon: Bot, badge: "AI" },
-    { id: "api-reference", name: "REST API Reference", icon: Server, badge: "25+ APIs" },
-    { id: "database-schema", name: "Database & Prisma Schema", icon: Database, badge: "PostgreSQL" },
-    { id: "security-rbac", name: "Security & RBAC Matrix", icon: Lock, badge: "Zero Leakage" },
-    { id: "faq", name: "FAQs & Troubleshooting", icon: HelpCircle, badge: "Support" },
+    { id: "user-onboarding", name: "1. Account & Login Guide", icon: UserCheck, badge: "Start Here" },
+    { id: "admin-dashboard", name: "2. Admin Dashboard & Projects", icon: Building2, badge: "Admin" },
+    { id: "materials-suppliers", name: "3. Materials & Suppliers", icon: Package, badge: "Inventory" },
+    { id: "quotations-invoices", name: "4. Quotations, Invoices & Payments", icon: Receipt, badge: "Billing" },
+    { id: "payroll-attendance", name: "5. Attendance & Staff Payroll", icon: Calendar, badge: "Payroll" },
+    { id: "engineer-portal", name: "6. Site Engineer Field Portal", icon: HardHat, badge: "Site Field" },
+    { id: "client-portal", name: "7. Client Transparency Portal", icon: Users, badge: "Client" },
+    { id: "custom-fields", name: "8. Custom Production Fields", icon: SlidersHorizontal, badge: "Settings" },
+    { id: "ai-studio", name: "9. AI Studio & Estimations", icon: Bot, badge: "AI Tools" },
+    { id: "super-admin", name: "10. Owner Portal (Super Admin)", icon: Crown, badge: "Owner" },
+    { id: "tips-tricks", name: "11. PDF, WhatsApp & Tips", icon: Share2, badge: "Helpful" },
   ];
 
   const filteredTopics = topics.filter((t) =>
@@ -103,7 +105,7 @@ export default function DocsPage() {
             Help Center
           </Link>
           <Link href="/docs" className="text-xs font-bold text-amber-400 border-b-2 border-amber-400 pb-0.5">
-            Documentation
+            User Guide (Docs)
           </Link>
 
           {/* Portals Dropdown */}
@@ -127,7 +129,7 @@ export default function DocsPage() {
                   </div>
                   <div>
                     <p className="text-slate-100 flex items-center gap-1">Super Admin <span className="text-[10px] bg-amber-500/20 text-amber-400 px-1.5 py-0.2 rounded font-mono">Owner</span></p>
-                    <p className="text-[10px] text-slate-400 font-normal">Global multi-tenant metrics</p>
+                    <p className="text-[10px] text-slate-400 font-normal">Global platform overview</p>
                   </div>
                 </button>
 
@@ -140,7 +142,7 @@ export default function DocsPage() {
                   </div>
                   <div>
                     <p className="text-slate-100">Admin Dashboard</p>
-                    <p className="text-[10px] text-slate-400 font-normal">Projects, payroll, materials & billing</p>
+                    <p className="text-[10px] text-slate-400 font-normal">Projects, payroll, inventory & billing</p>
                   </div>
                 </button>
 
@@ -153,7 +155,7 @@ export default function DocsPage() {
                   </div>
                   <div>
                     <p className="text-slate-100">Engineer Field Portal</p>
-                    <p className="text-[10px] text-slate-400 font-normal">QR attendance & AI site reports</p>
+                    <p className="text-[10px] text-slate-400 font-normal">QR attendance & AI daily reports</p>
                   </div>
                 </button>
 
@@ -165,7 +167,7 @@ export default function DocsPage() {
                     <Users className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-slate-100">Client Transparency</p>
+                    <p className="text-slate-100">Client Portal</p>
                     <p className="text-[10px] text-slate-400 font-normal">Milestones, PDF invoices & AI chat</p>
                   </div>
                 </button>
@@ -197,7 +199,7 @@ export default function DocsPage() {
           <Link href="/" onClick={() => setIsMobileNavOpen(false)} className="block text-sm font-semibold text-slate-200 py-1">Home</Link>
           <Link href="/about" onClick={() => setIsMobileNavOpen(false)} className="block text-sm font-semibold text-slate-200 py-1">About Us</Link>
           <Link href="/help" onClick={() => setIsMobileNavOpen(false)} className="block text-sm font-semibold text-slate-200 py-1">Help Center</Link>
-          <Link href="/docs" onClick={() => setIsMobileNavOpen(false)} className="block text-sm font-bold text-amber-400 py-1">Documentation</Link>
+          <Link href="/docs" onClick={() => setIsMobileNavOpen(false)} className="block text-sm font-bold text-amber-400 py-1">User Guide (Docs)</Link>
           <div className="pt-2 border-t border-slate-800 space-y-2">
             <button
               onClick={() => { setIsMobileNavOpen(false); handlePortalNavigation("/admin/dashboard"); }}
@@ -215,18 +217,18 @@ export default function DocsPage() {
         </div>
       )}
 
-      {/* Main Documentation Area */}
+      {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        {/* Hero Header */}
+        {/* Header Title & Live Search */}
         <div className="text-center max-w-3xl mx-auto space-y-4 mb-8 sm:mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold font-mono">
-            <BookOpen className="w-3.5 h-3.5" /> SYSTEM & USER MANUAL v1.0
+            <BookOpen className="w-3.5 h-3.5" /> COMPLETE USER & WEBSITE GUIDE
           </div>
           <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
-            AI Construction ERP Documentation
+            How to Use AI Construction ERP
           </h1>
           <p className="text-sm sm:text-base text-slate-400 leading-relaxed">
-            Everything you need to master multi-tenant construction management, field operations, AI daily reporting, automated billing, and REST APIs.
+            Step-by-step visual instructions on how to navigate the website, manage construction projects, track inventory, issue invoices, run AI daily reports, and calculate payroll.
           </p>
 
           {/* Quick Search */}
@@ -236,7 +238,7 @@ export default function DocsPage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search documentation (e.g., QR attendance, invoices, API, custom fields)..."
+              placeholder="Search website guides (e.g., how to create invoice, QR scan, add materials)..."
               className="w-full bg-slate-900 border border-slate-800 rounded-2xl pl-10 pr-4 py-3 text-xs sm:text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500/50 transition-all shadow-inner"
             />
           </div>
@@ -247,7 +249,7 @@ export default function DocsPage() {
           {/* Left Sidebar Topic Navigation */}
           <div className="lg:col-span-1 bg-slate-900/80 border border-slate-800 rounded-3xl p-4 space-y-2 sticky top-20 shadow-xl overflow-x-auto">
             <div className="px-2 py-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider font-mono">
-              Documentation Topics
+              User Guide Modules
             </div>
             <div className="flex lg:flex-col gap-1.5 overflow-x-auto pb-2 lg:pb-0">
               {filteredTopics.map((topic) => {
@@ -282,211 +284,336 @@ export default function DocsPage() {
 
           {/* Right Topic Content Body */}
           <div className="lg:col-span-3 bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-8 shadow-2xl">
-            {/* 1. Quickstart & Setup */}
-            {activeTopic === "getting-started" && (
+            {/* 1. Account & Login Guide */}
+            {activeTopic === "user-onboarding" && (
               <div className="space-y-6">
                 <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
                   <div className="p-2.5 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                    <Zap className="w-6 h-6" />
+                    <UserCheck className="w-6 h-6" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-white">Quickstart & Local Installation</h2>
-                    <p className="text-xs text-slate-400">Get AI Construction ERP running locally in under 3 minutes.</p>
+                    <h2 className="text-xl font-bold text-white">1. Account Creation, Login & Profile Management</h2>
+                    <p className="text-xs text-slate-400">How to register your construction business and manage your secure account.</p>
                   </div>
                 </div>
 
-                <div className="space-y-4 text-xs sm:text-sm text-slate-300 leading-relaxed">
-                  <h3 className="text-base font-bold text-white flex items-center gap-2">
-                    <Terminal className="w-4 h-4 text-amber-400" /> Step 1: Clone Repository & Install Dependencies
-                  </h3>
-                  <div className="relative bg-slate-950 rounded-2xl p-4 border border-slate-800 font-mono text-xs text-emerald-400">
-                    <code>
-                      git clone https://github.com/SidraRaza/ai-construction-erp.git<br />
-                      cd ai-construction-erp/frontend<br />
-                      npm install
-                    </code>
-                    <button
-                      onClick={() => copyToClipboard("git clone https://github.com/SidraRaza/ai-construction-erp.git\ncd ai-construction-erp/frontend\nnpm install", "c1")}
-                      className="absolute right-3 top-3 p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300"
-                    >
-                      {copiedCode === "c1" ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                    </button>
+                <div className="space-y-5 text-xs sm:text-sm text-slate-300 leading-relaxed">
+                  <div className="p-5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-3">
+                    <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                      <PlusCircle className="w-4 h-4 text-amber-400" /> How to Register a New Company Account
+                    </h4>
+                    <ol className="list-decimal pl-5 space-y-2 text-slate-300">
+                      <li>Click the amber <strong>&quot;Register / Login&quot;</strong> button in the top-right corner of the website.</li>
+                      <li>In the popup modal, select the <strong>&quot;Register Company&quot;</strong> tab.</li>
+                      <li>Type your <strong>Company Name</strong> (e.g. <em>Vertex Construction Corp</em>).</li>
+                      <li>Enter your <strong>Full Name</strong>, your <strong>Email</strong>, and create a secure <strong>Password</strong>.</li>
+                      <li>Click <strong>&quot;Create Company Account&quot;</strong>.</li>
+                      <li>You will instantly be logged in to your private company dashboard with full Admin capabilities!</li>
+                    </ol>
                   </div>
 
-                  <h3 className="text-base font-bold text-white flex items-center gap-2 pt-2">
-                    <Database className="w-4 h-4 text-amber-400" /> Step 2: Configure Environment Variables
-                  </h3>
-                  <p className="text-xs text-slate-400">Create a <code>frontend/.env</code> file with your PostgreSQL URL:</p>
-                  <div className="relative bg-slate-950 rounded-2xl p-4 border border-slate-800 font-mono text-xs text-slate-200">
-                    <code>
-                      DATABASE_URL=&quot;postgresql://user:pass@ep-cool-db.neon.tech/neondb?sslmode=require&quot;<br />
-                      NEXT_PUBLIC_SITE_URL=&quot;http://localhost:3000&quot;
-                    </code>
+                  <div className="p-5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-3">
+                    <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                      <Lock className="w-4 h-4 text-emerald-400" /> Auto-Safety 1-Hour Session Timer
+                    </h4>
+                    <p className="text-xs text-slate-400">
+                      For site safety and financial security, your session remains active for 1 hour. If inactive, the system securely locks to prevent unauthorized changes on open site laptops or phones. You can easily re-enter your password to continue working.
+                    </p>
                   </div>
 
-                  <h3 className="text-base font-bold text-white flex items-center gap-2 pt-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Step 3: Seed Database & Run Dev Server
-                  </h3>
-                  <div className="relative bg-slate-950 rounded-2xl p-4 border border-slate-800 font-mono text-xs text-emerald-400">
-                    <code>
-                      npx prisma db push<br />
-                      npx tsx prisma/seed.ts<br />
-                      npm run dev
-                    </code>
-                    <button
-                      onClick={() => copyToClipboard("npx prisma db push\nnpx tsx prisma/seed.ts\nnpm run dev", "c2")}
-                      className="absolute right-3 top-3 p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300"
-                    >
-                      {copiedCode === "c2" ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                    </button>
+                  <div className="p-5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-3">
+                    <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                      <Sliders className="w-4 h-4 text-blue-400" /> How to Edit Your Profile & Company Information
+                    </h4>
+                    <ol className="list-decimal pl-5 space-y-2 text-slate-300">
+                      <li>Click your profile avatar/name in the top header.</li>
+                      <li>Select <strong>&quot;Edit Profile & Company&quot;</strong> from the dropdown menu.</li>
+                      <li>Update your phone number, official company tax number, office address, or country.</li>
+                      <li>Click <strong>&quot;Save Changes&quot;</strong>.</li>
+                    </ol>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* 2. Company Admin Guide */}
-            {activeTopic === "admin-guide" && (
+            {/* 2. Admin Dashboard & Projects */}
+            {activeTopic === "admin-dashboard" && (
               <div className="space-y-6">
                 <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
                   <div className="p-2.5 rounded-2xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
                     <Building2 className="w-6 h-6" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-white">Company Admin & Contractor Guide</h2>
-                    <p className="text-xs text-slate-400">Manage construction projects, materials, procurement, quotations, and staff.</p>
+                    <h2 className="text-xl font-bold text-white">2. Admin Dashboard & Project Management</h2>
+                    <p className="text-xs text-slate-400">How to create construction projects, allocate budgets, and assign site teams.</p>
                   </div>
                 </div>
 
                 <div className="space-y-5 text-xs sm:text-sm text-slate-300 leading-relaxed">
-                  <div className="p-4 bg-slate-950/60 rounded-2xl border border-slate-800 space-y-2">
-                    <h4 className="font-bold text-white flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-amber-400" /> 1. Creating and Managing Projects
+                  <div className="p-5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-3">
+                    <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                      <LayoutDashboard className="w-4 h-4 text-amber-400" /> Reading the Executive Overview
                     </h4>
                     <p className="text-xs text-slate-400">
-                      Navigate to <code>/admin/projects</code> and click <strong>&quot;+ Create New Project&quot;</strong>. Enter project title, capital budget ($), target completion dates, and priority level. You can assign site engineers and workforce leads directly to project teams.
+                      Navigate to <code>/admin/dashboard</code>. The top KPI cards summarize your <strong>Active Projects</strong>, <strong>Workers On Site Today</strong>, <strong>Material Alerts</strong>, and <strong>Total Invoiced Revenue</strong>. The interactive charts show monthly cashflow and project burn rates in real-time.
                     </p>
                   </div>
 
-                  <div className="p-4 bg-slate-950/60 rounded-2xl border border-slate-800 space-y-2">
-                    <h4 className="font-bold text-white flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-amber-400" /> 2. Material Inventory & Reorder Thresholds
+                  <div className="p-5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-3">
+                    <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                      <PlusCircle className="w-4 h-4 text-emerald-400" /> How to Create a New Construction Project
                     </h4>
-                    <p className="text-xs text-slate-400">
-                      Monitor Cement, Steel, Sand, and Aggregates in <code>/admin/materials</code>. When stock level reaches or drops below the defined reorder threshold, the system automatically triggers an amber <strong>Low Stock Alert</strong>.
-                    </p>
-                  </div>
-
-                  <div className="p-4 bg-slate-950/60 rounded-2xl border border-slate-800 space-y-2">
-                    <h4 className="font-bold text-white flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-amber-400" /> 3. Quotations, Invoices & Multi-Channel Payments
-                    </h4>
-                    <p className="text-xs text-slate-400">
-                      Generate itemized quotations with custom IDs and initial statuses. When approved, generate immutable versioned invoices (<code>v1.0</code>, <code>v2.0</code>). Record payments with multi-channel support (Cash, Wire Transfer, Bank Cheque, JazzCash, EasyPaisa, Stripe).
-                    </p>
+                    <ol className="list-decimal pl-5 space-y-2 text-slate-300">
+                      <li>Click <strong>&quot;Projects&quot;</strong> in the left sidebar menu (or visit <code>/admin/projects</code>).</li>
+                      <li>Click the top-right amber button <strong>&quot;+ Create New Project&quot;</strong>.</li>
+                      <li>Fill out the project details:
+                        <ul className="list-disc pl-5 mt-1 text-slate-400 space-y-1">
+                          <li><strong>Project Name:</strong> (e.g. <em>Skyline Luxury Towers - Phase 1</em>)</li>
+                          <li><strong>Total Capital Budget ($):</strong> (e.g. <em>$1,500,000</em>)</li>
+                          <li><strong>Priority:</strong> Choose <em>Low, Medium, High, or Urgent</em>.</li>
+                          <li><strong>Start & Target Completion Dates</strong>.</li>
+                        </ul>
+                      </li>
+                      <li>Click <strong>&quot;Save Project&quot;</strong>.</li>
+                      <li>Click on any project card to assign Site Engineers, Foreman Leads, and Mason Supervisors to the site team!</li>
+                    </ol>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* 3. Site Engineer Field Guide */}
-            {activeTopic === "engineer-guide" && (
+            {/* 3. Materials & Suppliers */}
+            {activeTopic === "materials-suppliers" && (
+              <div className="space-y-6">
+                <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
+                  <div className="p-2.5 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                    <Package className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-white">3. Materials Inventory & Verified Suppliers</h2>
+                    <p className="text-xs text-slate-400">How to track cement, steel rebars, sand, and manage vendor ratings.</p>
+                  </div>
+                </div>
+
+                <div className="space-y-5 text-xs sm:text-sm text-slate-300 leading-relaxed">
+                  <div className="p-5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-3">
+                    <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                      <Package className="w-4 h-4 text-amber-400" /> How to Add Materials & Set Reorder Alerts
+                    </h4>
+                    <ol className="list-decimal pl-5 space-y-2 text-slate-300">
+                      <li>Go to <strong>&quot;Materials Inventory&quot;</strong> in the sidebar (<code>/admin/materials</code>).</li>
+                      <li>Click <strong>&quot;+ Add Material&quot;</strong>.</li>
+                      <li>Enter item name (e.g. <em>Portland Cement Grade 53</em>, <em>Grade 60 Steel Rebars</em>).</li>
+                      <li>Select the unit (<em>Bags, Tons, Cubic Meters, Meters, Pieces</em>).</li>
+                      <li>Set your <strong>Initial Stock Quantity</strong> and <strong>Reorder Safety Threshold</strong> (e.g. 100 bags).</li>
+                      <li>Whenever stock falls below your threshold, the system displays an amber <strong>&quot;Low Stock Alert&quot;</strong> so your site never runs out of concrete or steel.</li>
+                    </ol>
+                  </div>
+
+                  <div className="p-5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-3">
+                    <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                      <Truck className="w-4 h-4 text-blue-400" /> Managing Suppliers & Quality Ratings
+                    </h4>
+                    <ol className="list-decimal pl-5 space-y-2 text-slate-300">
+                      <li>Go to <strong>&quot;Suppliers & Procurement&quot;</strong> (<code>/admin/suppliers</code>).</li>
+                      <li>Click <strong>&quot;+ Add Supplier&quot;</strong>.</li>
+                      <li>Enter vendor company name, contact person, phone number, and category (<em>Steel, Cement, Aggregates, Electrical, Equipment</em>).</li>
+                      <li>Rate the supplier on a 5-star scale to maintain high procurement quality for your firm.</li>
+                    </ol>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 4. Quotations, Invoices & Payments */}
+            {activeTopic === "quotations-invoices" && (
+              <div className="space-y-6">
+                <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
+                  <div className="p-2.5 rounded-2xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <Receipt className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-white">4. Quotations, Invoices & Multi-Channel Payments</h2>
+                    <p className="text-xs text-slate-400">How to create estimates, generate immutable invoices, and record payments.</p>
+                  </div>
+                </div>
+
+                <div className="space-y-5 text-xs sm:text-sm text-slate-300 leading-relaxed">
+                  <div className="p-5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-3">
+                    <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-amber-400" /> How to Create a Quotation
+                    </h4>
+                    <ol className="list-decimal pl-5 space-y-2 text-slate-300">
+                      <li>Go to <strong>&quot;Quotations & Invoices&quot;</strong> in the sidebar (<code>/admin/invoices</code>).</li>
+                      <li>Click <strong>&quot;+ Create Quotation&quot;</strong>.</li>
+                      <li>Choose the client and project, add line items (e.g. <em>Site Excavation, Piling, Shuttering</em>), specify quantity and unit rates.</li>
+                      <li>Set status to <em>DRAFT, SENT, or APPROVED</em>.</li>
+                    </ol>
+                  </div>
+
+                  <div className="p-5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-3">
+                    <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                      <Receipt className="w-4 h-4 text-emerald-400" /> Issuing Invoices & Financial Versioning
+                    </h4>
+                    <p className="text-xs text-slate-400">
+                      When a quotation is approved, you can click <strong>&quot;Issue Invoice&quot;</strong>. The invoice receives an immutable version number (<code>v1.0</code>). If an invoice is reissued or modified, it advances to <code>v2.0</code>, keeping earlier records intact for financial audit compliance.
+                    </p>
+                  </div>
+
+                  <div className="p-5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-3">
+                    <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                      <CreditCard className="w-4 h-4 text-purple-400" /> How to Record a Client Payment
+                    </h4>
+                    <ol className="list-decimal pl-5 space-y-2 text-slate-300">
+                      <li>On the invoice row, click the green <strong>&quot;Record Payment&quot;</strong> button.</li>
+                      <li>Enter the received amount (e.g. $350,000).</li>
+                      <li>Select the Payment Channel:
+                        <ul className="list-disc pl-5 mt-1 text-slate-400 space-y-1">
+                          <li><strong>Cash:</strong> Direct on-site cash transaction.</li>
+                          <li><strong>Bank Wire Transfer:</strong> Interbank online transfer with transaction reference #.</li>
+                          <li><strong>Bank Cheque / Pay Order:</strong> Cheque number and deposit date.</li>
+                          <li><strong>JazzCash / EasyPaisa:</strong> Mobile wallet payments.</li>
+                          <li><strong>Stripe:</strong> Credit or debit card POS.</li>
+                        </ul>
+                      </li>
+                      <li>Click <strong>&quot;Save Payment&quot;</strong>. The invoice automatically marks as <code>PAID</code>!</li>
+                    </ol>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 5. Attendance & Payroll */}
+            {activeTopic === "payroll-attendance" && (
+              <div className="space-y-6">
+                <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
+                  <div className="p-2.5 rounded-2xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                    <Calendar className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-white">5. Daily Attendance & Staff Payroll</h2>
+                    <p className="text-xs text-slate-400">How to track worker attendance and calculate monthly salaries with deductions.</p>
+                  </div>
+                </div>
+
+                <div className="space-y-5 text-xs sm:text-sm text-slate-300 leading-relaxed">
+                  <div className="p-5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-3">
+                    <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                      <UserCheck className="w-4 h-4 text-amber-400" /> Daily Attendance Oversight
+                    </h4>
+                    <p className="text-xs text-slate-400">
+                      Navigate to <code>/admin/attendance</code>. The top summary cards show <strong>Total Workforce</strong>, <strong>Present Today</strong>, <strong>Late Entries</strong>, and <strong>Absent Workers</strong>. Admins can bulk-mark attendance for full subcontractor teams with 1 click.
+                    </p>
+                  </div>
+
+                  <div className="p-5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-3">
+                    <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                      <DollarSign className="w-4 h-4 text-emerald-400" /> Automated Monthly Payroll Calculation
+                    </h4>
+                    <ol className="list-decimal pl-5 space-y-2 text-slate-300">
+                      <li>Go to <strong>&quot;Staff & Payroll&quot;</strong> (<code>/admin/employees</code>).</li>
+                      <li>Select the month (e.g. <em>August 2026</em>) and click <strong>&quot;Calculate Monthly Payroll&quot;</strong>.</li>
+                      <li>The system computes base salary minus days absent to calculate net salary payouts.</li>
+                      <li>Click <strong>&quot;Print Payroll Statement&quot;</strong> or export to PDF for easy disbursement.</li>
+                    </ol>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 6. Site Engineer Field Portal */}
+            {activeTopic === "engineer-portal" && (
               <div className="space-y-6">
                 <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
                   <div className="p-2.5 rounded-2xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                     <HardHat className="w-6 h-6" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-white">Civil Site Engineer Field Guide</h2>
-                    <p className="text-xs text-slate-400">High-speed field tools optimized for mobile phones and tablet devices.</p>
+                    <h2 className="text-xl font-bold text-white">6. Civil Site Engineer Field Portal</h2>
+                    <p className="text-xs text-slate-400">Mobile and tablet interface for on-site engineers, QR scanning, and AI reporting.</p>
                   </div>
                 </div>
 
                 <div className="space-y-5 text-xs sm:text-sm text-slate-300 leading-relaxed">
-                  <div className="p-4 bg-slate-950/60 rounded-2xl border border-slate-800 space-y-2">
-                    <h4 className="font-bold text-white flex items-center gap-2">
-                      <Bot className="w-4 h-4 text-amber-400" /> 1. AI Daily Site Report Synthesis
+                  <div className="p-5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-3">
+                    <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                      <Bot className="w-4 h-4 text-amber-400" /> How to Generate an AI Daily Site Report
+                    </h4>
+                    <ol className="list-decimal pl-5 space-y-2 text-slate-300">
+                      <li>Log into <code>/engineer/dashboard</code> on your mobile phone or tablet.</li>
+                      <li>In the <strong>&quot;Today&apos;s Site Notes&quot;</strong> text box, type your raw observations (e.g. <em>&quot;Poured 45 cubic meters concrete on 2nd floor columns, 28 masons present, passed slump test, delayed 1 hour due to rain&quot;</em>).</li>
+                      <li>(Optional) Click <strong>&quot;Attach Site Photo&quot;</strong> to snap or upload a picture.</li>
+                      <li>Click the amber button <strong>&quot;Synthesize AI Daily Site Report&quot;</strong>.</li>
+                      <li>The AI instantly formats your raw notes into a formal, structured daily progress report with sections for Executed Work, Material Utilization, Delays, and Tomorrow&apos;s Plan!</li>
+                    </ol>
+                  </div>
+
+                  <div className="p-5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-3">
+                    <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                      <QrCode className="w-4 h-4 text-emerald-400" /> Worker QR Check-In with Duplicate Guard
                     </h4>
                     <p className="text-xs text-slate-400">
-                      Log into <code>/engineer/dashboard</code>. In <strong>Today&apos;s Site Notes</strong>, type rough notes (e.g. <em>&quot;Poured 45m³ concrete on 2nd floor, 28 workers, passed slump test&quot;</em>). Click <strong>&quot;Synthesize AI Daily Site Report&quot;</strong> to generate an executive progress report instantly.
+                      Click <strong>&quot;Scan Worker QR&quot;</strong> to scan worker badge cards. If you scan a worker who was already checked in today, the system alerts you immediately, preventing double attendance.
                     </p>
                   </div>
 
-                  <div className="p-4 bg-slate-950/60 rounded-2xl border border-slate-800 space-y-2">
-                    <h4 className="font-bold text-white flex items-center gap-2">
-                      <ShieldCheck className="w-4 h-4 text-emerald-400" /> 2. Worker QR Attendance & Duplicate Guards
+                  <div className="p-5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-3">
+                    <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                      <Receipt className="w-4 h-4 text-purple-400" /> Logging Site Expenses ($10,000 Safety Cap)
                     </h4>
                     <p className="text-xs text-slate-400">
-                      Click <strong>&quot;Scan Worker QR&quot;</strong> to record worker attendance. If a worker has already marked attendance today, the system triggers a duplicate guard error to eliminate accidental double scans.
-                    </p>
-                  </div>
-
-                  <div className="p-4 bg-slate-950/60 rounded-2xl border border-slate-800 space-y-2">
-                    <h4 className="font-bold text-white flex items-center gap-2">
-                      <Receipt className="w-4 h-4 text-purple-400" /> 3. Capped Field Expense Logging ($10,000 Cap)
-                    </h4>
-                    <p className="text-xs text-slate-400">
-                      Site engineers can log urgent field expenses up to <strong>$10,000</strong> with category and receipt upload. Amounts exceeding $10,000 are blocked and require Company Admin authorization.
+                      Click <strong>&quot;Log Site Expense&quot;</strong> to submit field payments for fuel, equipment repair, or emergency materials up to <strong>$10,000</strong>. Amounts above $10,000 require Company Admin approval.
                     </p>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* 4. Client Guide */}
-            {activeTopic === "client-guide" && (
+            {/* 7. Client Transparency Portal */}
+            {activeTopic === "client-portal" && (
               <div className="space-y-6">
                 <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
                   <div className="p-2.5 rounded-2xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
                     <Users className="w-6 h-6" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-white">Client & Property Investor Guide</h2>
-                    <p className="text-xs text-slate-400">Live milestone transparency, verified PDF statements, and AI project support.</p>
+                    <h2 className="text-xl font-bold text-white">7. Client & Property Investor Portal</h2>
+                    <p className="text-xs text-slate-400">Live milestone progress, PDF statements, and AI project support chat.</p>
                   </div>
                 </div>
 
-                <div className="space-y-4 text-xs sm:text-sm text-slate-300 leading-relaxed">
-                  <div className="p-4 bg-slate-950/60 rounded-2xl border border-slate-800 space-y-2">
-                    <h4 className="font-bold text-white">1. Live Progress Dashboard</h4>
-                    <p className="text-xs text-slate-400">Visit <code>/client/dashboard</code> to view dynamic project completion progress percentages and target completion dates.</p>
+                <div className="space-y-5 text-xs sm:text-sm text-slate-300 leading-relaxed">
+                  <div className="p-5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-3">
+                    <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                      <Eye className="w-4 h-4 text-amber-400" /> 1. Live Project Progress Tracking
+                    </h4>
+                    <p className="text-xs text-slate-400">
+                      Clients navigate to <code>/client/dashboard</code> to view live progress percentages (e.g. 25% completed), milestone completion dates, and project priorities.
+                    </p>
                   </div>
-                  <div className="p-4 bg-slate-950/60 rounded-2xl border border-slate-800 space-y-2">
-                    <h4 className="font-bold text-white">2. Invoices & PDF Statements</h4>
-                    <p className="text-xs text-slate-400">Visit <code>/client/invoices</code> to preview and download tamper-proof PDF billing statements.</p>
-                  </div>
-                  <div className="p-4 bg-slate-950/60 rounded-2xl border border-slate-800 space-y-2">
-                    <h4 className="font-bold text-white">3. Grounded AI Support Assistant</h4>
-                    <p className="text-xs text-slate-400">Visit <code>/client/ai</code> to ask real-time questions regarding site milestones, timelines, and progress.</p>
-                  </div>
-                </div>
-              </div>
-            )}
 
-            {/* 5. Super Admin */}
-            {activeTopic === "super-admin" && (
-              <div className="space-y-6">
-                <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
-                  <div className="p-2.5 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                    <Crown className="w-6 h-6" />
+                  <div className="p-5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-3">
+                    <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                      <Download className="w-4 h-4 text-emerald-400" /> 2. Invoices & PDF Statements
+                    </h4>
+                    <p className="text-xs text-slate-400">
+                      In <code>/client/invoices</code>, clients can view paid and pending invoices. Click <strong>&quot;Preview PDF&quot;</strong> to inspect or download official billing statements.
+                    </p>
                   </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-white">Super Admin Command Center</h2>
-                    <p className="text-xs text-slate-400">Exclusive platform owner dashboard overseeing all tenant accounts globally.</p>
-                  </div>
-                </div>
 
-                <div className="p-4 bg-slate-950/80 rounded-2xl border border-amber-500/30 text-xs text-slate-300 space-y-2">
-                  <p className="font-bold text-amber-400 flex items-center gap-2">
-                    <Lock className="w-4 h-4" /> Accessing the Super Admin Vault:
-                  </p>
-                  <p className="text-slate-400 leading-relaxed">
-                    Navigate to <code>/admin/super-admin</code>. Enter the Super Admin password to unlock global tenant monitoring, subscription plan tiers, user counts, and feedback inbox logs.
-                  </p>
+                  <div className="p-5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-3">
+                    <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                      <Bot className="w-4 h-4 text-purple-400" /> 3. Grounded AI Support Chat
+                    </h4>
+                    <p className="text-xs text-slate-400">
+                      Clients can open <code>/client/ai</code> and ask: <em>&quot;When will the foundation piling be completed?&quot;</em> The AI reads live site logs and gives an accurate, plain-language answer.
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* 6. Custom Production Fields */}
+            {/* 8. Custom Production Fields */}
             {activeTopic === "custom-fields" && (
               <div className="space-y-6">
                 <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
@@ -494,28 +621,37 @@ export default function DocsPage() {
                     <SlidersHorizontal className="w-6 h-6" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-white">Self-Configurable Custom Production Fields</h2>
-                    <p className="text-xs text-slate-400">Create bespoke data capture schemas without writing custom code.</p>
+                    <h2 className="text-xl font-bold text-white">8. Custom Production Fields (No Code Required)</h2>
+                    <p className="text-xs text-slate-400">How to create custom data fields tailored to your unique construction business.</p>
                   </div>
                 </div>
 
-                <div className="space-y-3 text-xs sm:text-sm text-slate-300">
-                  <p>Companies can define custom attributes in <code>/admin/custom-fields</code>:</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="p-3 bg-slate-950 rounded-xl border border-slate-800">
-                      <span className="font-bold text-white">TEXT / NUMBER</span>
-                      <p className="text-[11px] text-slate-400">Batch Truck IDs, Slump tests, concrete temperature (°C)</p>
-                    </div>
-                    <div className="grid grid-cols-1 gap-2 p-3 bg-slate-950 rounded-xl border border-slate-800">
-                      <span className="font-bold text-white">SELECT / CHECKBOX</span>
-                      <p className="text-[11px] text-slate-400">Dropdown options and engineer quality sign-off flags</p>
-                    </div>
+                <div className="space-y-5 text-xs sm:text-sm text-slate-300 leading-relaxed">
+                  <div className="p-5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-3">
+                    <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                      <PlusCircle className="w-4 h-4 text-amber-400" /> How to Create Custom Fields
+                    </h4>
+                    <ol className="list-decimal pl-5 space-y-2 text-slate-300">
+                      <li>Go to <strong>&quot;Custom Production Fields&quot;</strong> in the sidebar (<code>/admin/custom-fields</code>).</li>
+                      <li>Click <strong>&quot;+ Create Custom Field&quot;</strong>.</li>
+                      <li>Enter the Field Label (e.g. <em>Concrete Pour Temperature (°C)</em>, <em>Slump Test Result</em>, <em>Excavator Batch #</em>).</li>
+                      <li>Choose the Field Type:
+                        <ul className="list-disc pl-5 mt-1 text-slate-400 space-y-1">
+                          <li><strong>TEXT:</strong> General names or codes.</li>
+                          <li><strong>NUMBER:</strong> Quantities, temperatures, cubic meters.</li>
+                          <li><strong>DATE:</strong> Inspection deadlines or concrete curing dates.</li>
+                          <li><strong>SELECT:</strong> Dropdown lists (e.g. <em>Passed, Failed, Retest</em>).</li>
+                          <li><strong>CHECKBOX:</strong> Safety check flags (e.g. <em>Lead Inspector Approved</em>).</li>
+                        </ul>
+                      </li>
+                      <li>Click <strong>&quot;Create Field&quot;</strong>. This custom field will now appear on all your site production forms automatically!</li>
+                    </ol>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* 7. AI Studio */}
+            {/* 9. AI Studio */}
             {activeTopic === "ai-studio" && (
               <div className="space-y-6">
                 <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
@@ -523,178 +659,95 @@ export default function DocsPage() {
                     <Bot className="w-6 h-6" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-white">AI Intelligence Studio</h2>
-                    <p className="text-xs text-slate-400">Grounded LLM intelligence pipelines built for construction workflows.</p>
+                    <h2 className="text-xl font-bold text-white">9. AI Intelligence Studio & Cost Estimations</h2>
+                    <p className="text-xs text-slate-400">How to use AI tools for instant budget estimations and quotation drafting.</p>
+                  </div>
+                </div>
+
+                <div className="space-y-5 text-xs sm:text-sm text-slate-300 leading-relaxed">
+                  <div className="p-5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-3">
+                    <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-amber-400" /> AI Project Cost & Timeline Estimator
+                    </h4>
+                    <ol className="list-decimal pl-5 space-y-2 text-slate-300">
+                      <li>Go to <strong>&quot;AI Studio&quot;</strong> (<code>/admin/ai</code>).</li>
+                      <li>Select project size (e.g. <em>5 Marla, 10 Marla, 1 Kanal, or Multi-Story Commercial</em>).</li>
+                      <li>Click <strong>&quot;Estimate Cost & Timeline&quot;</strong>.</li>
+                      <li>The AI calculates material quantities (cement bags, steel tons, sand m³), estimated timeline in days, and total budget breakdown!</li>
+                    </ol>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 10. Super Admin */}
+            {activeTopic === "super-admin" && (
+              <div className="space-y-6">
+                <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
+                  <div className="p-2.5 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                    <Crown className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-white">10. Platform Owner Control Center (Super Admin)</h2>
+                    <p className="text-xs text-slate-400">How platform founder Sidra Raza monitors global platform metrics.</p>
+                  </div>
+                </div>
+
+                <div className="space-y-5 text-xs sm:text-sm text-slate-300 leading-relaxed">
+                  <div className="p-5 bg-slate-950/80 rounded-2xl border border-amber-500/30 space-y-3">
+                    <h4 className="font-bold text-amber-400 text-sm flex items-center gap-2">
+                      <Lock className="w-4 h-4" /> Unlocking the Owner Vault
+                    </h4>
+                    <p className="text-xs text-slate-400">
+                      Navigate to <code>/admin/super-admin</code>. Enter the Super Admin owner credentials. Once inside, you can inspect total registered construction companies, user counts, geographical locations by country, active subscription plans, and user feedback submissions.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 11. Tips & Tricks */}
+            {activeTopic === "tips-tricks" && (
+              <div className="space-y-6">
+                <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
+                  <div className="p-2.5 rounded-2xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <Share2 className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-white">11. PDF Downloads, WhatsApp Sharing & Helpful Tips</h2>
+                    <p className="text-xs text-slate-400">Convenient shortcuts to speed up daily site communication.</p>
                   </div>
                 </div>
 
                 <div className="space-y-4 text-xs sm:text-sm text-slate-300">
-                  <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800">
-                    <h4 className="font-bold text-white mb-1">🤖 1. AI Daily Site Report Formatter</h4>
-                    <p className="text-xs text-slate-400">Synthesizes unstructured engineer field notes into formal progress reports with completed tasks and quality inspections.</p>
+                  <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 flex items-start gap-3">
+                    <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
+                      <MessageCircle className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-white mb-1">1-Click WhatsApp Sharing</h4>
+                      <p className="text-xs text-slate-400">On any quotation or invoice, click <strong>&quot;Share to WhatsApp&quot;</strong> to send an formatted summary directly to your client&apos;s phone.</p>
+                    </div>
                   </div>
-                  <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800">
-                    <h4 className="font-bold text-white mb-1">📐 2. Project Cost & Timeline Estimator</h4>
-                    <p className="text-xs text-slate-400">Calculates estimated materials, labour requirements, and duration for 5 Marla, 10 Marla, 1 Kanal, or commercial projects.</p>
-                  </div>
-                  <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800">
-                    <h4 className="font-bold text-white mb-1">💬 3. Grounded Q&A Assistant</h4>
-                    <p className="text-xs text-slate-400">Queries live project database tables to provide accurate answers to client and management inquiries.</p>
-                  </div>
-                </div>
-              </div>
-            )}
 
-            {/* 8. REST API Reference */}
-            {activeTopic === "api-reference" && (
-              <div className="space-y-6">
-                <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
-                  <div className="p-2.5 rounded-2xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-                    <Server className="w-6 h-6" />
+                  <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 flex items-start gap-3">
+                    <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 shrink-0">
+                      <Download className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-white mb-1">High-Resolution PDF Downloads</h4>
+                      <p className="text-xs text-slate-400">Click <strong>&quot;Download PDF&quot;</strong> on invoices or daily reports to save print-ready documents for site binders and client meetings.</p>
+                    </div>
                   </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-white">REST API Reference Manual</h2>
-                    <p className="text-xs text-slate-400">Complete endpoint catalog with authentication requirements.</p>
-                  </div>
-                </div>
 
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs border border-slate-800 rounded-2xl overflow-hidden">
-                    <thead className="bg-slate-950 text-slate-400 border-b border-slate-800 font-mono">
-                      <tr>
-                        <th className="p-3">Method</th>
-                        <th className="p-3">Endpoint</th>
-                        <th className="p-3">Description</th>
-                        <th className="p-3">Role</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-800/80">
-                      <tr>
-                        <td className="p-3"><span className="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-mono font-bold">POST</span></td>
-                        <td className="p-3 font-mono text-slate-200">/api/auth/register</td>
-                        <td className="p-3 text-slate-400">Create company & admin account</td>
-                        <td className="p-3 text-slate-400">Public</td>
-                      </tr>
-                      <tr>
-                        <td className="p-3"><span className="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-mono font-bold">POST</span></td>
-                        <td className="p-3 font-mono text-slate-200">/api/auth/login</td>
-                        <td className="p-3 text-slate-400">Authenticate credentials & set cookies</td>
-                        <td className="p-3 text-slate-400">Public</td>
-                      </tr>
-                      <tr>
-                        <td className="p-3"><span className="bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded font-mono font-bold">GET</span></td>
-                        <td className="p-3 font-mono text-slate-200">/api/projects</td>
-                        <td className="p-3 text-slate-400">Fetch tenant construction projects</td>
-                        <td className="p-3 text-slate-400">All Authenticated</td>
-                      </tr>
-                      <tr>
-                        <td className="p-3"><span className="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-mono font-bold">POST</span></td>
-                        <td className="p-3 font-mono text-slate-200">/api/attendance/mark</td>
-                        <td className="p-3 text-slate-400">QR attendance with duplicate guard</td>
-                        <td className="p-3 text-slate-400">Admin, Engineer, Labour</td>
-                      </tr>
-                      <tr>
-                        <td className="p-3"><span className="bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded font-mono font-bold">GET</span></td>
-                        <td className="p-3 font-mono text-slate-200">/api/invoices</td>
-                        <td className="p-3 text-slate-400">Fetch versioned immutable invoices</td>
-                        <td className="p-3 text-slate-400">Admin, Client</td>
-                      </tr>
-                      <tr>
-                        <td className="p-3"><span className="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-mono font-bold">POST</span></td>
-                        <td className="p-3 font-mono text-slate-200">/api/expenses</td>
-                        <td className="p-3 text-slate-400">Log site expense ($10k cap for engineers)</td>
-                        <td className="p-3 text-slate-400">Admin, Engineer</td>
-                      </tr>
-                      <tr>
-                        <td className="p-3"><span className="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-mono font-bold">POST</span></td>
-                        <td className="p-3 font-mono text-slate-200">/api/ai/report</td>
-                        <td className="p-3 text-slate-400">Synthesize raw notes into daily report</td>
-                        <td className="p-3 text-slate-400">Admin, Engineer</td>
-                      </tr>
-                      <tr>
-                        <td className="p-3"><span className="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-mono font-bold">POST</span></td>
-                        <td className="p-3 font-mono text-slate-200">/api/ai/chat</td>
-                        <td className="p-3 text-slate-400">Grounded Q&A over database records</td>
-                        <td className="p-3 text-slate-400">All Authenticated</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-
-            {/* 9. Database Schema */}
-            {activeTopic === "database-schema" && (
-              <div className="space-y-6">
-                <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
-                  <div className="p-2.5 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                    <Database className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-white">Database & Prisma Schema Models</h2>
-                    <p className="text-xs text-slate-400">PostgreSQL relational models configured with Prisma ORM v5.22.</p>
-                  </div>
-                </div>
-
-                <div className="space-y-3 text-xs text-slate-300">
-                  <p>Key models defined in <code>prisma/schema.prisma</code>:</p>
-                  <ul className="list-disc pl-5 space-y-1 text-slate-400">
-                    <li><strong className="text-white">Company:</strong> Root tenant organization entity.</li>
-                    <li><strong className="text-white">User:</strong> Scoped users with roles (<code>SUPER_ADMIN</code>, <code>ADMIN</code>, <code>ENGINEER</code>, <code>LABOUR</code>, <code>CLIENT</code>).</li>
-                    <li><strong className="text-white">Project:</strong> Projects with budget, priority, and progress percentage.</li>
-                    <li><strong className="text-white">Invoice & Payment:</strong> Versioned immutable documents with transaction ledgers.</li>
-                    <li><strong className="text-white">Material & Supplier:</strong> Inventory tracking and verified supplier directories.</li>
-                    <li><strong className="text-white">SiteIncident:</strong> OSHA & site safety compliance records.</li>
-                  </ul>
-                </div>
-              </div>
-            )}
-
-            {/* 10. Security & RBAC */}
-            {activeTopic === "security-rbac" && (
-              <div className="space-y-6">
-                <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
-                  <div className="p-2.5 rounded-2xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    <Lock className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-white">Security & 5-Tier RBAC Matrix</h2>
-                    <p className="text-xs text-slate-400">Strict multi-tenant cryptographic query isolation.</p>
-                  </div>
-                </div>
-
-                <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-2 text-xs text-slate-300">
-                  <h4 className="font-bold text-white flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-emerald-400" /> Multi-Tenant Isolation Guarantee
-                  </h4>
-                  <p className="text-slate-400 leading-relaxed">
-                    All API routes extract authenticated session context using <code>getAuthContext(req)</code>. Database operations are strictly constrained to <code>{`{ where: { companyId } }`}</code>, preventing cross-tenant leakage.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* 11. FAQ & Troubleshooting */}
-            {activeTopic === "faq" && (
-              <div className="space-y-6">
-                <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
-                  <div className="p-2.5 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                    <HelpCircle className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-white">Frequently Asked Questions</h2>
-                    <p className="text-xs text-slate-400">Common questions regarding system features and usage.</p>
-                  </div>
-                </div>
-
-                <div className="space-y-3 text-xs text-slate-300">
-                  <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
-                    <p className="font-bold text-white">How do I switch between different company accounts?</p>
-                    <p className="text-slate-400">Click your profile badge in the top header, select &quot;Sign Out / Switch Account&quot;, and log in with your other company credentials.</p>
-                  </div>
-                  <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
-                    <p className="font-bold text-white">Can an engineer log an expense higher than $10,000?</p>
-                    <p className="text-slate-400">No. The system enforces an engineer expense cap of $10,000. Expenses exceeding $10,000 require Company Admin approval.</p>
+                  <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 flex items-start gap-3">
+                    <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 shrink-0">
+                      <Sun className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-white mb-1">Dark / Light Mode Toggle</h4>
+                      <p className="text-xs text-slate-400">Click the Sun/Moon icon in the top header to switch between Dark Mode (ideal for night shifts) and Light Mode (ideal for bright outdoor sunlight on site).</p>
+                    </div>
                   </div>
                 </div>
               </div>
