@@ -9,8 +9,11 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen.svg?style=flat-square)](https://github.com/SidraRaza/ai-construction-erp/pulls)
 
 > **Created & Built by:** **Sidra Raza** (Platform Founder & Lead Architect)  
-> **Official Repository:** [https://github.com/SidraRaza/ai-construction-erp.git](https://github.com/SidraRaza/ai-construction-erp.git)  
-> **Complete User & Website Guide:** [📖 Read DOCUMENTATION.md](./DOCUMENTATION.md)
+> **🌐 Live Application:** [https://ai-construction-erp-eight.vercel.app](https://ai-construction-erp-eight.vercel.app)  
+> **📖 Interactive User Manual:** [https://ai-construction-erp-eight.vercel.app/docs](https://ai-construction-erp-eight.vercel.app/docs)  
+> **📁 Official Repository:** [https://github.com/SidraRaza/ai-construction-erp.git](https://github.com/SidraRaza/ai-construction-erp.git)  
+> **📄 Local Docs:** [📖 Read DOCUMENTATION.md](./DOCUMENTATION.md)
+
 
 
 AI Construction ERP is a full-stack, enterprise-grade Construction Resource Planning (ERP) platform designed, conceptualized, and built by **Sidra Raza**. Powered by Next.js, Prisma, and Artificial Intelligence, it serves construction firms, civil engineers, contractors, real estate developers, skilled workers, and project investors across the globe, providing complete end-to-end management of construction sites, workforce attendance, material inventory, financial billing, multi-channel payment processing, and AI-driven site intelligence.
