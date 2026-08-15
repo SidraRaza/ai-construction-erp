@@ -153,6 +153,7 @@ async function runVerificationSuite() {
     assert(bulkRecords.length === 1, "Admin bulk-marked labour attendance");
 
     // Test Duplicate Rejection
+    let duplicateRejected = false;
     try {
       await AttendanceService.markAttendance(companyId, engineerUser.id, "ENGINEER", {
         userId: engineerUser.id,
@@ -161,10 +162,11 @@ async function runVerificationSuite() {
         status: "PRESENT",
         method: "QR",
       });
-      assert(false, "Duplicate attendance on same day should be rejected");
     } catch {
-      assert(true, "Duplicate attendance attempt rejected as expected");
+      duplicateRejected = true;
     }
+    assert(duplicateRejected, "Duplicate attendance attempt rejected as expected");
+
 
     // ---------------------------------------------------------
     // TEST SUITE 4: MATERIAL INVENTORY & REORDER ALERTS

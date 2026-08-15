@@ -28,12 +28,16 @@ export class AttendanceService {
     });
 
     if (existing) {
+      if (markedById === data.userId) {
+        throw new Error("Attendance already recorded for today");
+      }
       const updated = await db.attendance.update({
         where: { id: existing.id },
         data: { status: data.status },
       });
       return updated;
     }
+
 
     const record = await db.attendance.create({
       data: {

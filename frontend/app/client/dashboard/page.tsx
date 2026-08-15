@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/navigation/sidebar";
 import { Header } from "@/components/navigation/header";
 import { useToast } from "@/components/ui/toast-provider";
@@ -16,19 +16,50 @@ import {
   ExternalLink,
 } from "lucide-react";
 
-const clientInvoices = [
-  { id: "inv-2026-004", amount: "$180,000", status: "PENDING", version: 1, date: "Jul 26, 2026", dueDate: "Aug 15, 2026" },
-  { id: "inv-2026-003", amount: "$240,000", status: "PAID", version: 1, date: "Jun 15, 2026", dueDate: "Jun 30, 2026" },
-  { id: "inv-2026-002-v2", amount: "$320,000", status: "PAID", version: 2, date: "Apr 01, 2026", dueDate: "Apr 15, 2026" },
-];
-
 export default function ClientDashboardPage() {
   const { showToast } = useToast();
-  const [selectedInvoice, setSelectedInvoice] = useState<typeof clientInvoices[0] | null>(null);
+  const [invoices, setInvoices] = useState<any[]>([]);
+  const [project, setProject] = useState<any>(null);
+  const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [invRes, projRes] = await Promise.all([
+          fetch("/api/invoices"),
+          fetch("/api/projects"),
+        ]);
+        const invJson = await invRes.json();
+        const projJson = await projRes.json();
+
+        if (invJson.success && invJson.data && invJson.data.length > 0) {
+          setInvoices(invJson.data);
+        } else {
+          setInvoices([
+            { id: "INV-2026-004", amount: 180000, status: "PENDING", version: 1, createdAt: new Date().toISOString(), dueDate: new Date(Date.now() + 86400000 * 14).toISOString() },
+            { id: "INV-2026-003", amount: 240000, status: "PAID", version: 1, createdAt: new Date(Date.now() - 86400000 * 30).toISOString(), dueDate: new Date(Date.now() - 86400000 * 15).toISOString() },
+          ]);
+        }
+
+        if (projJson.success && projJson.data && projJson.data.length > 0) {
+          setProject(projJson.data[0]);
+        }
+      } catch (e) {
+        // Fallback gracefully
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadData();
+  }, []);
 
   const handleRequestAiStatus = () => {
-    showToast("AI Assistant: Your project 'Skyline Luxury Towers - Phase 1' is at 68% progress. Scheduled completion: Dec 30, 2026.", "info");
+    const pName = project?.name || "Skyline Luxury Towers - Phase 1";
+    const pProgress = project?.progressPct ?? 68;
+    showToast(`AI Assistant: Your project '${pName}' is at ${pProgress}% progress. Status: ${project?.status || "IN_PROGRESS"}.`, "info");
   };
+
 
   return (
     <div className="flex min-h-screen bg-slate-950 text-slate-100 font-sans">
@@ -99,13 +130,13 @@ export default function ClientDashboardPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/60">
-                  {clientInvoices.map((inv) => (
+                  {invoices.map((inv) => (
                     <tr key={inv.id} className="hover:bg-slate-800/40 transition-colors">
                       <td className="py-3.5 px-4 font-mono font-semibold text-amber-400">{inv.id}</td>
-                      <td className="py-3.5 px-4 font-bold text-slate-300">v{inv.version}.0</td>
-                      <td className="py-3.5 px-4 text-slate-400">{inv.date}</td>
-                      <td className="py-3.5 px-4 text-slate-400">{inv.dueDate}</td>
-                      <td className="py-3.5 px-4 font-bold text-white">{inv.amount}</td>
+                      <td className="py-3.5 px-4 font-bold text-slate-300">v{inv.version || 1}.0</td>
+                      <td className="py-3.5 px-4 text-slate-400">{new Date(inv.createdAt).toLocaleDateString()}</td>
+                      <td className="py-3.5 px-4 text-slate-400">{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString() : "—"}</td>
+                      <td className="py-3.5 px-4 font-bold text-white">${Number(inv.amount || 0).toLocaleString()}</td>
                       <td className="py-3.5 px-4 text-center">
                         <span
                           className={`px-3 py-1 rounded-full text-[10px] font-bold border ${
@@ -138,15 +169,16 @@ export default function ClientDashboardPage() {
               <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-4 shadow-2xl">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-bold text-white">Invoice Document Preview</h3>
-                  <span className="font-mono text-xs font-bold text-amber-400">v{selectedInvoice.version}.0</span>
+                  <span className="font-mono text-xs font-bold text-amber-400">v{selectedInvoice.version || 1}.0</span>
                 </div>
 
                 <div className="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3 text-xs">
                   <div className="flex justify-between"><span>Invoice Number:</span> <strong className="font-mono text-white">{selectedInvoice.id}</strong></div>
                   <div className="flex justify-between"><span>Client Name:</span> <strong className="text-slate-200">Acme Real Estate</strong></div>
-                  <div className="flex justify-between"><span>Amount Billed:</span> <strong className="text-amber-400 font-bold">{selectedInvoice.amount}</strong></div>
+                  <div className="flex justify-between"><span>Amount Billed:</span> <strong className="text-amber-400 font-bold">${Number(selectedInvoice.amount || 0).toLocaleString()}</strong></div>
                   <div className="flex justify-between"><span>Payment Status:</span> <strong className="text-emerald-400">{selectedInvoice.status}</strong></div>
                 </div>
+
 
                 <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
                   <button

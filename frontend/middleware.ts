@@ -46,15 +46,21 @@ export function middleware(req: NextRequest) {
   }
 
   // 5. Role-Based Access Control (RBAC) Route Guard
-  if (pathname.startsWith("/admin") && roleCookie && roleCookie === "CLIENT") {
-    const clientUrl = new URL("/client/dashboard", req.url);
-    return NextResponse.redirect(clientUrl);
+  if (pathname.startsWith("/admin") && roleCookie && roleCookie !== "ADMIN" && roleCookie !== "SUPER_ADMIN") {
+    if (roleCookie === "ENGINEER") {
+      return NextResponse.redirect(new URL("/engineer/dashboard", req.url));
+    }
+    if (roleCookie === "CLIENT") {
+      return NextResponse.redirect(new URL("/client/dashboard", req.url));
+    }
   }
 
-  if (pathname.startsWith("/engineer") && roleCookie && roleCookie === "CLIENT") {
-    const clientUrl = new URL("/client/dashboard", req.url);
-    return NextResponse.redirect(clientUrl);
+  if (pathname.startsWith("/engineer") && roleCookie && roleCookie !== "ENGINEER" && roleCookie !== "ADMIN" && roleCookie !== "SUPER_ADMIN") {
+    if (roleCookie === "CLIENT") {
+      return NextResponse.redirect(new URL("/client/dashboard", req.url));
+    }
   }
+
 
   return NextResponse.next();
 }
