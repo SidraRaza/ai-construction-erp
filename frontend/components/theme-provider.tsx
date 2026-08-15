@@ -15,13 +15,8 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("dark");
 
-  useEffect(() => {
-    const savedTheme = (localStorage.getItem("theme") as Theme) || "dark";
-    setThemeState(savedTheme);
-    applyTheme(savedTheme);
-  }, []);
-
   const applyTheme = (t: Theme) => {
+    if (typeof document === "undefined") return;
     const root = document.documentElement;
     if (t === "dark") {
       root.classList.add("dark");
@@ -31,6 +26,13 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       root.classList.remove("dark");
     }
   };
+
+  useEffect(() => {
+    const savedTheme = (localStorage.getItem("theme") as Theme) || "dark";
+    setThemeState(savedTheme);
+    applyTheme(savedTheme);
+  }, []);
+
 
   const setTheme = (t: Theme) => {
     setThemeState(t);

@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Download, Share2, MessageCircle, FileText, Check, Loader2 } from "lucide-react";
+import { Download, Share2, MessageCircle, Check, Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/toast-provider";
+
 
 interface PdfWhatsappShareProps {
   elementId: string;
