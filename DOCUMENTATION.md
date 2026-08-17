@@ -243,3 +243,6 @@ The Owner Portal (`/admin/super-admin`) is exclusively for platform founder **Si
 
 <!-- attendance: offline QR code validation cache strategy with anti-spoofing -->
 
+
+<!-- api-errors: standard RFC 7807 compliant error payload structures -->
+
