@@ -85,3 +85,6 @@ Built on a **Multi-Tenant SaaS Architecture**, independent businesses and users 
 
 <!-- db-config: Neon connection pooling and direct connection guidelines -->
 
+
+<!-- layout: responsive grid breakpoints tested for 320px to 4K displays -->
+
