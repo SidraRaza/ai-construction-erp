@@ -88,3 +88,6 @@ Built on a **Multi-Tenant SaaS Architecture**, independent businesses and users 
 
 <!-- layout: responsive grid breakpoints tested for 320px to 4K displays -->
 
+
+<!-- keywords: civil-engineering, construction-erp, inventory-tracking, nextjs16 -->
+
