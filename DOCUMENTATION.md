@@ -240,3 +240,6 @@ The Owner Portal (`/admin/super-admin`) is exclusively for platform founder **Si
 
 <!-- sharing: automated WhatsApp PDF invoice share format with web preview -->
 
+
+<!-- attendance: offline QR code validation cache strategy with anti-spoofing -->
+
