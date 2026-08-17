@@ -249,3 +249,5 @@ The Owner Portal (`/admin/super-admin`) is exclusively for platform founder **Si
 
 <!-- analytics: real-time aggregate KPI metrics across multi-tenant database -->
 
+
+<!-- sync-index: repository tree and commit metadata verified -->
