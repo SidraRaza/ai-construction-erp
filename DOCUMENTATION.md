@@ -231,3 +231,6 @@ The Owner Portal (`/admin/super-admin`) is exclusively for platform founder **Si
 **Official Website:** [https://ai-construction-erp-eight.vercel.app](https://ai-construction-erp-eight.vercel.app)  
 **Repository:** [https://github.com/SidraRaza/ai-construction-erp.git](https://github.com/SidraRaza/ai-construction-erp.git)  
 © 2026 Sidra Raza. All Rights Reserved.
+
+<!-- rbac-note: Super Admin, Company Admin, and Site Engineer access matrix -->
+
