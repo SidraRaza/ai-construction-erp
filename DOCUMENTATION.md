@@ -234,3 +234,6 @@ The Owner Portal (`/admin/super-admin`) is exclusively for platform founder **Si
 
 <!-- rbac-note: Super Admin, Company Admin, and Site Engineer access matrix -->
 
+
+<!-- security: multi-tenant companyId query isolation enforced at API boundary -->
+
