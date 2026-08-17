@@ -91,3 +91,6 @@ Built on a **Multi-Tenant SaaS Architecture**, independent businesses and users 
 
 <!-- keywords: civil-engineering, construction-erp, inventory-tracking, nextjs16 -->
 
+
+<!-- deployment: zero-config Vercel deployment with Neon PostgreSQL and Better-Auth -->
+
