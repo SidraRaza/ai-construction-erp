@@ -76,3 +76,6 @@ Built on a **Multi-Tenant SaaS Architecture**, independent businesses and users 
 **Created & Authored by:** **Sidra Raza**  
 **Repository:** [https://github.com/SidraRaza/ai-construction-erp.git](https://github.com/SidraRaza/ai-construction-erp.git)  
 © 2026 Sidra Raza. All Rights Reserved.
+
+<!-- doc-note: Node.js 18+ and PostgreSQL/Neon DB required for local environment -->
+
