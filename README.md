@@ -79,3 +79,6 @@ Built on a **Multi-Tenant SaaS Architecture**, independent businesses and users 
 
 <!-- doc-note: Node.js 18+ and PostgreSQL/Neon DB required for local environment -->
 
+
+<!-- theme-spec: slate-zinc enterprise neutral palette with emerald accents -->
+
