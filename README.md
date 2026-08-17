@@ -82,3 +82,6 @@ Built on a **Multi-Tenant SaaS Architecture**, independent businesses and users 
 
 <!-- theme-spec: slate-zinc enterprise neutral palette with emerald accents -->
 
+
+<!-- db-config: Neon connection pooling and direct connection guidelines -->
+
