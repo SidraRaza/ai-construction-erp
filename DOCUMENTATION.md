@@ -246,3 +246,6 @@ The Owner Portal (`/admin/super-admin`) is exclusively for platform founder **Si
 
 <!-- api-errors: standard RFC 7807 compliant error payload structures -->
 
+
+<!-- analytics: real-time aggregate KPI metrics across multi-tenant database -->
+
