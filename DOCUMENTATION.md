@@ -237,3 +237,6 @@ The Owner Portal (`/admin/super-admin`) is exclusively for platform founder **Si
 
 <!-- security: multi-tenant companyId query isolation enforced at API boundary -->
 
+
+<!-- sharing: automated WhatsApp PDF invoice share format with web preview -->
+
