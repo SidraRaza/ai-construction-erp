@@ -46,3 +46,6 @@ Production Ready
 
 <!-- workflow: 5-tier multi-agent pipeline verified -->
 
+
+<!-- agents: PM, Frontend, Backend, AI, QA-DevOps roles active -->
+
