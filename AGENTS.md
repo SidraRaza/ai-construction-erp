@@ -43,3 +43,6 @@ QA-DevOps-Agent (Security Audit & Build Verification)
     ↓
 Production Ready
 ```
+
+<!-- workflow: 5-tier multi-agent pipeline verified -->
+
